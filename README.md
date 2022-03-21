@@ -7,7 +7,7 @@
 **线程**
 
 - [多线程并发](./docs/thread/多线程并发.md)
-- [Java的18把锁](./docs/thread/图解Java中那18 把锁.md)
+- [Java的18把锁](./docs/thread/图解Java中那18把锁.md)
 
 **else**
 
