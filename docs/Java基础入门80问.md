@@ -1,4 +1,3 @@
-> 本文首发我的微信公众号『[爱笑的架构师](#公众号)』，欢迎大家关注。
 
 <!-- TOC -->
 
@@ -1911,4 +1910,3 @@ class Ball implements Rollable {
 <div align="center">
     <img src="https://cdn.jsdelivr.net/gh/smileArchitect/assets@main/202012/20201205221844.png"></img>
 </div>
-
