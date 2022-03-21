@@ -1,3 +1,31 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [第一章：整数](#%E7%AC%AC%E4%B8%80%E7%AB%A0%E6%95%B4%E6%95%B0)
+  - [面试题1：整数除法](#%E9%9D%A2%E8%AF%95%E9%A2%981%E6%95%B4%E6%95%B0%E9%99%A4%E6%B3%95)
+    - [题目](#%E9%A2%98%E7%9B%AE)
+    - [参考代码](#%E5%8F%82%E8%80%83%E4%BB%A3%E7%A0%81)
+  - [面试题2：二进制加法](#%E9%9D%A2%E8%AF%95%E9%A2%982%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8A%A0%E6%B3%95)
+    - [题目](#%E9%A2%98%E7%9B%AE-1)
+    - [参考代码](#%E5%8F%82%E8%80%83%E4%BB%A3%E7%A0%81-1)
+  - [面试题3：前n个数字二进制中1的个数](#%E9%9D%A2%E8%AF%95%E9%A2%983%E5%89%8Dn%E4%B8%AA%E6%95%B0%E5%AD%97%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%AD1%E7%9A%84%E4%B8%AA%E6%95%B0)
+    - [题目](#%E9%A2%98%E7%9B%AE-2)
+    - [参考代码](#%E5%8F%82%E8%80%83%E4%BB%A3%E7%A0%81-2)
+      - [解法一](#%E8%A7%A3%E6%B3%95%E4%B8%80)
+      - [解法二](#%E8%A7%A3%E6%B3%95%E4%BA%8C)
+      - [解法三](#%E8%A7%A3%E6%B3%95%E4%B8%89)
+  - [面试题4：只出现一次的数字](#%E9%9D%A2%E8%AF%95%E9%A2%984%E5%8F%AA%E5%87%BA%E7%8E%B0%E4%B8%80%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97)
+    - [题目](#%E9%A2%98%E7%9B%AE-3)
+    - [参考代码](#%E5%8F%82%E8%80%83%E4%BB%A3%E7%A0%81-3)
+  - [面试题5：单词长度的最大乘积](#%E9%9D%A2%E8%AF%95%E9%A2%985%E5%8D%95%E8%AF%8D%E9%95%BF%E5%BA%A6%E7%9A%84%E6%9C%80%E5%A4%A7%E4%B9%98%E7%A7%AF)
+    - [题目](#%E9%A2%98%E7%9B%AE-4)
+    - [参考代码](#%E5%8F%82%E8%80%83%E4%BB%A3%E7%A0%81-4)
+      - [解法一：哈希表记录字符串中出现的字符](#%E8%A7%A3%E6%B3%95%E4%B8%80%E5%93%88%E5%B8%8C%E8%A1%A8%E8%AE%B0%E5%BD%95%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E5%87%BA%E7%8E%B0%E7%9A%84%E5%AD%97%E7%AC%A6)
+      - [解法二：用整数的二进制位数记录字符串中出现的字符](#%E8%A7%A3%E6%B3%95%E4%BA%8C%E7%94%A8%E6%95%B4%E6%95%B0%E7%9A%84%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BD%8D%E6%95%B0%E8%AE%B0%E5%BD%95%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E5%87%BA%E7%8E%B0%E7%9A%84%E5%AD%97%E7%AC%A6)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 第一章：整数
 
 ## 面试题1：整数除法

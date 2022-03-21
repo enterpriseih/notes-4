@@ -1,4 +1,6 @@
+# 全局生成目录
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/toc_npm.png" width=650px>
 
 ## 一、标题
 
