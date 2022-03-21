@@ -1,5 +1,10 @@
-# yienx-notes
+# notes
 
 好好学习，天天向上！！！
 
-<img src="https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/Java-eight-part-logo-2021-04-28-23-07-56.png" alt="Java八股文">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/eight-legged_essay.png" alt="Java八股文" width=300px>
+
+
+
+- [多线程并发](./docs/多线程并发.md)
+- [计算机网络](./docs/计算机网络.md)
