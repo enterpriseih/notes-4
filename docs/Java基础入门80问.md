@@ -81,7 +81,6 @@
 - [78.能不能自己写个类，也叫java.lang.String？](#78能不能自己写个类也叫javalangstring)
 - [79.获得一个类的类对象有哪些方式？](#79获得一个类的类对象有哪些方式)
 - [80.Java代码查错](#80java代码查错)
-- [公众号](#公众号)
 
 <!-- /TOC -->
 
@@ -1904,9 +1903,3 @@ class Ball implements Rollable {
 
 因此编译器将在"ball = new Ball("Football");"这里显示有错。
 
-# 公众号
-**`Github` 上所有的文章我都会首发在微信公众号『爱笑的架构师』，大家可以关注一下，定时推送技术干货~**
-
-<div align="center">
-    <img src="https://cdn.jsdelivr.net/gh/smileArchitect/assets@main/202012/20201205221844.png"></img>
-</div>
