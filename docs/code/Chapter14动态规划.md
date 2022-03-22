@@ -774,52 +774,147 @@ public int minimumTotal(List<List<Integer>> triangle) {
 
 ## 14.4 背包问题
 
+## 14.4.1 01背包
+
+有n件物品和一个最多能背重量为w 的背包。第i件物品的重量是weight[i]，得到的价值是value[i] 。**每件物品只能用一次**，求解将哪些物品装入背包里物品价值总和最大。
+
+### 例子
+
+背包最大重量为4，物品为：
+
+|       | 重量 | 价值 |
+| :---- | ---- | :--- |
+| 物品1 | 1    | 15   |
+| 物品2 | 3    | 20   |
+| 物品3 | 4    | 30   |
+
+问背包能背的物品都最大价值是多少？
+
+### 解法
+
+```
+dp[i][j] 表示从下标为[0-i]的物品里任意取，放进容量为j的背包，价值总和最大是多少。
+```
+
+| 背包重量-> | 0    | 1    | 2    | 3    | 4    |
+| ------- | ---- | ---- | ---- | ---- | ---- |
+| 物品0（不放） |      |      |      |      |      |
+| 物品1         |      |      |      |      |      |
+| 物品2         |      |      |      |      |      |
+| 物品3         |      |      |      |      |      |
+
+
+
+
+- **不放物品i**
+
+```
+由dp[i - 1][j]推出，即背包容量为j，里面不放物品i的最大价值，此时dp[i][j]就是dp[i - 1][j]。(其实就是当物品i的重量大于背包j的重量时，物品i无法放进背包中，所以被背包内的价值依然和前面相同。)
+```
+
+- **放物品i**
+
+```
+由dp[i - 1][j - weight[i]]推出，dp[i - 1][j - weight[i]] 为背包容量为j - weight[i]的时候不放物品i的最大价值，那么dp[i - 1][j - weight[i]] + value[i] （物品i的价值），就是背包放物品i得到的最大价值
+```
+
+- `dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i])`
+
+```java
+//遍历顺序：先遍历物品，再遍历背包容量
+for (int i = 1; i <= wlen; i++){
+    for (int j = 1; j <= bagsize; j++){
+        if (j < weight[i - 1]){
+            dp[i][j] = dp[i - 1][j];
+        }else{
+            dp[i][j] = Math.max(dp[i - 1][j], 
+                   dp[i - 1][j - weight[i - 1]] + value[i - 1]);
+        }
+    }
+}
+```
+
+
+
+
+
 ## 面试题101：分割等和子集
 
 ### 题目
 
 给你一个非空的正整数数组，请判断能否将这些数字分成和相等的两部分。例如，如果输入数组为[3, 4, 1]，这些数字分成[3, 1]和[4]两部分，因此输出true；如果输入数组为[1, 2, 3, 5]，则不能将这些数字分成和相等的两部分，因此输出false。
 
+> - 背包体积：sum / 2
+> - 背包要放入的商品（集合里的元素）重量为**元素的数值**，价值也是
+> - 正好装满，则找到了sum / 2 的子集
+> - 每一个元素都不可重复放入
+
 ### 参考代码
 
-#### 解法一
+#### 传统01背包解法
 
-``` java
-public boolean canPartition(int[] nums) {
-    int sum = 0;
-    for (int num : nums) {
-        sum += num;
-    }
-
-    if (sum % 2 == 1) {
-        return false;
-    }
-
-    return subsetSum(nums, sum / 2);
-}
-
-private boolean subsetSum(int[] nums, int target) {
-    Boolean[][] dp = new Boolean[nums.length + 1][target + 1];
-    return helper(nums, dp, nums.length, target);
-}
-
-private boolean helper(int[] nums, Boolean[][] dp, int i, int j) {
-    if (dp[i][j] == null) {
-        if (j == 0) {
-            dp[i][j] = true;
-        } else if (i == 0) {
-            dp[i][j] = false;
-        } else {
-            dp[i][j] = helper(nums, dp, i - 1, j);
-            if (!dp[i][j] && j >= nums[i - 1]) {
-                dp[i][j] = helper(nums, dp, i - 1, j - nums[i - 1]);
+```java
+// 二维数组
+class Solution {
+    public boolean canPartition(int[] nums) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        if (sum % 2 == 1) return false;
+        int target = sum / 2;
+        int len = nums.length;
+        int[][] dp = new int[len + 1][target + 1];
+        // nums[i - 1]就是第i个
+        for (int i = 1; i <= len; i++) {
+            for (int j = 1; j <= target; j++) {
+                // 不放（放不下）
+                dp[i][j] = dp[i - 1][j];
+                // 可以放（再考虑放还是不放）
+                if (j >= nums[i - 1]) {
+                    dp[i][j] = Math.max(dp[i][j], 
+                            dp[i - 1][j - nums[i - 1]] + nums[i - 1]);
+                } 
             }
         }
+        return dp[len][target] == target;
     }
+}
 
-    return dp[i][j];
+// 一位数组
+class Solution {
+    public boolean canPartition(int[] nums) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        if (sum % 2 == 1) return false;
+        int target = sum / 2;
+        int len = nums.length;
+        int[] dp = new int[target + 1];
+
+        for (int num : nums) {
+            for (int j = target; j >= 1; j--) {
+                // dp[i][j] = dp[i - 1][j] -> dp[j] = dp[j];
+                if (j >= num) {
+                    dp[j] = Math.max(dp[j], dp[j - num] + num);
+                }
+            }
+        }
+        /*
+        // 这样也是对的，
+        for (int num : nums) {
+            for (int j = target; j >= num; j--) {
+            	dp[j] = Math.max(dp[j], dp[j - num] + num);
+            }
+        }
+        */
+        
+        return dp[target] == target;
+    }
 }
 ```
+
 
 #### 解法二
 
