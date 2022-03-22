@@ -6,7 +6,7 @@
 
 海洋岛屿地图可以用由0、1组成的二维数组表示，水平或者竖直方向相连的一组1表示一个岛屿。请计算最大的岛屿的面积（即岛屿中1的数目）。例如，在图15.5中有4个岛屿，其中最大的岛屿的面积为5。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1505.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1505.png" alt="图2.1">
 
 图15.5：用0、1矩阵表示的海洋岛屿地图。地图中有4个岛屿，最大的岛屿的面积为5。
 
@@ -154,7 +154,7 @@ public int maxAreaOfIsland(int[][] grid) {
 
 如果能将一个图的结点分成A、B两部分，使得任意一条边的一个结点属于A另一个结点属于B，那么该图就是一个二分图。输入一个由数组graph表示的图，graph[i]里包含所有和结点i相邻的结点，请判断该图是否为二分图。例如，如果输入graph为[[1, 3], [0, 2], [1, 3], [0, 2]]，那么我们可以将结点分为{0, 2}、{1, 3}两部分，因此该图是一个二分图，如图15.7（a）所示。如果输入graph为[[1,2,3],[0,2],[0,1,3],[0,2]]，则不是一个二分图，如图15.7（b）所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1507.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1507.png" alt="图2.1">
 
 图15.7：二分图与非二分图。（a）二分图。（b）不是二分图。
 
@@ -240,7 +240,7 @@ private boolean setColor(int[][] graph, int[] colors, int i, int color) {
 
 输入一个有0、1组成的矩阵M，请输出一个大小相同的矩阵D，矩阵D中的每个格子是M中对应格子离最近的0的距离。水平或者竖直方向相邻两个格子的距离为1。假设矩阵M中至少要有一个0。例如，图15.8（a）是一个只包含0、1的矩阵M，它每个格子离最近的0的距离如15.8（b）的矩阵D所示。矩阵M[0][0]等于0，因此它离最近的0的距离是0，所以D[0][0]等于0。M[2][1]等于1，离它最近的0的坐标是(0, 1)、(1, 0)、(1, 2)，它们离坐标(2, 1)的距离都是2，所以D[2][1]等于2。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1508.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1508.png" alt="图2.1">
 
 图15.8：矩阵中离0最近的距离。（a）一个只包含0、1的矩阵。（b）每个格子为（a）中矩阵相应位置离最近的0的距离。
 
@@ -465,7 +465,7 @@ public int openLock(String[] deadends, String target) {
 
 一个有向无环图由n个结点（标号从0到n-1，n≥2）组成，请找出所有从结点0到结点n-1的所有路径。图用一个数组graph表示，数组的graph[i]包含所有从结点i能直接到达的结点。例如，输入数组graph为[[1,2], [3], [3], []]，则输出两条从结点0到结点3的路径，分别为0→1→3和0→2→3，如图15.12所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1512.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1512.png" alt="图2.1">
 
 图15.12：一个有4个结点的有向无环图。从结点0到结点3有两条不同的路径，分别为0→1→3和0→2→3。
 
@@ -565,7 +565,7 @@ private double dfs(Map<String, Map<String, Double>> graph, String from, String t
 
 输入一个有整数组成的矩阵，请找出最长递增路径的长度。矩阵中的路径可以沿着上、下、左、右四个方向前行。例如，图15.10中矩阵的最长递增路径的长度为4，其中一条最长的递增路径为3→4→5→8，如阴影部分所示。 
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1515.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1515.png" alt="图2.1">
 
 图15.15：矩阵中的路径可以沿着上、下、左、右四个方向前行，其中一条最长的递增路径为3→4→5→8（阴影部分），它的长度为4。
 
@@ -928,7 +928,7 @@ private boolean union(int[] fathers, int i, int j) {
 
 例如，如果输入edges为[[1, 2], [1, 3], [2, 4], [3, 4], [2, 5]]，则它对应的无向图如图15.22所示。输出为边[3, 4]。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1522.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1522.png" alt="图2.1">
 
 图15.22：由边列表[[1, 2], [1, 3], [2, 4], [3, 4], [2, 5]]构成的图。
 

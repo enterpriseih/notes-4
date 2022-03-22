@@ -6,7 +6,7 @@
 
 一个数组cost的所有数字都是正数，它的第i个数字表示在一个楼梯的第i级台阶往上爬的成本，在支付了成本cost[i]之后我们可以从第i级台阶往上爬1级或者2级。假设台阶至少有两级，我们可以从第0级台阶出发，也可以从第1级台阶出发，请计算爬上该楼梯的最少成本。例如输入数组[1, 100, 1, 1, 100, 1]，则爬上该楼梯的最少成本是4，分别经过下标为0、2、3、5这四级台阶，如图14.1所示。 
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1401.png" alt="图14.1" width=300px>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1401.png" alt="图14.1" width=300px>
 
 图14.1： 一个楼梯爬上每级台阶的成本用数组[1, 100, 1, 1, 100, 1]表示，爬上该台阶的最少成本为4，分别经过下标为0、2、3、5四级台阶。
 
@@ -71,7 +71,7 @@ public int minCostClimbingStairs(int[] cost) {
 
 输入一个数组表示某条街上的一排房屋内财产的数量。如果这条街道上相邻的两家被盗就会自动触发报警系统。一个小偷打算到给街去偷窃，请计算该小偷最多能偷到多少财产。例如，街道上五家的财产用数组[2, 3, 4, 5, 3]表示，如果小偷到下标为1、2和4的房屋内偷窃，那么他能偷取到价值9的财物，这是他在不触发报警系统情况下能偷取到的最多的财物，如图14.3所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1403.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1403.png" alt="图2.1">
 
 图14.3： 一条街道上有5个财产数量分别为2、3、4、5、3的家庭。一个小偷到这条街道上偷东西，如果他不能到相邻的两家盗窃，那么他最多只能偷到价值为9的财物。被盗的房屋上方用特殊符号标出。
 
@@ -179,7 +179,7 @@ public int rob(int[] nums) {
 
 一个环形街道上有若干房屋。输入一个数组表示该街上的房屋内财产的数量。如果这条街道上相邻的两家被盗就会自动触发报警系统。一个小偷打算到给街去偷窃，请计算该小偷最多能偷到多少财产。例如，街道上五家的财产用数组[2, 3, 4, 5, 3]表示，如果小偷到下标为1和3的房屋内偷窃，那么他能偷取到价值8的财物，这是他在不触发报警系统情况下能偷取到的最多的财物，如图14.4所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1404.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1404.png" alt="图2.1">
 
 图14.4： 一条环形街道上有5个财产数量分别为2、3、4、5、3的家庭。一个小偷到这条街道上偷东西，如果他不能到相邻的两家盗窃，那么他最多只能偷到价值为8的财物。被盗的房屋上方用特殊符号标出。
 
@@ -444,7 +444,7 @@ public int longestCommonSubsequence(String text1, String text2) {
 
 输入三个字符串s1、s2、s3，请判断s3能不能由s1和s2交织而成，即s3的所有字符都是s1或s2的字符，s1和s2的字符都出现在s3中且相对位置不变。例如"aadbbcbcac"可以由"aabcc"和"dbbca"交织而成，如图14.5所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1405.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1405.png" alt="图2.1">
 
 图14.5：一种交织"aabcc"和"dbbca"得到"aadbbcbcac"的方法。
 
@@ -524,7 +524,7 @@ public boolean isInterleave(String s1, String s2, String s3) {
 
 输入字符串S和T，请计算S有多少个子序列等于T。例如，在字符串"appplep"中，有三个子序列等于字符串"apple"，如图14.6所示。 
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1406.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1406.png" alt="图2.1">
 
 图14.6：字符串"appplep"中有三个子序列等于"apple"。
 
@@ -583,7 +583,7 @@ public int numDistinct(String s, String t) {
 
 一个机器人从m×n的格子的左上角出发，它每一步要么向下要么向右直到抵达格子的右下角。请计算机器人从左上角到达右下角的路径的数目。例如，如果格子的大小是3×3，那么机器人有6中符合条件的不同路径从左上角走到右下角，如图14.7所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1407.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1407.png" alt="图2.1">
 
 图14.7：机器人在3×3的格子每一步只能向下或者向右，它从左上角到右下角有6条不同的路径。
 
@@ -653,7 +653,7 @@ public int uniquePaths(int m, int n) {
 
 在一个m×n（m、n均大于0）的格子里每个位置都有一个数字。一个机器人每一步只能向下或者向右，请计算它从格子的左上角到右下角的路径的数字之和的最小值。例如，从图14.8中3×3的格子的左上角到右下角的路径的数字之和的最小值是8。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1408.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1408.png" alt="图2.1">
 
 图14.8：机器人在3×3的格子中每一步只能向下或者向右，它从左上角右下角的路径的数字之和为8。数字之和最小的路径用灰色背景表示。
 
@@ -708,7 +708,7 @@ public int minPathSum(int[][] grid) {
 
 在一个由数字组成的三角形中，第一行有1个数字，第二行有2个数字，以此类推第n行有n个数字。例如图14.9是一个包含4行数字的三角形。如果每一步我们只能前往下一行中相邻的数字，请计算从三角形顶部到底部的路径经过的数字之和的最小值。例如，图14.9中三角形从顶部到底部的路径数字之和的最小值为11，对应的路径经过的数字用阴影表示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1409.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1409.png" alt="图2.1">
 
 图14.9：一个包含4行数字的三角形。从三角形的顶部到底部的路径数字之和的最小值为11，对应的路径经过的数字用阴影表示。
 

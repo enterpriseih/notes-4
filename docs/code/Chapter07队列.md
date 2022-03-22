@@ -118,7 +118,7 @@ public List<Integer> bfs(TreeNode root) {
 + 函数CBTInserter.insert(int v)往完全二叉树里添加一个值为v的节点，并返回被插入节点的父节点。例如往图7.3（a）的完全二叉树里添加一个值为7的节点之后，二叉树如图7.3（b）所示，并返回节点3。往图7.3（b）的完成二叉树里添加一个值为8的节点之和，二叉树如图7.3（c）所示，并返回节点4。往7.3（c）中的完全二叉树中添加节点9得到7.3（d），并返回节点4。
 + 函数CBTInserter.get_root()返回完全二叉树的根节点。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0703.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0703.png" alt="图2.1">
 
 图7.3：四个完全二叉树。往（a）中的完全二叉树中添加节点7得到（b）；往（b）中的完全二叉树中添加节点8得到（c）；往（c）中的完全二叉树中添加节点9得到（d）。
 
@@ -170,7 +170,7 @@ class CBTInserter {
 
 输入一棵二叉树，请找出二叉树中每一层的最大值。例如输入图7.4中的二叉树，返回三层节点的最大值[3, 4, 9]。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0704.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0704.png" alt="图2.1">
 
 图7.4：一棵二叉树，第一层的最大值是3，第二层的最大值是4，第三层的最大值是9。
 
@@ -220,7 +220,7 @@ public List<Integer> largestValues(TreeNode root) {
 
 如何在一个二叉树中找出它最底层中最左边节点的值？假设二叉树中最少有一个节点。例如在图7.5中的二叉树中最底层节点中最左边一个节点的值是5。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0705.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0705.png" alt="图2.1">
 
 图7.5：一棵二叉树，最底层最左边的节点的值是5。
 
@@ -261,7 +261,7 @@ public int findBottomLeftValue(TreeNode root) {
 
 给你一个二叉树，想象你站在该二叉树的右侧，从上到下你看到的节点构成二叉树的右侧试图。例如图7.6中的二叉树的右侧视图包含8、10、7三个节点。请写一个函数返回二叉树的右侧视图节点的值。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0706.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0706.png" alt="图2.1">
 
 图7.6：一棵二叉树，它的右侧视图包含值分别为8、10、7三个节点。
 

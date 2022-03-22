@@ -12,6 +12,6 @@
 **else**
 
 - [计算机网络](./docs/计算机网络.md)
-- [数据结构与算法（剑指Offer）](./docs/dataStructuresAndAlgorithms/TOC.md)
+- [数据结构与算法（剑指Offer）](./docs/code/TOC.md)
 - [设计模式](./docs/设计模式.md)
 - [深浅拷贝](https://blog.csdn.net/riemann_/article/details/87217229)

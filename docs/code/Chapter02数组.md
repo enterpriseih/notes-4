@@ -288,7 +288,7 @@ public int pivotIndex(int[] nums) {
 
 输入一个二维矩阵，如何计算给定左上角坐标和右下角坐标的子矩阵数字之和？对同一个二维矩阵，计算子矩阵数字之和的函数可能输入不同的坐标而被反复调用多次。例如输入图2.1中的二维矩阵，以及左上角坐标为(2, 1)和右下角坐标为(4, 3)，该函数输出8。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0201.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0201.png" alt="图2.1">
 
 图2.1：在一个5×5的二维数组中左上角坐标为(2, 1)、右下角坐标为(4, 3)的子矩阵（有灰色背景部分）的和等于8。
 

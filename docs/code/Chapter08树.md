@@ -129,7 +129,7 @@ public List<Integer> inorderTraversal(TreeNode root) {
 ### 题目
 一个二叉树的所有结点的值要么是0要么是1，请剪除该二叉树中所有结点的值全都是0 的子树。例如，在剪除图8.2（a）中二叉树中所有结点值都为0的子树之后的结果如图8.2（b）所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0802.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0802.png" alt="图2.1">
 
 图8.2：剪除所有结点值都为0的子树。（a）一个结点值要么是0要么是1的二叉树。（b）剪除所有结点值都为0的子树的结果。
 
@@ -194,7 +194,7 @@ private TreeNode dfs(String[] strs, int[] i) {
 ### 题目
 在一个二叉树里所有结点都在0-9的范围之类，从根结点到叶结点的路径表示一个数字。求二叉树里所有路径表示的数字之和。例如在图8.4中的二叉树有三条从根结点到叶结点的路径，它们分别表示数字395、391和302，这三个数字之和是1088。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0804.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0804.png" alt="图2.1">
 
 图8.4：一个从根结点到叶结点的路径分别表示数字395、391和302的二叉树。
 
@@ -249,7 +249,7 @@ void dfs(TreeNode node, int val){
 ### 题目
 给定一个二叉树和一个值sum，求二叉树里结点值之和等于sum的路径的数目。路径的定义为二叉树中沿着指向子结点的指针向下移动所经过的结点，但不一定从根结点开始，也不一定到叶结点结束。例如在图8.5中的二叉树里，有两个路径的结点值之和等于8，其中第一条路径从结点5开始经过结点2到达结点1，第二条路径从结点2开始到结点6。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0805.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0805.png" alt="图2.1">
 
 图8.5：二叉树中有两条路径上的结点值之和等于8，第一条路径从结点5开始经过结点2到达结点1，第二条路径从结点2开始到结点6。
 
@@ -285,7 +285,7 @@ private int dfs(TreeNode root, int sum,
 ### 题目
 在二叉树中定义路径为从沿着结点间的连接从任意一个结点开始到达任意一个结点所经过的所有结点。路径中至少包含一个结点，不一定经过二叉树的根结点，也不一定经过叶结点。给你非空的一个二叉树，请求出二叉树所有路径上结点值之和的最大值。例如在图8.6中的二叉树中，从结点15开始经过结点20到达结点7的路径是结点值之和为42，是结点值之和最大的路径。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0806.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0806.png" alt="图2.1">
 
 图8.6：在二叉树中，从结点15开始经过结点20到达结点7的路径是结点值之和为42，是结点值之和最大的路径。
 
@@ -354,7 +354,7 @@ class Solution {
 ### 题目
 给你一个二叉搜索树，请调整结点的指针使得每个结点都没有左子结点看起来像一个链表，但新的树仍然是二叉搜索树。例如把图8.8（a）中的二叉搜索树按照这个规则展平之后的结果如图8.8（b）所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0808.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0808.png" alt="图2.1">
 
 图8.8：把二叉搜索树展平成链表。（a）一个有6个结点的二叉树。（b）展平成看起来是链表的二叉搜索树，每个结点都没有左子结点。
 
@@ -392,7 +392,7 @@ public TreeNode increasingBST(TreeNode root) {
 ### 题目
 给你一个二叉搜索时和它的一个结点p，请找出按中序遍历的顺序该结点p的下一个结点。假设二叉搜索树中结点的值都是唯一的。例如在图8.9的二叉搜索树中，结点8的下一个结点是结点9，结点11的下一个结点是null。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0809.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0809.png" alt="图2.1">
 
 图8.9：在二叉搜索树中，按照中序遍历的顺序结点8的下一个结点是结点9，结点11的下一个结点是null。
 
@@ -445,7 +445,7 @@ public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
 ### 题目
 给你一个二叉搜索树，请将它的每个结点的值替换成树中大于或者等于该结点值的所有结点值之和。假设二叉搜索树中结点的值唯一。例如，输入图8.10（a）中的二叉搜索树，由于有两个结点的值大于或者等于6（即结点6和结点7），因此值为6结点的值替换成13，其他结点的值的替换过程类似，所有结点的值替换之后的结果如图8.10（b）所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0810.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0810.png" alt="图2.1">
 
 图8.10：把二叉搜索树中每个结点的值替换成树中大于或者等于该结点值的所有结点值之和。（a）一个二叉搜索树。（b）替换之后的二叉树。
 
@@ -480,7 +480,7 @@ public TreeNode convertBST(TreeNode root) {
 
 例如输入图8.11中的二叉树搜索树初始化BSTIterator，第一次调用函数next将返回最小的结点值1，此时调用函数hasNext返回true。再次调用函数next将返回下一个最小的结点的值2，此时再调用函数hasNext将返回true。第三次调用函数next将返回下一个最小的结点的值3，如果此时再调用函数hasNext将返回false。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0811.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0811.png" alt="图2.1">
 
 图8.11：一个有3个结点的二叉搜索树。
 
@@ -518,7 +518,7 @@ public class BSTIterator {
 ### 题目
 给你一个二叉搜索树和一个值k，请判断该二叉搜索树中是否存在两个结点它们的值之和等于k。假设二叉搜索树中结点的值均唯一。例如在图8.12中的二叉搜索树里，存在两个两个结点它们的和等于12（结点5和结点7），但不存在两个结点值之和为22的结点。 
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/0812.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0812.png" alt="图2.1">
 
 图8.12：在二叉搜索树中，存在两个结点它们的和等于12（结点5和结点7），但不存在两个结点值之和为22的结点。
 
