@@ -8,11 +8,16 @@
 
 - [多线程并发零碎知识](./docs/thread/多线程并发.md)
 - [Java的18把锁](./docs/thread/图解Java中那18把锁.md)
+- [Java内存模型](./docs/thread/Java内存模型.md)
 
 **算法**
 
 - [代码随想录](https://programmercarl.com/)
 - [数据结构与算法（剑指Offer）](./docs/code/TOC.md)
+
+**Redis**
+
+- [20道Redis经典面试题](./docs/redis/20道Redis经典面试题.md)
 
 **else**
 
