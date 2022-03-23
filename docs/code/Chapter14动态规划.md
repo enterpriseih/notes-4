@@ -903,6 +903,10 @@ class Solution {
         return dp[len][target] == target;
     }
 }
+```
+
+
+```java
 // dp[j]表示 背包总容量是j，最大可以凑成j的子集总和为dp[j]
 // 一位数组
 class Solution {
@@ -973,6 +977,10 @@ private boolean subsetSum(int[] nums, int target) {
 
     return dp[nums.length][target];
 }
+```
+
+
+```java
 // 一维
 private boolean subsetSum(int[] nums, int target) {
     boolean dp[] = new boolean[target + 1];

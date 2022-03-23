@@ -2,6 +2,7 @@
 
 noted by YiENx
 
+### 前言：[ACM模式](./ACM模式.md)
 ### 第1章：[整数](./Chapter01整数.md)
 ### 第2章：[数组](./Chapter02数组.md)
 ### 第3章：[字符串](./Chapter03字符串.md)
@@ -17,3 +18,8 @@ noted by YiENx
 ### 第13章：[回溯法](./Chapter13回溯法.md)
 ### 第14章：[动态规划](./Chapter14动态规划.md)
 ### 第15章：[图](./Chapter15图.md)
+
+
+
+
+
