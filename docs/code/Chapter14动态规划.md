@@ -832,6 +832,13 @@ for (int i = 1; i <= wlen; i++){
         }
     }
 }
+
+// 一维，物品从0开始就可以，数组大小只和 j 有关
+for(int i = 0; i < weight.size(); i++) { // 遍历物品
+    for(int j = bagWeight; j >= weight[i]; j--) { // 遍历背包容量
+        dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+    }
+}
 ```
 
 
@@ -851,9 +858,25 @@ for (int i = 1; i <= wlen; i++){
 
 ### 参考代码
 
+### 模板-最大的价值
+
+```java
+// dp[j]表示 背包总容量是j，最大可以凑成j的子集总和为dp[j]
+// dp[0] = 0;
+// 如果如果题目给的价值都是正整数那么非0下标都初始化为0就可以了，如果题目给的价值有负数，那么非0下标就要初始化为负无穷。
+for (int num : nums) {
+    for (int j = target; j >= num; j--) {
+        dp[j] = Math.max(dp[j], dp[j - num] + num);
+    }
+}
+```
+
+
+
 #### 传统01背包解法
 
 ```java
+// dp[i][j]表示 从前 i 个（下标为[0,.,i - 1]）的物品里任意取，放进容量为j的背包，价值总和最大是多少。
 // 二维数组
 class Solution {
     public boolean canPartition(int[] nums) {
@@ -880,7 +903,7 @@ class Solution {
         return dp[len][target] == target;
     }
 }
-
+// dp[j]表示 背包总容量是j，最大可以凑成j的子集总和为dp[j]
 // 一位数组
 class Solution {
     public boolean canPartition(int[] nums) {
@@ -916,6 +939,7 @@ class Solution {
 ```
 
 
+
 #### 解法二
 
 ``` java
@@ -931,7 +955,7 @@ public boolean canPartition(int[] nums) {
 
     return subsetSum(nums, sum / 2);
 }
-
+// 二维
 private boolean subsetSum(int[] nums, int target) {
     boolean[][] dp = new boolean[nums.length + 1][target + 1];
     for (int i = 0; i <= nums.length; i++) {
@@ -949,24 +973,7 @@ private boolean subsetSum(int[] nums, int target) {
 
     return dp[nums.length][target];
 }
-```
-
-#### 解法三
-
-``` java
-public boolean canPartition(int[] nums) {
-    int sum = 0;
-    for (int num : nums) {
-        sum += num;
-    }
-
-    if (sum % 2 == 1) {
-        return false;
-    }
-
-    return subsetSum(nums, sum / 2);
-}
-
+// 一维
 private boolean subsetSum(int[] nums, int target) {
     boolean dp[] = new boolean[target + 1];
     dp[0] = true;
@@ -983,15 +990,50 @@ private boolean subsetSum(int[] nums, int target) {
 }
 ```
 
-## 面试题102：加减的目标值
+
+
+## 面试题102：加减的目标值（目标和）
 
 ### 题目
 
-给你一个非空的正整数数组和一个目标值S，如果给每个数字添加‘+’或者‘-’运算符，请计算有多少种方法使得这个整数的计算结果为S。例如，如果输入数组[2, 2, 2]并且S等于2，有三种添加‘+’或者‘-’的方法，使得结果为2，它们分别是2+2-2=2、2-2+2=2以及-2+2+2=2。
+给你一个非空的正整数数组和一个目标值S，如果给每个数字添加‘+’或者‘-’运算符，请计算有多少种方法使得这个整数的计算结果为S。
+
+例如，如果输入数组[2, 2, 2]并且S等于2，有三种添加‘+’或者‘-’的方法，使得结果为2，它们分别是2+2-2=2、2-2+2=2以及-2+2+2=2。
+
+> - 令 ‘+’ 的数字和为p，‘-’ 的数字和为q， `p - q = S, p + q = sum`
+> - `p = (S + sum) / 2`
+> - 即找出数组中和为`(S + sum) / 2`的数字，**装满容量为p的背包，有几种方法**
+
+### 模板-装满背包有多少种方法
+
+> 例如：dp[j]，j 为5，
+>
+> - 已经有一个1（nums[i]） 的话，有 dp[4]种方法 凑成 dp[5]。
+> - 已经有一个2（nums[i]） 的话，有 dp[3]种方法 凑成 dp[5]。
+> - 已经有一个3（nums[i]） 的话，有 dp[2]中方法 凑成 dp[5]
+> - 已经有一个4（nums[i]） 的话，有 dp[1]中方法 凑成 dp[5]
+> - 已经有一个5 （nums[i]）的话，有 dp[0]中方法 凑成 dp[5]
+>
+> 累加就是`dp[j] += dp[j - num];`
+
+```java
+// dp[j]表示 填满 j 容量的背包，有dp[j]种方法 
+for (int num : nums) {
+    for (int j = target; j >= num; --j) {
+        dp[j] += dp[j - num];
+    }
+}
+```
+
+
 
 ### 参考代码
 
-#### 解法一
+**二维状态转移方程**
+
+<img src = "https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/MommyTalk1648001536829.png">
+
+**一维解法**
 
 ``` java
 public int findTargetSumWays(int[] nums, int S) {
@@ -1009,6 +1051,7 @@ public int findTargetSumWays(int[] nums, int S) {
 
 private int subsetSum(int[] nums, int target) {
     int dp[] = new int[target + 1];
+    // 装满 0 容量的背包有一种方法，即啥也不加
     dp[0] = 1;
 
     for (int num : nums) {
@@ -1021,57 +1064,187 @@ private int subsetSum(int[] nums, int target) {
 }
 ```
 
+
+
+## [二维01背包问题](https://programmercarl.com/0474.%E4%B8%80%E5%92%8C%E9%9B%B6.html#_474-%E4%B8%80%E5%92%8C%E9%9B%B6)
+
+### 题目
+
+给你一个二进制字符串数组 strs 和两个整数 m 和 n 。
+
+请你找出并返回 strs 的最大子集的大小，该子集中 最多 有 m 个 0 和 n 个 1 。
+
+如果 x 的所有元素也是 y 的元素，集合 x 是集合 y 的 子集 。
+
+示例 1：
+
+输入：strs = ["10", "0001", "111001", "1", "0"], m = 5, n = 3 输出：4
+
+解释：最多有 5 个 0 和 3 个 1 的最大子集是 {"10","0001","1","0"} ，因此答案是 4 。 其他满足题意但较小的子集包括 {"0001","1"} 和 {"10","1","0"} 。{"111001"} 不满足题意，因为它含 4 个 1 ，大于 n 的值 3 。
+
+示例 2： 输入：strs = ["10", "0", "1"], m = 1, n = 1 输出：2 解释：最大的子集是 {"0", "1"} ，所以答案是 2 。
+
+> **本题中strs 数组里的元素就是物品，每个物品都是一个！**
+>
+> **而m 和 n相当于是一个背包，两个维度的背包**。
+
+```java
+// dp[i][j]：最多有i个0和j个1的strs的最大子集的大小为dp[i][j]。
+public int findMaxForm(String[] strs, int m, int n) {
+    //dp[i][j]表示i个0和j个1时的最大子集
+    int[][] dp = new int[m + 1][n + 1];
+    int oneNum, zeroNum;
+    for (String str : strs) {
+        oneNum = 0;
+        zeroNum = 0;
+        for (char ch : str.toCharArray()) {
+            if (ch == '0') {
+                zeroNum++;
+            } else {
+                oneNum++;
+            }
+        }
+        //倒序遍历
+        for (int j = m; j >= zeroNum; j--) {
+            for (int k = n; k >= oneNum; k--) {
+                dp[j][k] = Math.max(dp[j][k], 
+                         dp[j - zeroNum][k - oneNum] + 1);
+            }
+        }
+    }
+    return dp[m][n];
+}
+```
+
+
+
+## 14.4.2 完全背包
+
+> **如果求组合数就是外层for循环遍历物品，内层for遍历背包**。
+>
+> **如果求排列数就是外层for遍历背包，内层for循环遍历物品**。
+
+```java
+// 物品是可以添加多次的，所以要从小到大去遍历
+// 与01背包相反，01背包正序遍历的话会多次存放，相当于用了覆盖之后的数据
+// 覆盖之后的数据就是添加了前面元素之后
+// 而倒序，使用的数据都是遍历这一层之前的
+
+// 先遍历物品，再遍历背包（组合） 
+for(int i = 0; i < weight.size(); i++) { // 遍历物品
+    for(int j = weight[i]; j <= bagWeight ; j++) { // 遍历背包容量
+        dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+    }
+}
+// 只有 j >= weight[i]才能放进去，不够放的话，之前的数值不会改变
+
+// （排列）
+for (int i = 1; i <= target; ++i) {
+    for (int num : nums) {
+        if (i >= num) {
+            dp[i] += dp[i - num];
+        }
+    }
+}
+```
+
+
+
+**遍历顺序的区别**
+
+```java
+// 组合：先遍历物品再遍历背包
+for (int i = 0; i < nums.length; i++) {
+	for (int j = nums[i]; j <= target; j++) {
+        dp[j] += dp[j - nums[i]];
+    }
+}
+```
+
+假设：nums[0] = 1，nums[1] = 5。
+
+那么就是先把1加入计算，然后再把5加入计算，得到的方法数量只有{1, 5}这种情况。而不会出现{5, 1}的情况。
+
+```java
+// 排列：先遍历背包再遍历物品
+for (int j = 1; j <= target; j++) {
+    for (int i = 0; i < nums.length; i++) {
+        if (j - nums[i] >= 0) {
+            dp[j] += dp[j - nums[i]];
+        }
+    }
+}
+```
+
+背包容量的每一个值，都是经过 1 和 5 的计算，包含了{1, 5} 和 {5, 1}两种情况。
+
+
+
 ## 面试题103：最少的硬币数目
 
 ### 题目
 
 给你正整数数组coins表示硬币的面额和一个目标总额t，请计算凑出总额t至少需要的硬币数目。每种硬币可以使用任意多枚。如果不能用输入的硬币凑出给定的总额，则返回-1。例如，如果硬币的面额为[1, 3, 9, 10]，总额t为15，那么至少需要3枚硬币，即2枚面额为3的硬币以及1枚面额为9的硬币。
 
+> - `dp[j] = min(dp[j - coins[i]] + 1, dp[j]);`
+
 ### 参考代码
 
-#### 解法一
-
 ``` java
-public int coinChange(int[] coins, int target) {
-    int[] dp = new int[target + 1];
-    Arrays.fill(dp, target + 1);
+public int coinChange(int[] coins, int amount) {
+    int[] dp = new int[amount + 1];
+    // 凑出amount不可能用到 amount + 1 个硬币，币值最低为1
+    Arrays.fill(dp, amount + 1);
     dp[0] = 0;
-
     for (int coin : coins) {
-        for (int j = target; j >= 1; j--) {
-            for (int k = 1; k * coin <= j; k++) {
-                dp[j] = Math.min(dp[j], dp[j - k * coin] + k);
-            }
+        for (int j = coin; j <= amount; j++) {
+            dp[j] = Math.min(dp[j], dp[j - coin] + 1);
         }
     }
-
-    return dp[target] > target ? -1 : dp[target];
+    return dp[amount] > amount ? -1 : dp[amount];
 }
 ```
 
-#### 解法二
 
-``` java
-public int coinChange(int[] coins, int target) {
-    int[] dp = new int[target + 1];
-    for (int i = 1; i <= target; ++i) {
-        dp[i] = target + 1;            
-        for (int coin : coins) {
-            if (i >= coin) {
-                dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-            }
+
+## 最少的硬币数目2
+
+给定不同面额的硬币和一个总金额。写出函数来计算可以凑成总金额的硬币组合数。假设每一种面额的硬币有无限个。
+
+示例 1:输入: amount = 5, coins = [1, 2, 5] 输出: 4 解释: 有四种方式可以凑成总金额: 
+
+5=5 
+
+5=2+2+1 
+
+5=2+1+1+1 
+
+5=1+1+1+1+1
+
+> 组合 + 满包
+
+```java
+public int change(int amount, int[] coins) {
+    //递推表达式
+    int[] dp = new int[amount + 1];
+    //初始化dp数组，表示金额为0时只有一种情况，也就是什么都不装
+    dp[0] = 1;
+    for (int i = 0; i < coins.length; i++) {
+        for (int j = coins[i]; j <= amount; j++) {
+            dp[j] += dp[j - coins[i]];
         }
     }
-
-    return dp[target] > target ? -1 : dp[target];
+    return dp[amount];
 }
 ```
+
+
 
 ## 面试题104：排列的数目
 
 ### 题目
 
-给你一个非空的正整数数组nums和一个目标值t，数组中所有数字都是唯一的，请计算数字之和等于t的所有排列的数目。数组中的数字可以在排列中出现任意次。例如，输入数组[1, 2, 3]并且t为3，那么总共由4个排序的数字之和等于3，它们分别为{1, 1, 1}、{1, 2}、{2, 1}以及{3}。
+给你一个非空的正整数数组nums和一个目标值t，数组中所有数字都是唯一的，请计算数字之和等于t的所有排列的数目。数组中的数字**可以在排列中出现任意次**。例如，输入数组[1, 2, 3]并且t为3，那么总共由4个排序的数字之和等于3，它们分别为{1, 1, 1}、{1, 2}、{2, 1}以及{3}。
 
 ### 参考代码
 
@@ -1089,6 +1262,55 @@ public int combinationSum4(int[] nums, int target) {
     }
 
     return dp[target];
+}
+```
+
+
+
+## 14.4.3 多重背包
+
+```java
+public void testMultiPack1(){
+    // 版本一：改变物品数量为01背包格式
+    List<Integer> weight = new ArrayList<>(Arrays.asList(1, 3, 4));
+    List<Integer> value = new ArrayList<>(Arrays.asList(15, 20, 30));
+    List<Integer> nums = new ArrayList<>(Arrays.asList(2, 3, 2));
+    int bagWeight = 10;
+
+    for (int i = 0; i < nums.size(); i++) {
+        while (nums.get(i) > 1) { // 把物品展开为i
+            weight.add(weight.get(i));
+            value.add(value.get(i));
+            nums.set(i, nums.get(i) - 1);
+        }
+    }
+
+    int[] dp = new int[bagWeight + 1];
+    for(int i = 0; i < weight.size(); i++) { // 遍历物品
+        for(int j = bagWeight; j >= weight.get(i); j--) { // 遍历背包容量
+            dp[j] = Math.max(dp[j], dp[j - weight.get(i)] + value.get(i));
+        }
+        System.out.println(Arrays.toString(dp));
+    }
+}
+
+public void testMultiPack2(){
+    // 版本二：改变遍历个数
+    int[] weight = new int[] {1, 3, 4};
+    int[] value = new int[] {15, 20, 30};
+    int[] nums = new int[] {2, 3, 2};
+    int bagWeight = 10;
+
+    int[] dp = new int[bagWeight + 1];
+    for(int i = 0; i < weight.length; i++) { // 遍历物品
+        for(int j = bagWeight; j >= weight[i]; j--) { // 遍历背包容量
+            // 以上为01背包，然后加一个遍历个数
+            for (int k = 1; k <= nums[i] && (j - k * weight[i]) >= 0; k++) { // 遍历个数
+                dp[j] = Math.max(dp[j], dp[j - k * weight[i]] + k * value[i]);
+            }
+            System.out.println(Arrays.toString(dp));
+        }
+    }
 }
 ```
 
