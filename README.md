@@ -24,5 +24,5 @@
 - [计算机网络](./docs/计算机网络.md)
 - [Web](./docs/Web.md)
 - [设计模式](./docs/设计模式.md)
-- [深浅拷贝](https://blog.csdn.net/riemann_/article/details/87217229)
+- [深浅拷贝](./docs/)
 
