@@ -49,7 +49,7 @@ Bean缓存池为HashMap实现
 
 - **BeanFactory**
 
-	- Spring框架的基础设施，面向Spring本身
+	- Spring框架的基础设施，面向Spring本身，BeanFactory是接口，**提供了IOC容器最基本的形式，给具体的IOC容器的实现提供了规范**
 
 	- 加载配置文件的时候不会创建对象，在获取对象（使用）才去创建对象
 
@@ -292,7 +292,7 @@ Spring中的事务管理就用到AOP
 
 ### @Transactional中的参数配置
 
-1. propagation：事务传播行为
+1. propagation：**事务传播行为**
 
 	- 事务方法：对数据库表数据进行改变的操作
 	- 多事务方法直接进行调用，这个过程中事务是如何进行管理的
@@ -322,3 +322,9 @@ Spring中的事务管理就用到AOP
 	- 设置哪些异常进行回滚
 6. noRollbackFor：不回滚
 	- 设置哪些异常不进行回滚
+
+
+
+## 5、Spring中的设计模式
+
+- 工厂模式：BeanFactory、FactoryBean

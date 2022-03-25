@@ -403,6 +403,9 @@ private ListNode merge(ListNode head1, ListNode head2) {
 
 ## 12.4 冒泡排序
 
+- 一共`[0,n-1]`依次两两交换，最终第一轮会把最大的放到末尾
+- 第二轮在`[0, n-2]`中从头两两交换
+
 ```java
 public bubble(int[] nums) {
     for (int i = 0; i < nums.length; i++) {
@@ -413,6 +416,38 @@ public bubble(int[] nums) {
                 nums[j+1] = temp;
             }
         }
+    }
+}
+```
+
+
+
+## 12.5 选择排序
+
+1. 遍历全部，选择最小（最大）的与第一个节点交换
+2. 从第二个节点开始遍历后面，选择最小（最大）的，与第二个交换，这样前两个是排序的
+3. 以此类推
+
+```java
+void select_sort(int a[], int n)
+{
+    int i;        // 有序区的末尾位置
+    int j;        // 无序区的起始位置
+    int min;    // 无序区中最小元素位置
+
+    for(i=0; i<n; i++)
+    {
+        min=i;
+        //找"a[i+1]..a[n]"之间最小元素，并赋给min
+        for(j=i+1; j<n; j++)
+        {
+            if(a[j] < a[min])
+                min=j;
+        }
+        //若min!=i，则交换 a[i] 和 a[min]。
+        //交换后，保证了a[0]..a[i]之间元素有序。
+        if(min != i)
+            swap(a[i], a[min]);
     }
 }
 ```

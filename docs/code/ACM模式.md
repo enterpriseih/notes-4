@@ -5,20 +5,31 @@
 [链表输入](####链表输入)
 [树的输入](####树的输入)
 
+
+
+**nextInt()不会读取换行符；**
+
+**next()划分每个元素的标准是：空格、制表符、或者换行符。**
+
 ```java
-Scanner sc=new Scanner(System.in);
-System.out.println("在下面一行中以空格为间隙输入元素:");
-//得出的是string类型
-String[] str = sc.nextLine().split(" ");
-//将String类型数组转成Integer类型数组。.parseInt()是基本类型
-int[] nums=new int[str.length];
-for (int i = 0; i < nums.length; i++) {
-	nums[i]=Integer.valueOf(str[i]);
+int option = in.nextInt();
+in.nextLine();  //**
+if (option == 0) {
+       System.out.println("请输入个人信息：");
+       System.out.println("姓名：");
+       String name = in.nextLine();
+       System.out.println("密码：");
+       String password = in.nextLine();
+       System.out.println("地址：");
+       String address = in.nextLine();
+       System.out.println("电话：");
+       String phone = in.nextLine();
+       System.out.println(name + "," + password + "," + address + "," + phone);
 }
-
-
-int N = s.nextInt();
 ```
+
+nextInt()输入option值，之后用户输入换行符想要结束，可是nextInt()方法并不会读取换行符，因此换行符被读取放到了下一个nextLine()中，nextLine()读取换行符，直接输入结束，因此若没有第2行**的nextLine()方法，输入的姓名name值将会是空（“”）
+
 
 
 
@@ -55,7 +66,8 @@ for(int i = 0; i < n; i++){
 输入:
 7 15
 15 5 3 7 9 14 0
-    
+ 
+Scanner sc = new Scanner(System.in);    
 int n = sc.nextInt();
 int l = sc.nextLong();
 int[] nums = new int[n];
@@ -122,7 +134,7 @@ public class LinkListInput {
         //初始化一个整数数组
         int[] ints = new int[arr.length];
         //给整数数组赋值
-        for(int j = 0; j<ints.length;j++) {
+        for(int j = 0; j < ints.length;j++) {
             ints[j] = Integer.parseInt(arr[j]);
         }
         
