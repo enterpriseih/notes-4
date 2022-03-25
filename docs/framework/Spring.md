@@ -1,7 +1,7 @@
 ## Spring、Spring MVC和Spring Boot
 
 - spring是⼀个IOC容器，⽤来管理Bean，使⽤依赖注⼊实现控制反转，可以很⽅便的整合各种框架，提供AOP机制弥补OOP的代码重复问题、更⽅便将不同类不同⽅法中的共同处理抽取成切⾯、⾃动注⼊给⽅法执⾏，⽐如⽇志、异常等 。
-- springmvc是spring对web框架的⼀个解决⽅案，提供了⼀个总的前端控制器Servlet，⽤来接收请求，然后定义了⼀套路由策略（url到handle的映射）及适配执⾏handle，将handle结果使⽤视图解析技术⽣成视图展现给前端 。
+- springmvc是spring对web框架的⼀个解决⽅案，提供了⼀个总的`前端控制器DispatcherServlet`，⽤来接收请求，然后定义了⼀套路由策略（url到handle的映射）及适配执⾏handle，将handle结果使⽤视图解析技术⽣成视图展现给前端 。
 - springboot是spring提供的⼀个快速开发⼯具包，让程序员能更⽅便、更快速的开发spring+springmvc应⽤，简化了配置（约定了默认配置），整合了⼀系列的解决⽅案（starter机制）、redis、mongodb、es，可以开箱即⽤。
 
 
@@ -328,3 +328,13 @@ Spring中的事务管理就用到AOP
 ## 5、Spring中的设计模式
 
 - 工厂模式：BeanFactory、FactoryBean
+	- FactoryBean是一种bean，在Spring内部广泛使用，这个Bean不是简单的Bean，而是一个能生产或者修饰对象生成的工厂Bean,它的实现与设计模式中的工厂模式和修饰器模式类似 
+
+- 代理模式：AOP
+	- 事务管理中使用
+
+- 模版模式：JdbcTemplate
+
+
+
+## 6、Spring MVC原理
