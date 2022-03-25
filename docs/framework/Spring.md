@@ -338,3 +338,15 @@ Spring中的事务管理就用到AOP
 
 
 ## 6、Spring MVC原理
+
+MVC是一种软件架构的思想，将软件按照模型、视图、控制器（MVC）来划分，围绕前端控制器DispatcherServlet来设计的。
+
+**MVC的工作流程**: 
+
+1. 用户通过视图层发送请求到服务器，
+2. 在服务器中请求被Controller接收，
+3. Controller 调用相应的Model层处理请求，
+4. 处理完毕将结果返回到Controller，Controller再根据请求处理的结果找到相应的View视图，
+5. View视图渲染数据后最终响应给浏览器。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203251523555.png" alt="image-20220325152345234" />

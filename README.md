@@ -18,11 +18,11 @@
 **框架**
 
 - [Spring](./docs/framework/Spring.md)
+- [MyBatis](./docs/framework/MyBatis.md)
 
 **数据库**
 
 - [MySQL](./docs/database/MySQL.md)
-- [MyBatis](./docs/database/MyBatis.md)
 
 **算法**
 
