@@ -260,7 +260,7 @@ private void mergeSort(int[] src, int[] dst, int start, int nnextStart) {
 
 输入一个链表的头节点，请将该链表排序。例如，输入图12.4（a）中的链表，该链表排序后如图12.4（b）所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1204.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1204.png" alt="图2.1">
 
 图12.4：链表排序。（a）一个有6个结点的链表。（b）排序后的链表。
 
@@ -322,7 +322,7 @@ private ListNode merge(ListNode head1, ListNode head2) {
 
 输入k个排序的链表，请将它们合并成一个排序的链表。例如，输入三个排序的链表如图12.5（a）所示，将它们合并之后得到的排序的链表如图12.5（b）所示。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/codingInterviews/1205.png" alt="图2.1">
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1205.png" alt="图2.1">
 
 图12.5：合并排序链表。（a）三个排序的链表。（b）合并后的链表。
 
@@ -331,6 +331,7 @@ private ListNode merge(ListNode head1, ListNode head2) {
 #### 解法一
 
 ``` java
+// 将节点放入minHeap，每次都从中选取最小的那个，然后挨个拼接
 public ListNode mergeKLists(ListNode[] lists) {
     ListNode dummy = new ListNode(0);
     ListNode cur = dummy;
@@ -360,15 +361,25 @@ public ListNode mergeKLists(ListNode[] lists) {
 #### 解法二
 
 ``` java
+/*
+	eg：123456
+	start = 0，end = 6
+	mid = 3，是后半段的头，也是前半段的长度
+	eg：1234567
+	start = 0，end = 7
+	mid = 3，是后半段的头，也是前半段的长度
+*/
+
 public ListNode mergeKLists(ListNode[] lists) {
     if (lists.length == 0) {
         return null;
     }
-
+	// start和end举例更好理解
     return mergeLists(lists, 0, lists.length);
 }
 
 private ListNode mergeLists(ListNode[] lists, int start, int end) {
+    // 分到只剩单独的链表节点
     if (start + 1 == end) {
         return lists[start];
     }
@@ -379,6 +390,7 @@ private ListNode mergeLists(ListNode[] lists, int start, int end) {
     return merge(head1, head2);
 }
 
+// 合并两个排序链表，一道单独的题目
 private ListNode merge(ListNode head1, ListNode head2) {
     ListNode dummy = new ListNode(0);
     ListNode cur = dummy;
