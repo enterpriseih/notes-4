@@ -58,3 +58,9 @@
 	- 类和方法的全限定名 
 	- 字段（属性field）的名称和描述符 
 	- 方法的名称和描述符。
+
+
+
+# 对象的实例化
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311610240.png" alt="第10章_对象的实例化" style="zoom:50%;" />
