@@ -64,3 +64,135 @@
 # 对象的实例化
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311610240.png" alt="第10章_对象的实例化" style="zoom:50%;" />
+
+# StringTable
+
+## 一、字符串的拼接
+
+1. 常量与常量的拼接结果在字符串常量池，原理是编译期优化
+2. 字符串常量池中不会存在相同内容的常量
+3. 只要其中有一个是变量，结果就在堆中（但不是字符串常量池所在的空间），原理是StringBuilder；final除外
+4. 如果拼接的结果调用intern()方法，则主动将字符串常量池中还没有的字符串对象放入池中，并返回此对象的地址，如存在了就直接返回地址
+
+```java
+String s1 = "a" + "b" + "c";
+String s2 = "abc";
+/*
+	编译阶段
+	s1 = "abc";
+	s2 = "abc";
+	编译期就完成了拼接
+*/
+System.out.println(s1 == s2);// true
+System.out.println(s2.equals(s1););// true
+
+/*
+	如下的 s1 + s2 的执行细节
+	1、StringBuilder s = new StringBuilder();
+	2、s.append("Java");
+	3、s.append("Go");
+	4、s.toString(); ——> 约等于new String("ab");
+	JDK5.0之前用的buffer
+*/
+
+String s1 = "Java";
+String s2 = "Go";
+String s3 = "JavaGo";
+String s4 = "Java" + "Go";
+String s5 = s1 + "Go";
+String s6 = "Java" + s2;
+String s7 = s1 + s2;
+final String s8 = "Java";
+final String s9 = "Go";
+String s10 = s8 + s9;
+
+System.out.println(s3 == s4);// true
+System.out.println(s3 == s5);// false
+System.out.println(s3 == s6);// false
+System.out.println(s3 == s7);// false
+System.out.println(s5 == s6);// false
+System.out.println(s5 == s7);// false
+System.out.println(s6 == s7);// false
+System.out.println(s10 == s3);// true
+
+String s11 = s6.intern();
+System.out.println(s3 == s11);// true
+
+
+```
+
+
+
+## 二、intern()
+
+native方法
+
+如果拼接的结果调用intern()方法，查看字符串常量池
+
+- 如存在字符串就直接返回地址
+- 如果不存在
+	- ≤1.6 放入字符串池
+	- ≥1.7 将对象的引用地址复制放入池
+
+Interned String就是确保字符串在内存中只有一份拷贝
+
+调用Intern()可以保证变量s指向的是字符串常量池中的数据
+
+<br>
+
+**题目**
+
+```java
+/**
+ * 题目：
+ * new String("ab")会创建几个对象？
+ *     一个对象是：new关键字在堆空间创建的
+ *     另一个对象是：字符串常量池中的对象"ab" 
+ *
+ *
+ * 思考：
+ * new String("a") + new String("b")呢？
+ *  对象1：new StringBuilder()
+ *  对象2：new String("a")
+ *  对象3：常量池中的"a"
+ *  对象4：new String("b")
+ *  对象5：常量池中的"b"
+ *
+ *  深入剖析： StringBuilder的toString():
+ *      对象6 ：new String("ab")
+ *      强调一下，toString()的调用，在字符串常量池中，没有生成"ab"
+ *
+ */
+```
+
+
+
+```java
+String s1 = new String("a");
+s1.intern(); // 调用之前已经存在了a
+String s2 = "a";
+System.out.println(s1 == s2);
+// jdk1.6 false, jdk7/8 false
+
+String s3 = new String("a") + new String("a");
+// s3变量记录的地址：new String("aa")
+// 执行完后，字符串常量池中没有"aa"
+s3.intern();
+// jdk6:创建了一个新的对象"aa"，也有了新的地址
+// jdk7:常量池放进堆里了，常量池中并没有创建"aa",
+// 而是创建一个指向堆空间中new String("aa")的地址
+// 因为堆中已经有了，节省空间，常量池中就不创建了
+String s4 = "aa";
+// s4变量记录的地址：使用的是intern()后在常量池中生成的"aa"的地址
+System.out.println(s3 == s4);
+// jdk1.6 false, jdk7/8 true
+
+```
+
+
+
+补充：
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203312241480.PNG" alt="IMG_1014" style="zoom:40%;" />
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203312241221.PNG" alt="IMG_1013" style="zoom:40%;" />
