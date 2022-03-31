@@ -160,7 +160,7 @@ Java 源文件 → 编译器 → 字节码文件 .class → JVM →机器码
 
 1.8后加上`字符串池`和`静态变量`
 
-所有线程共享Java堆，但是还可以划分线程私有的缓冲区（Thread Local Allocation Buffer，TLAB）
+所有线程共享 Java 堆，但是还可以划分`线程私有的缓冲区（Thread Local Allocation Buffer，TLAB）`
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203301316327.png" alt="image-20220330131644568" style="zoom:40%;" />
 
@@ -177,6 +177,7 @@ Java 源文件 → 编译器 → 字节码文件 .class → JVM →机器码
 	- 当 Eden 内存不够的时候会触发 MinorGC，对新生代区进行 GC
 - **ServivorFrom**：上一次 GC 的幸存者，作为这一次 GC 的被扫描者
 - **ServicorTo**：保留了一次 MinorGC 过程中的幸存者
+	- to 和 from 不是固定的
 - **MinorGC** 的过程（复制 -> 清空 -> 互换，复制算法）
 	- eden、from 中存活的对象复制到 to，年龄 + 1
 		- to 满了就直接进 old 
@@ -185,6 +186,8 @@ Java 源文件 → 编译器 → 字节码文件 .class → JVM →机器码
 	- to 和 from 互换指针，即原 to 成为下一次 GC 的 from
 
 > 复制必交换，谁空谁为 to
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203310942440.png" alt="image-20220331094237355" style="zoom:50%;" />
 
 #### 老年代old
 
