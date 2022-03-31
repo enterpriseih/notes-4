@@ -19,7 +19,7 @@ Java 源文件 → 编译器 → 字节码文件 .class → JVM →机器码
 
 # JVM运行机制
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203291127022.png" alt="jvm机制" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311552729.png" alt="第02章_JVM架构-简图" style="zoom:33%;" />
 
 **线程**
 
