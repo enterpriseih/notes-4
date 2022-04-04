@@ -343,11 +343,19 @@ MVC 是一种软件架构的思想，将软件按照模型、视图、控制器�
 
 **MVC的工作流程**: 
 
-1. 用户通过视图层发送请求到服务器，
-2. 在服务器中请求被 Controller 接收，
-3. Controller 调用相应的 Model 层处理请求，
-4. 处理完毕将结果返回到 Controller，Controller 再根据请求处理的结果找到相应的 View视图，
-5. View 视图渲染数据后最终响应给浏览器。
+1. 浏览器发送请求至前端控制器 DispatcherServlet
+2. DispatcherServlet 收到请求调用 HandlerMapping 处理器映射器
+3. HandlerMapping 找到具体的处理器（根据xml配置、注解进行查找），生成处理器及处理器拦截器（如果有则生成）一并返回给 DispatcherServlet
+4. DispatcherServlet 调⽤ HandlerAdapter 处理器适配器。 
+4. HandlerAdapter 经过适配调⽤具体的处理器(Controller，也叫后端控制器) 
+4. Controller 执⾏完成返回 ModelAndView。 
+4. HandlerAdapter 将 controller 执⾏结果 ModelAndView 返回给 DispatcherServlet。
+4. DispatcherServlet 将 ModelAndView 传给 ViewReslover 视图解析器。 
+4. ViewReslover 解析后返回具体 View。 
+4. DispatcherServlet 根据 View 进⾏渲染视图（即将模型数据填充⾄视图中）
+4. DispatcherServlet 响应⽤户
+
+> 浏览器访问、映射到前端控制器、读取配置文件、组件扫描找到控制器、根据mapping转发、控制器返回、视图解析、视图渲染
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203251523555.png" alt="image-20220325152345234" />
 

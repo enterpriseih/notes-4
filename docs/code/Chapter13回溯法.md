@@ -1,5 +1,23 @@
 # 第十三章：回溯法
 
+回溯回去的时候要记得清除修改
+
+```
+void backtracking(参数) {
+    if (终止条件) {
+        存放结果;
+        return;
+    }
+    for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) {
+        处理节点;
+        backtracking(路径，选择列表); // 递归
+        回溯，撤销处理结果
+    }
+}
+```
+
+
+
 ## 面试题79：所有子集
 
 ### 题目
@@ -28,6 +46,17 @@ private void helper(int[] nums, int index,
 
         subset.add(nums[index]);
         helper(nums, index + 1, subset, result);
+        subset.removeLast();
+    }
+}
+
+// 法二
+private void backtrace(int[] nums, 
+  List<List<Integer>> res, LinkedList<Integer> subset, int i) { 
+    res.add(new LinkedList<>(subset));
+    for (int start = i; start < nums.length; start++) {
+        subset.add(nums[start]);
+        backtrace(nums, res, subset, start + 1);
         subset.removeLast();
     }
 }
@@ -63,10 +92,57 @@ private void helper(int n, int k, int i,
         helper(n, k, i + 1, combination, result);
         combination.removeLast();
     }
-}   
+}  
+
+// 法二 
+backtrace(res, combination, 1, n, k);
+private void backtrace(List<List<Integer>> res, LinkedList<Integer> combination, int i, int n, int k) {
+        if (k == 0) {
+            res.add(new LinkedList<>(combination));
+        }
+        for (int start = i; start <= n && k > 0; start++) {
+            combination.add(start);
+            backtrace(res, combination, start + 1, n, k - 1);
+            combination.removeLast();
+        }
+    }
+}
 ```
 
+
+
 ## 面试题81：允许重复选择元素的组合
+
+### 模板
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        // 排序之后才能剪枝
+        Arrays.sort(candidates);
+        backtrack(candidates, target, res, 0, new ArrayList<Integer>());
+        return res;
+    }
+
+    private void backtrack(int[] candidates, int target, List<List<Integer>> res, int i, ArrayList<Integer> tmp_list) {
+        if (target < 0) return;
+        if (target == 0) {
+            res.add(new ArrayList<>(tmp_list));
+            return;
+        }
+        // 用for来代替不选
+        for (int start = i; start < candidates.length; start++) {
+            if (target < 0) break;
+            tmp_list.add(candidates[start]);
+            backtrack(candidates, target - candidates[start], res, start, tmp_list);
+            tmp_list.remove(tmp_list.size() - 1);
+        }
+    }
+}
+```
+
+
 
 ### 题目
 
@@ -79,7 +155,6 @@ public List<List<Integer>> combinationSum(int[] nums, int target) {
     List<List<Integer>> result = new LinkedList<>();
     LinkedList<Integer> combination = new LinkedList<>();
     helper(nums, target, 0, combination, result);
-
     return result;
 }
 
@@ -90,9 +165,11 @@ private void helper(int[] nums, int target, int i,
     } else if (target > 0 && i < nums.length) {
         helper(nums, target, i + 1, combination, result);
 
-        combination.add(nums[i]);            
-        helper(nums, target - nums[i], i, combination, result);
-        combination.removeLast();
+        if (nums[i] <= target) {
+            combination.add(nums[i]);            
+        	helper(nums, target - nums[i], i, combination, result);
+        	combination.removeLast();
+        }
     }
 }
 ```
@@ -315,19 +392,24 @@ public List<String> restoreIpAddresses(String s) {
 
     return result;
 }
-
-private void helper(String s, int index, int segIndex,
+/*
+	i是当前被处理的字符下标
+	segI是当前第几个分段，有四个分段，取值0～3
+*/
+private void helper(String s, int index, int segI,
     String seg, String ip, List<String> result) {
+    // 
     if (index == s.length() && segIndex == 3 && isValidSeg(seg)) {
         result.add(ip + seg);
-    } else if (index < s.length() && segIndex <= 3) {
+    } else if (index < s.length() && segI <= 3) {
         char ch = s.charAt(index);
+        // 在当前分段续上
         if (isValidSeg(seg + ch)) {
-            helper(s, index + 1, segIndex, seg + ch, ip, result);
+            helper(s, index + 1, segI, seg + ch, ip, result);
         }
-
-        if (seg.length() > 0 && segIndex < 3) {
-            helper(s, index, segIndex + 1, "", ip + seg + ".", result);
+		// 另起新片段
+        if (seg.length() > 0 && segI < 3) {
+            helper(s, index + 1, segI + 1, "" + ch, ip + seg + ".", result);
         }
     }
 }

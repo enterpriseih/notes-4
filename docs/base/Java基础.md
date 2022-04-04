@@ -196,3 +196,11 @@ System.out.println(s3 == s4);
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203312241480.PNG" alt="IMG_1014" style="zoom:40%;" />
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203312241221.PNG" alt="IMG_1013" style="zoom:40%;" />
+
+# final修饰
+
+final修饰的方法不能重写，但可以继承、重载
+
+重载：方法名字相同，而参数不同。返回类型可以相同也可以不同。
+
+每个重载的方法（或者构造函数）都必须有一个独一无二的参数类型列表。
