@@ -855,7 +855,7 @@ public String testRedirect(){
 >
 > 当SpringMVC中设置任何一个view-controller时，其他控制器中的请求映射将全部失效，此时需要在SpringMVC的核心配置文件中设置开启mvc注解驱动的标签：
 >
-> <mvc:annotation-driven />
+> `<mvc:annotation-driven />`
 
 # 七、RESTful
 

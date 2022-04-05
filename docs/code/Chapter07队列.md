@@ -1,5 +1,11 @@
 # 第七章：队列
 
+接口Queue，常用LinkedList、ArrayDeque
+
+抛异常：add(e)，remove，element
+
+不抛异常：offer(e)，poll，peek
+
 ## 7.1 应用
 
 ## 面试题41：滑动窗口的平均值
@@ -106,7 +112,7 @@ public List<Integer> bfs(TreeNode root) {
 }
 ```
 
-
+> 二叉树题目中出现**层**这个概念
 
 ## 面试题43：往完全二叉树添加节点
 
@@ -177,6 +183,7 @@ class CBTInserter {
 ### 参考代码
 
 ``` java
+// 一个队列，需要标记位记录该层是否读完
 public List<Integer> largestValues(TreeNode root) {
     int current = 0;
     int next = 0;
@@ -213,6 +220,31 @@ public List<Integer> largestValues(TreeNode root) {
     return result;
 }
 ```
+
+```java
+public int findBottomLeftValue(TreeNode root) {
+    Queue<TreeNode> queue1 = new LinkedList<>();
+    Queue<TreeNode> queue2 = new LinkedList<>();
+    queue1.offer(root);
+	int max = Integer.MIN_VALUE;
+    List<Integer> res = new LinkedList<>();
+    while(!queue1.isEmpty()) {
+        TreeNode node = queue1.poll();
+        max = Math.max(node.val, max);
+        if (node.left != null) {queue2.offer(node.left);}
+        if (node.right != null) {queue2.offer(node.right);}
+        if (queue1.isEmpty()) {
+            queue1 = queue2;
+            queue2 = new LinkedList<>();
+            res.add(max);
+            max = Integer.MIN_VALUE;
+        }
+    }
+    return res;
+}
+```
+
+
 
 ## 面试题45：二叉树最底层最左边的值
 

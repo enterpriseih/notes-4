@@ -32,6 +32,8 @@ public int divide(int dividend, int divisor) {
     while(dividend <= divisor) {
         int quotient = 1;
         int value = divisor;
+        // 0xc0000000是MIN_VALUE的一半
+        // 0x80000000是MIN_VALUE
         while (value >= 0xc0000000 && dividend <= value + value) {
             value += value;
             quotient += quotient;

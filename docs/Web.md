@@ -214,6 +214,7 @@ request.getRequestDispatcher("...").forward(request,response);
 - 由...响应
 
 - 地址栏没有变化
+- 同一个request和response
 
 ## 2、客户端重定向
 
@@ -224,4 +225,5 @@ request.getRequestDispatcher("...").forward(request,response);
 - 两次请求响应的过程。客户端肯定知道请求URL有变化
 
 - 地址栏有变化
+- 不同的request和response
 
