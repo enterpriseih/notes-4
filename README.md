@@ -14,7 +14,7 @@
 ### 线程
 
 - [多线程并发](./docs/thread/多线程并发.md)
-- [Java的18把锁](./docs/thread/图解Java中那18把锁.md)
+- [Java的18把锁](./docs/thread/Java中的18把锁.md)
 - [Java内存模型](./docs/thread/Java内存模型.md)
 
 ### 框架
