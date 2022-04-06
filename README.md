@@ -10,12 +10,18 @@
 - [Java基础入门80问](./docs/base/Java基础入门80问.md)
 - [深浅拷贝](./docs/base/深浅拷贝.md)
 - [JavaIO&NIO](./docs/base/JavaIO&NIO.md)
+- [设计模式](./docs/设计模式.md)
 
-### 线程
+### J.U.C
 
 - [多线程并发](./docs/thread/多线程并发.md)
 - [Java的18把锁](./docs/thread/Java中的18把锁.md)
-- [Java内存模型](./docs/thread/Java内存模型.md)
+
+
+### JVM
+
+- [JVM](./docs/JVM.md)
+
 
 ### 框架
 
@@ -38,10 +44,9 @@
 
 ### else
 
+- [Java内存模型](./docs/thread/Java内存模型.md)
 - [计算机网络](./docs/计算机网络.md)
 - [Web](./docs/Web.md)
-- [设计模式](./docs/设计模式.md)
-- [JVM](./docs/JVM.md)
 - [Maven](./docs/maven/Maven.md)
 
 ### 工具

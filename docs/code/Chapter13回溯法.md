@@ -8,15 +8,18 @@ void backtracking(参数) {
         存放结果;
         return;
     }
+    // 法1
     for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) {
         处理节点;
         backtracking(路径，选择列表); // 递归
         回溯，撤销处理结果
     }
+    // 法2
+    选还是不选
 }
 ```
 
-
+> for是横向遍历，递归是纵向遍历
 
 ## 面试题79：所有子集
 
@@ -32,7 +35,6 @@ public List<List<Integer>> subsets(int[] nums) {
     if (nums.length == 0) {
         return result;
     }
-
     helper(nums, 0, new LinkedList<Integer>(), result);        
     return result;
 }
@@ -42,8 +44,9 @@ private void helper(int[] nums, int index,
     if (index == nums.length) {
         result.add(new LinkedList<>(subset));
     } else if (index < nums.length) {
+        // 不要这个数
         helper(nums, index + 1, subset, result);
-
+		// 要这个数
         subset.add(nums[index]);
         helper(nums, index + 1, subset, result);
         subset.removeLast();
@@ -81,7 +84,7 @@ public List<List<Integer>> combine(int n, int k) {
 
 private void helper(int n, int k, int i,
     LinkedList<Integer> combination, List<List<Integer>> result) {
-    // 剩下的不够组成k个一组了
+    // 剩下的不够组成k个一组了，剪枝
     if ((combination.size() + n - i) < k) return;
     if (combination.size() == k) {
         result.add(new LinkedList<>(combination));
@@ -236,11 +239,12 @@ public void helper(int[] nums, int i, List<List<Integer>> result) {
         for (int num : nums) {
             permutation.add(num);
         }
-
         result.add(permutation);
     } else {
         for (int j = i; j < nums.length; ++j) {
             swap(nums, i, j);
+            // 为排列数组中下标为i+1的数字选择数字
+            // 排列这里比较特殊
             helper(nums, i + 1, result);
             swap(nums, i, j);
         }
@@ -277,7 +281,6 @@ private void helper(int[] nums, int i, List<List<Integer>> result) {
         for (int num : nums) {
             permutation.add(num);
         }
-
         result.add(permutation);
     } else {
         Set<Integer> set = new HashSet<>();
@@ -340,7 +343,11 @@ private void helper(int left, int right,
 
 输入一个字符串，要求将它分割成若干子字符串使得每个子字符串都是回文。请列出所有可能的分割方法。例如，输入"google"，将输出3中符合条件的分割方法，分别是["g", "o", "o", "g", "l", "e"]、["g", "oo", "g", "l", "e"]和["goog", "l", "e"]。
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061931336.png" alt="image-20220406193113157" style="zoom:67%;" />
+
 ### 参考代码
+
+其实是一种组合问题
 
 ``` java
 public List<List<String>> partition(String s) {
@@ -357,10 +364,13 @@ private void helper(String str, int start,
         return;
     }
 
-    for (int i = start; i < str.length(); ++i) {
-        if (isPalindrome(str, start, i)) {
-            substrings.add(str.substring(start, i + 1));
-            helper(str, i + 1, substrings, result);
+    for (int j = start; j < str.length(); ++j) {
+        if (isPalindrome(str, start, j)) {
+            substrings.add(str.substring(start, j + 1));
+            // 切过的地方不能重复切，所以j+1
+            // 如果是start + 1，
+            // 第二轮for的递归的时候会再切一次第一轮for的位置
+            helper(str, j + 1, substrings, result);
             substrings.removeLast();
         }
     }

@@ -28,7 +28,7 @@ public int divide(int dividend, int divisor) {
 
     dividend = dividend > 0 ? -dividend : dividend;
     divisor = divisor > 0 ? -divisor : divisor;
-
+	// 因为转为负数计算了
     while(dividend <= divisor) {
         int quotient = 1;
         int value = divisor;
@@ -46,6 +46,27 @@ public int divide(int dividend, int divisor) {
 ```
 
 `时间复杂度`O(log*n*)
+
+## 补：Pow(x,n)
+
+```java
+public double myPow(double x, int n) {
+    if(x == 0.0f) return 0.0d;
+    // 防止n为负取整后越界
+    long b = n;
+    double res = 1.0;
+    if (b < 0) {
+        x = 1 / x;
+        b = - b;
+    }
+    while (b > 0) {
+        if ((b & 1) == 1) res *= x;
+        x *= x;
+        b >>= 1;
+    }
+    return res;
+}
+```
 
 
 

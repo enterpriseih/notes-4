@@ -1,4 +1,6 @@
-# 变量类型
+# 基础的基础
+
+## 一、变量类型
 
 第一种（按照位置）：局部变量 vs 成员变量（或属性）
 
@@ -23,32 +25,7 @@
 第二种（按照类型）：基本数据类型 vs 引用数据类型变量（类、数组、接口）
 
 
-
-# 常量池
-
-存放
-
-- 字面量
-- 符号引用
-
-<br>
-
-1. **(Class)常量池**
-  - Class 文件中除了有类的版本、字段、方法、接口等描述等信息外，还有一项信息是常量池（Constant Pool Table），存放编译期生成的各种`字面量`和`符号引用`
-  - 每个class文件都有一个class常量池
-2. **运行时常量池**（方法区里的重要结构）
-  - 运行时常量池存在于内存中，也就是`class常量池被加载到内存之后的版本`，不同之处是：它的字面量可以动态的添加(String.intern())，符号引用可以被解析为直接引用
-  - JVM在执行某个类的时候，必须经过加载、连接、初始化，而连接又包括验证、准备、解析三个阶段。而当类加载到内存中后，jvm就会将class常量池中的内容存放到运行时常量池中，由此可知，`运行时常量池也是每个类都有一个`。在解析阶段，会把`符号引用替换为直接引用`，解析的过程会去`查询字符串常量池`，也就是我们上面所说的StringTable，以保证运行时常量池所引用的字符串与字符串常量池中是一致的。
-
-> 字符串常量池
->
-> - ≤1.6 方法区中
-> 	- String Pool里放的都是字符串常量
-> - ≥1.7 移到了堆中
-> 	- 由于String#intern()发生了改变，因此String Pool中也可以存放放于堆内的字符串对象的引用
-> - 字符串常量池中的字符串只保存一份
-
-## 字面量和符号引用
+## 二、字面量和符号引用
 
 - 字面量包括：
 	- 文本字符串 
@@ -59,7 +36,17 @@
 	- 字段（属性field）的名称和描述符 
 	- 方法的名称和描述符。
 
+## 三、final修饰
 
+**final：属性不可变、方法不可覆盖、类不可继承**
+
+final修饰的方法不能重写，但可以继承、重载
+
+重载：方法名字相同，而参数不同。返回类型可以相同也可以不同。
+
+每个重载的方法（或者构造函数）都必须有一个独一无二的参数类型列表。
+
+<br>
 
 # 对象的实例化
 
@@ -197,12 +184,78 @@ System.out.println(s3 == s4);
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203312241221.PNG" alt="IMG_1013" style="zoom:40%;" />
 
-# final修饰
 
-**final：属性不可变、方法不可覆盖、类不可继承**
 
-final修饰的方法不能重写，但可以继承、重载
+---
 
-重载：方法名字相同，而参数不同。返回类型可以相同也可以不同。
+# 集合框架
 
-每个重载的方法（或者构造函数）都必须有一个独一无二的参数类型列表。
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061519804.png" alt="image-20220406151857332" style="zoom: 50%;" />
+
+Note：无序是指存储位置的无序，不是按照索引顺序添加，而是按照hash值添加
+
+threshold：扩容的阈值，=容量*加载因子，超过阈值就扩容
+
+工具类：Collections操作集合、Arrays操作数组
+
+## 一、Collection
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061509495.png" alt="image-20220406150940121" style="zoom:67%;" />
+
+
+
+## 二、Map
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061510286.png" alt="image-20220406151031801" style="zoom:67%;" />
+
+### 1、HashMap的添加过程
+
+```
+map.put(key1,value1):
+1、首先，调用key1所在类的hashCode()计算key1哈希值，
+此哈希值经过某种算法计算以后，得到在Entry数组中的存放位置。
+2、
+如果此位置上的数据为空，此时的key1-value1添加成功。 ----情况1
+如果此位置上的数据不为空，(意味着此位置上存在一个或多个数据(以链表形式存在)),
+比较key1和已经存在的一个或多个数据的哈希值：
+	2.1、如果key1的哈希值与已经存在的数据的哈希值都不相同，
+	此时key1-value1添加成功。----情况2
+	2.2、如果key1的哈希值和已经存在的某一个数据(key2-value2)的哈希值相同，
+	继续比较：调用key1所在类的equals(key2)方法，比较：
+		如果equals()返回false:此时key1-value1添加成功。----情况3
+		如果equals()返回true:使用value1替换value2。
+```
+
+### 2、Entry
+
+```java
+Set<Map.Entry<Integer,String>> set = map.entrySet();
+// foreach
+// 这种方式效率比较高，因为获取key和value都是直接从node对象中获取的属性值。
+// 这种方式比较适合于大数据量。
+for(Map.Entry<Integer,String> node : set){
+    System.out.println(node.getKey() + "--->" + node.getValue());
+}
+```
+
+### 3、ConcurrentHashMap
+
+#### a>Segment段
+
+#### b>线程安全（Segment 继承 ReentrantLock 加锁）
+
+简单理解就是，ConcurrentHashMap 是一个 Segment 数组，Segment 通过继承ReentrantLock 来进行加锁，所以每次需要加锁的操作**锁住的是一个 segment**，这样只要保证每个 Segment 是线程安全的，也就实现了全局的线程安全。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061546572.png" alt="image-20220406154643937" style="zoom:80%;" />
+
+每个segment也具有红黑树结构
+
+#### c>并行度（默认16）
+
+concurrencyLevel：并行级别、并发数、Segment 数。
+
+也就是说 ConcurrentHashMap 有 16 个 Segments，所以理论上，这个时候，最多可以同时支持 16 个线程并发写，只要它们的操作分别分布在不同的 Segment 上。
+
+`可以初始化赋值，但是初始化后不可扩容`
+
+每个 Segment 很像之前介绍的 HashMap，不过它要保证线程安全，所以处理起来要麻烦些。
