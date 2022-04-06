@@ -13,21 +13,13 @@
 
 <!-- /TOC -->
 
-在面试中，面试官经常喜欢问：『说说什么是Java内存模型(JMM)？』
-
-面试者内心狂喜，这题刚背过：『Java内存主要分为五大块：堆、方法区、虚拟机栈、本地方法栈、PC寄存器，balabala……』
-
-面试官会心一笑，露出一道光芒：『好了，今天的面试先到这里了，回去等通知吧』
-
-一般听到等通知这句话，这场面试大概率就是凉凉了。为什么呢？因为面试者弄错了概念，面试官是想考察JMM，但是面试者一听到`Java内存`这几个关键字就开始背诵八股文了。Java内存模型(JMM)和Java运行时内存区域区别可大了呢，不要走开接着往下看，答应我要看完。
-
-# 1. 为什么要有内存模型？
+# 1. 为什么要有内存模型JMM？
 
 要想回答这个问题，我们需要先弄懂传统计算机硬件内存架构。好了，我要开始画图了。
 
 ## 1.1. 硬件内存架构
 
-![](https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/20210415231143.png)
+![传统计算机内存架构](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204052048567.png)
 
 （1）CPU
 
@@ -53,7 +45,7 @@ Main Memory 就是主存，主存比 L1、L2 缓存要大很多。
 
 使用高速缓存解决了 CPU 和主存速率不匹配的问题，但同时又引入另外一个新问题：缓存一致性问题。
 
-![](https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/20210415231224.png)
+<img src="https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/20210415231224.png" alt="抽象内存架构" style="zoom:50%;" />
 
 在多CPU的系统中(或者单CPU多核的系统)，每个CPU内核都有自己的高速缓存，它们共享同一主内存(Main Memory)。当多个CPU的运算任务都涉及同一块主内存区域时，CPU 会将数据读取到缓存中进行运算，这可能会导致各自的缓存数据不一致。
 
@@ -67,7 +59,7 @@ Main Memory 就是主存，主存比 L1、L2 缓存要大很多。
 
 除了处理器会对代码进行优化处理，很多现代编程语言的编译器也会做类似的优化，比如像 Java 的即时编译器（JIT）会做指令重排序。
 
-![](https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/20210416234526.png)
+![](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204052049801.png)
 
 > 处理器优化其实也是重排序的一种类型，这里总结一下，重排序可以分为三种类型：
 >
@@ -81,7 +73,7 @@ Main Memory 就是主存，主存比 L1、L2 缓存要大很多。
 
 熟悉 Java 并发的同学肯定对这三个问题很熟悉：『可见性问题』、『原子性问题』、『有序性问题』。如果从更深层次看这三个问题，其实就是上面讲的『缓存一致性』、『处理器优化』、『指令重排序』造成的。
 
-![](https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/20210416234000.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204052049670.png" style="zoom: 67%;" />
 
 缓存一致性问题其实就是可见性问题，处理器优化可能会造成原子性问题，指令重排序会造成有序性问题，你看是不是都联系上了。
 
@@ -97,7 +89,7 @@ Main Memory 就是主存，主存比 L1、L2 缓存要大很多。
 
 了解过 JVM 的同学都知道，JVM 运行时内存区域是分片的，分为栈、堆等，其实这些都是 JVM 定义的逻辑概念。在传统的硬件内存架构中是没有栈和堆这种概念。
 
-![](https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/20210416221328.png)
+![](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204052050766.png)
 
 从图中可以看出栈和堆既存在于高速缓存中又存在于主内存中，所以两者并没有很直接的关系。
 
@@ -112,13 +104,13 @@ Java 内存模型是一种规范，定义了很多东西：
 
 看文字太枯燥了，我又画了一张图：
 
-![](https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/20210416224815.png)
+![](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204052050718.png)
 
 ## 3.3. 线程间通信
 
 如果两个线程都对一个共享变量进行操作，共享变量初始值为 1，每个线程都变量进行加 1，预期共享变量的值为 3。在 JMM 规范下会有一系列的操作。
 
-![](https://cdn.jsdelivr.net/gh/smileArchitect/assets/202102/20210416230022.png)
+![](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204052050409.png)
 
 为了更好的控制主内存和本地内存的交互，Java 内存模型定义了八种操作来实现：
 
@@ -143,7 +135,7 @@ Java 语言在遵循内存模型的基础上推出了 JMM 规范，目的是解�
 
 为了更精准控制工作内存和主内存间的交互，JMM 还定义了八种操作：`lock`, `unlock`, `read`, `load`,` use`,` assign`, `store`, `write`。
 
--- End --
+
 
 
 
