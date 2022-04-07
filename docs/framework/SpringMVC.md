@@ -1153,7 +1153,7 @@ public String getEmployeeList(Model model){
             <td th:text="${employee.email}"></td>
             <td th:text="${employee.gender}"></td>
             <td>
-                <a class="deleteA" @click="deleteEmployee" th:href="@{'/employee/'+${employee.id}}">delete</a>
+                <a class="deleteA" @click="deleteEmployee" th:href="@{|/employee/${employee.id}|}">delete</a>
                 <a th:href="@{'/employee/'+${employee.id}}">update</a>
             </td>
         </tr>
