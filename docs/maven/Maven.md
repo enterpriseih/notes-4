@@ -1,9 +1,11 @@
+# Maven的三大坐标
+
 - groupId：公司或组织域名的倒序，通常也会加上项目名称
-	- 例如：com.atguigu.maven
+  - 例如：com.atguigu.maven
 - artifactId：模块的名称，将来作为 Maven 工程的工程名
 - version：模块的版本号，根据自己的需要设定
-	- 例如：SNAPSHOT 表示快照版本，正在迭代过程中，不稳定的版本
-	- 例如：RELEASE 表示正式版本
+  - 例如：SNAPSHOT 表示快照版本，正在迭代过程中，不稳定的版本
+  - 例如：RELEASE 表示正式版本
 
 # 基础概念
 

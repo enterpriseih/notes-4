@@ -16,6 +16,7 @@
 
 - [多线程并发](./docs/thread/多线程并发.md)
 - [Java的18把锁](./docs/thread/Java中的18把锁.md)
+- [Java内存模型](./docs/thread/Java内存模型.md)
 
 
 ### JVM
@@ -44,7 +45,7 @@
 
 ### else
 
-- [Java内存模型](./docs/thread/Java内存模型.md)
+
 - [计算机网络](./docs/计算机网络.md)
 - [Web](./docs/Web.md)
 - [Maven](./docs/maven/Maven.md)
