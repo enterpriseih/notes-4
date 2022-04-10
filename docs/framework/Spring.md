@@ -1,4 +1,4 @@
-## Spring、Spring MVC和Spring Boot
+# Spring、Spring MVC和Spring Boot
 
 - spring是⼀个IOC容器，⽤来管理Bean，使⽤依赖注⼊实现控制反转，可以很⽅便的整合各种框架，提供AOP机制弥补OOP的代码重复问题、更⽅便将不同类不同⽅法中的共同处理抽取成切⾯、⾃动注⼊给⽅法执⾏，⽐如⽇志、异常等 。
 - springmvc是spring对web框架的⼀个解决⽅案，提供了⼀个总的`前端控制器DispatcherServlet`，⽤来接收请求，然后定义了⼀套路由策略（url到handle的映射）及适配执⾏handle，将handle结果使⽤视图解析技术⽣成视图展现给前端 。
@@ -8,7 +8,7 @@
 
 
 
-## 1、Spring特点
+# Spring特点
 
 - 轻量级
 	- 大小和开销都是轻量级
@@ -35,9 +35,9 @@
 
 
 
-## 2、IOC
+# IOC
 
-### 容器
+## 一、容器
 
 实际上就是个map（key，value），存放配置文件里配置的各种对象；容器底层是对象工厂。
 
@@ -45,7 +45,7 @@
 
 Bean缓存池为HashMap实现
 
-#### 实现方式（两个接口）
+## 二、实现方式（两个接口）
 
 - **BeanFactory**
 
@@ -207,11 +207,11 @@ public class SpringConfig {
 
 
 
-## 3、AOP
+# AOP
 
 Spring中的事务管理就用到AOP
 
-### 核心概念
+## 核心概念
 
 - 连接点（joinpoint）
 	- 可以被增强的方法
@@ -239,32 +239,32 @@ Spring中的事务管理就用到AOP
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203241614714.jpeg" alt="AOP核心概念" />
 
-### AOP中的动态代理
+## AOP中的动态代理
 
 > [动态代理](../base/动态代理.md)
 
 - JDK动态代理：有接口的情况
 - CGLIB动态代理，没有接口的情况
 
-#### JDK动态代理
+### JDK动态代理
 
 - 创建接口实现类代理对象，增强类的方法
 - 只能为接口创建代理实例
 
-#### CGLIB动态代理
+### CGLIB动态代理
 
 - 创建子类的代理对象，增强类的方法
 
 
 
-#### AspectJ
+### AspectJ
 
 - Spring一般基于AspectJ实现AOP操作，其不是Spring 的组成，是独立AOP框架
 - Spring会自行判断并调用JDK还是CGLIB
 
 
 
-## 4、Spring中的事务管理
+# Spring中的事务管理
 
 - 编程式
 - **声明式**（使用）
@@ -325,7 +325,7 @@ Spring中的事务管理就用到AOP
 
 
 
-## 5、Spring中的设计模式
+# Spring中的设计模式
 
 - 工厂模式：BeanFactory、FactoryBean
 	- FactoryBean是一种bean，在Spring内部广泛使用，这个Bean不是简单的Bean，而是一个能生产或者修饰对象生成的工厂Bean,它的实现与设计模式中的工厂模式和修饰器模式类似 
@@ -337,7 +337,7 @@ Spring中的事务管理就用到AOP
 
 
 
-## 6、Spring MVC原理
+# Spring MVC原理
 
 MVC 是一种软件架构的思想，将软件按照模型、视图、控制器（MVC）来划分，围绕前端控制器 DispatcherServlet 来设计的。
 

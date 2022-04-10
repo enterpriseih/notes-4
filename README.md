@@ -28,7 +28,7 @@
 
 - [Spring](./docs/framework/Spring.md)
 - [MyBatis](./docs/framework/MyBatis.md)
-- [SpringMVC](./docs/framework/SpringMVC.md)
+- [SpringMVC](./docs/framework/SpringMVC笔记.md)
 
 ### 数据库
 
