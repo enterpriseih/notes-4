@@ -22,7 +22,7 @@ noted by YiENx
 ### 第14章：[动态规划](./Chapter14动态规划.md)
 ### 第15章：[图](./Chapter15图.md)
 
-
+### 第16章：[贪心](./Chapter16贪心.md)
 
 
 

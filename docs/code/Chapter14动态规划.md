@@ -1,5 +1,63 @@
 # 第十四章：动态规划
 
+## 补充：最大字数组之和
+
+给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+```
+输入：nums = [-2,1,-3,4,-1,2,1,-5,4]
+输出：6
+解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
+```
+
+### 题解
+
+```java
+// dp[i]以i结尾的最大连续子序列和
+// 1
+dp[i] = max{nums[i], dp[i - 1] + nums[i]};
+// 2，可以合并成1
+if (dp[i - 1] > 0) {
+    dp[i] = dp[i - 1] + nums[i];
+} else {
+    dp[i] = nums[i];
+}
+```
+
+
+
+```java
+public int maxSubArray(int[] nums) {
+    int res = Integer.MIN_VALUE;
+    int pre = 0;
+    for (int num : nums) {
+        pre = Math.max(num, pre + num);
+        res = Math.max(res, pre);
+    }
+    return res;
+}
+```
+
+```java
+public int maxSubArray(int[] nums) {
+    int len = nums.length;
+    int[] dp = new int[len];
+    dp[0] = nums[0];
+    int res = dp[0];
+    for (int i = 1; i < len; i++) {
+        if (dp[i - 1] > 0) {
+            dp[i] = dp[i - 1] + nums[i];
+        } else {
+            dp[i] = nums[i];
+        }
+        res = Math.max(res, dp[i]);
+    }
+    return res;
+}
+```
+
+
+
 ## 面试题88：爬楼梯的最少成本
 
 ### 题目
