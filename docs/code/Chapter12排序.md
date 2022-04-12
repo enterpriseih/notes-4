@@ -33,6 +33,12 @@ public int[][] merge(int[][] intervals) {
 
 ## 12.1 计数排序
 
+数组长度n，数字范围k（最大值和最小值的差值），时间复杂度`O(n+k)`
+
+适合k远小于n的场景，比如员工的年龄排序
+
+出现数字范围的时候使用
+
 ```java
 public int[] sortArray (int[] nums) {
     int max = Integer.MIN_VALUE;
@@ -41,7 +47,7 @@ public int[] sortArray (int[] nums) {
         max = Math.max(max, num);
         min = Math.min(min, num);
     }
-    
+    // count记录数组中每个数出现的次数
     int counts = new int[max - min + 1];
     for(int num : nums) {
         count[num - min]++;
@@ -49,6 +55,7 @@ public int[] sortArray (int[] nums) {
     
     int i = 0;
     for (int num = min; num <= max; num++) {
+        // 如果有这个数
         while(counts[num - min] > 0) {
             nums[i++] = num;
             counts[num - min]--;
@@ -65,7 +72,11 @@ public int[] sortArray (int[] nums) {
 
 ### 题目
 
-输入两个数组arr1和arr2，其中arr2里的每个数字都唯一并且也都是arr1中的数字。请将arr1中的数字按照arr2中数字的相对顺序排序。如果arr1中的数字在arr2中没有出现，那么将这些数字按递增的顺序排在后面。假设数组中的所有数字都在0到1000的范围内。例如，输入的数组arr1和arr2分别是[2, 3, 3, 7, 3, 9, 2, 1, 7, 2]和[3, 2, 1]，则arr1排序之后为[3, 3, 3, 2, 2, 2, 1, 7, 7, 9]。
+输入两个数组arr1和arr2，其中arr2里的每个数字都唯一并且也都是arr1中的数字。请将arr1中的数字按照arr2中数字的相对顺序排序。
+
+如果arr1中的数字在arr2中没有出现，那么将这些数字按递增的顺序排在后面。假设数组中的所有数字都在0到1000的范围内。
+
+例如，输入的数组arr1和arr2分别是[2, 3, 3, 7, 3, 9, 2, 1, 7, 2]和[3, 2, 1]，则arr1排序之后为[3, 3, 3, 2, 2, 2, 1, 7, 7, 9]。
 
 ### 参考代码
 
@@ -96,6 +107,23 @@ public int[] relativeSortArray(int[] arr1, int[] arr2) {
 ```
 
 ## 12.2 快速排序
+
+时间复杂度`O(nlogn)`
+
+分治思想，过程如下
+
+1. 在输入数组中随机选取一个元素作为中间值（pivot）
+2. 对数组进行分区（partition），使得，所有比中间值小的挪到数组左侧，比中间值大的挪到数组右侧
+3. 对中间值左右侧的数组用同样的步骤，直至子数组中只有一个数
+
+**分区步骤**
+
+1. 先将中间值换到末尾去
+2. p1初始化为-1的位置，p2初始化为0的位置；p1指向的是发现的最后一个小于中间值的位置
+3. 向右移动p2，当p2指向一个小于中间值的数时，移动p1，并交换p1和p2指向的数字，继续；
+4. 最后将中间值与p1++互换，此时p1指向的是本次的中间值 
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122146644.png" alt="iShot2022-04-12_21.44.25" style="zoom: 33%;" />                                                                                                                                                                                                                                                            
 
 ```java
 public int[] sortArray(int[] nums) {
@@ -227,7 +255,8 @@ public int[] mergeSort(int[] nums) {
     }
     return src;
 }
-
+```
+```java
 // 递归
 public int[] sortArray(int[] nums) {
     int[] dst = new int[nums.length];

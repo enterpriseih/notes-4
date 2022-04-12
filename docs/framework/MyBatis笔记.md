@@ -6,7 +6,7 @@
 1. MyBatis 是支持定制化 SQL、存储过程以及高级映射的优秀的持久层框架
 2. MyBatis 避免了几乎所有的 JDBC 代码和手动设置参数以及获取结果集
 3. MyBatis可以使用简单的XML或注解用于配置和原始映射，将接口和Java的POJO（Plain Old Java Objects，普通的Java对象）映射成数据库中的记录
-4. MyBatis 是一个 半自动的ORM（Object Relation Mapping）框架
+4. MyBatis 是一个`半自动的ORM（Object Relation Mapping）`框架
 ## MyBatis下载
 - [MyBatis下载地址](https://github.com/mybatis/mybatis-3)
 - ![](Resources/MyBatis下载.png)
@@ -35,29 +35,29 @@
 - 打包方式：jar
 - 引入依赖
 
-	```xml
-	<dependencies>
-		<!-- Mybatis核心 -->
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis</artifactId>
-			<version>3.5.7</version>
-		</dependency>
-		<!-- junit测试 -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- MySQL驱动 -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.3</version>
-			</dependency>
-	</dependencies>
-	```
+```xml
+<dependencies>
+	<!-- Mybatis核心 -->
+	<dependency>
+		<groupId>org.mybatis</groupId>
+		<artifactId>mybatis</artifactId>
+		<version>3.5.7</version>
+	</dependency>
+	<!-- junit测试 -->
+	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>4.12</version>
+		<scope>test</scope>
+	</dependency>
+	<!-- MySQL驱动 -->
+	<dependency>
+		<groupId>mysql</groupId>
+		<artifactId>mysql-connector-java</artifactId>
+		<version>5.1.3</version>
+	</dependency>
+</dependencies>
+```
 ## 创建MyBatis的核心配置文件
 >习惯上命名为`mybatis-config.xml`，这个文件名仅仅只是建议，并非强制要求。将来整合Spring之后，这个配置文件可以省略，所以大家操作时可以直接复制、粘贴。
 >核心配置文件主要用于配置连接数据库的环境以及MyBatis的全局配置信息
