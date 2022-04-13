@@ -239,23 +239,5 @@ for(Map.Entry<Integer,String> node : set){
 ```
 
 ### 3、ConcurrentHashMap
-
-#### a>Segment段
-
-#### b>线程安全（Segment 继承 ReentrantLock 加锁）
-
-简单理解就是，ConcurrentHashMap 是一个 Segment 数组，Segment 通过继承ReentrantLock 来进行加锁，所以每次需要加锁的操作**锁住的是一个 segment**，这样只要保证每个 Segment 是线程安全的，也就实现了全局的线程安全。
-
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061546572.png" alt="image-20220406154643937" style="zoom:80%;" />
-
-每个segment也具有红黑树结构
-
-#### c>并行度（默认16）
-
-concurrencyLevel：并行级别、并发数、Segment 数。
-
-也就是说 ConcurrentHashMap 有 16 个 Segments，所以理论上，这个时候，最多可以同时支持 16 个线程并发写，只要它们的操作分别分布在不同的 Segment 上。
-
-`可以初始化赋值，但是初始化后不可扩容`
-
-每个 Segment 很像之前介绍的 HashMap，不过它要保证线程安全，所以处理起来要麻烦些。
+线程安全
+多线程并发中详细

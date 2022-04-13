@@ -9,7 +9,7 @@
 4. MyBatis 是一个`半自动的ORM（Object Relation Mapping）`框架
 ## MyBatis下载
 - [MyBatis下载地址](https://github.com/mybatis/mybatis-3)
-- ![](Resources/MyBatis下载.png)
+- <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122307205.png" style="zoom:67%;" />
 ## 和其它持久化层技术对比
 - JDBC  
 	- SQL 夹杂在Java代码中耦合度高，导致硬编码内伤  
@@ -117,7 +117,7 @@ public interface UserMapper {
 	- MyBatis映射文件用于编写SQL，访问以及操作表中的数据
 	- MyBatis映射文件存放的位置是src/main/resources/mappers目录下
 - MyBatis中可以面向接口操作数据，要保证两个一致
-	- mapper接口的全类名和映射文件的命名空间（namespace）保持一致
+	- **mapper接口的全类名和映射文件的命名空间（namespace）保持一致**
 	- mapper接口中方法的方法名和映射文件中编写SQL的标签的id属性保持一致
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>  
@@ -265,6 +265,7 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
             </dataSource>
         </environment>
     </environments>
+    
     <!--引入映射文件-->
     <mappers>
         <!-- <mapper resource="UserMapper.xml"/> -->
@@ -278,10 +279,11 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
     </mappers>
 </configuration>
 ```
-- ![](Resources/mapper接口和mapper映射文件在同一包下.png)
+- <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122328209.png" style="zoom:90%;" />
 # 默认的类型别名
-![](Resources/默认的类型别名1.png)
-![](Resources/默认的类型别名2.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122329506.png" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122329387.png" style="zoom:67%;" />
+
 # MyBatis的增删改查
 1. 添加
 	```xml
@@ -320,10 +322,13 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
 	```
 - 注意：
 
-	1. 查询的标签select必须设置属性resultType或resultMap，用于设置实体类和数据库表的映射关系  
+	1. 查询的标签select必须设置属性resultType或resultMap，
+	用于设置实体类和数据库表的映射关系  
 		- resultType：自动映射，用于属性名和表中字段名一致的情况  
-		- resultMap：自定义映射，用于一对多或多对一或字段名和属性名不一致的情况  
-	2. 当查询的数据为多条时，不能使用实体类作为返回值，只能使用集合，否则会抛出异常TooManyResultsException；但是若查询的数据只有一条，可以使用实体类或集合作为返回值
+	    - resultMap：自定义映射，用于一对多或多对一或字段名和属性名不一致的情况  
+	2. 当查询的数据为多条时，不能使用实体类作为返回值，只能使用集合，
+	否则会抛出异常TooManyResultsException；
+	但是若查询的数据只有一条，可以使用实体类或集合作为返回值
 # MyBatis获取参数值的两种方式（重点）
 - MyBatis获取参数值的两种方式：${}和#{}  
 - ${}的本质就是字符串拼接，#{}的本质就是占位符赋值  

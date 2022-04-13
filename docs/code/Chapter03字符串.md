@@ -227,7 +227,8 @@ public String minWindow(String s, String t) {
                     count--;
                 }
             }
-
+			// 当count减到0的时候，末尾坐标还自加了，
+            // 所以最后取子串的时候直接用p2
             p2++;
         } else {
             if (p2 - p1 + 1 < minLength) {
