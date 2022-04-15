@@ -158,6 +158,24 @@ public class UserMapperTest {
         System.out.println("result:" + result);
     }
 }
+
+// 单独写个工具类
+public class SqlSessionUtils {
+    public static SqlSession getSqlSession(){
+        SqlSession sqlSession = null;
+        try {
+            InputStream is = Resources.getResourceAsStream("mybatis-config.xml");
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
+            sqlSession = sqlSessionFactory.openSession(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sqlSession;
+    }
+}
+
+SqlSession sqlSession = SqlSessionUtils.getSqlSession();
+SelectMapper mapper = sqlSession.getMapper(SelectMapper.class);
 ```
 - 此时需要手动提交事务，如果要自动提交事务，则在获取sqlSession对象时，使用`SqlSession sqlSession = sqlSessionFactory.openSession(true);`，传入一个Boolean类型的参数，值为true，这样就可以自动提交
 ## 加入log4j日志功能
@@ -268,11 +286,13 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
     
     <!--引入映射文件-->
     <mappers>
-        <!-- <mapper resource="UserMapper.xml"/> -->
+        <!--<mapper resource="mappers/UserMapper.xml"/>-->
         <!--
         以包为单位，将包下所有的映射文件引入核心配置文件
+		在resources里面创建包只能用目录的形式，
+		创建的时候要用/分割，不能用.分割
         注意：
-			1. 此方式必须保证mapper接口和mapper映射文件必须在相同的包下
+			1. 此方式必须保证mapper接口和mapper映射文件必须在同名的包下
 			2. mapper接口要和mapper映射文件的名字一致
         -->
         <package name="com.atguigu.mybatis.mapper"/>
@@ -329,12 +349,12 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
 	2. 当查询的数据为多条时，不能使用实体类作为返回值，只能使用集合，
 	否则会抛出异常TooManyResultsException；
 	但是若查询的数据只有一条，可以使用实体类或集合作为返回值
-# MyBatis获取参数值的两种方式（重点）
+# MyBatis获取参数值的两种方式（重点***）
 - MyBatis获取参数值的两种方式：${}和#{}  
-- ${}的本质就是字符串拼接，#{}的本质就是占位符赋值  
+- `${}的本质就是字符串拼接`，`#{}的本质就是占位符赋值  `
 - ${}使用字符串拼接的方式拼接sql，若为字符串类型或日期类型的字段进行赋值时，需要手动加单引号；但是#{}使用占位符赋值的方式拼接sql，此时为字符串类型或日期类型的字段进行赋值时，可以自动添加单引号
-## 单个字面量类型的参数
-- 若mapper接口中的方法参数为单个的字面量类型，此时可以使用\${}和#{}以任意的名称（最好见名识意）获取参数的值，注意${}需要手动加单引号
+## 一、单个字面量类型的参数
+- 若mapper接口中的方法参数为单个的字面量类型，此时可以使用\${}和#{}以任意的名称（最好见名识意）获取参数的值，**注意${}需要手动加单引号**
 ```xml
 <!--User getUserByUsername(String username);-->
 <select id="getUserByUsername" resultType="User">
@@ -347,13 +367,13 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
 	select * from t_user where username = '${username}'  
 </select>
 ```
-## 多个字面量类型的参数
+## 二、多个字面量类型的参数
 - 若mapper接口中的方法参数为多个时，此时MyBatis会自动将这些参数放在一个map集合中
 
 	1. 以arg0,arg1...为键，以参数为值；
 	2. 以param1,param2...为键，以参数为值；
 - 因此只需要通过\${}和#{}访问map集合的键就可以获取相对应的值，注意${}需要手动加单引号。
-- 使用arg或者param都行，要注意的是，arg是从arg0开始的，param是从param1开始的
+- 使用arg或者param都行，要注意的是，`arg是从arg0开始的`，`param是从param1开始的`
 ```xml
 <!--User checkLogin(String username,String password);-->
 <select id="checkLogin" resultType="User">  
@@ -366,7 +386,7 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
 	select * from t_user where username = '${param1}' and password = '${param2}'
 </select>
 ```
-## map集合类型的参数
+## 三、map集合类型的参数
 - 若mapper接口中的方法需要的参数为多个时，此时可以手动创建map集合，将这些数据放在map中只需要通过\${}和#{}访问map集合的键就可以获取相对应的值，注意${}需要手动加单引号
 ```xml
 <!--User checkLoginByMap(Map<String,Object> map);-->
@@ -385,9 +405,11 @@ public void checkLoginByMap() {
 	User user = mapper.checkLoginByMap(map);
 	System.out.println(user);
 }
+// 自己设置了键名
 ```
-## 实体类类型的参数
+## 四、实体类类型的参数
 - 若mapper接口中的方法参数为实体类对象时此时可以使用\${}和#{}，通过访问实体类对象中的属性名获取属性值，注意${}需要手动加单引号
+- 此处是通过set和get方法，就算没有属性，但是有get和set，也是能放入的参数名
 ```xml
 <!--int insertUser(User user);-->
 <insert id="insertUser">
@@ -403,8 +425,8 @@ public void insertUser() {
 	mapper.insertUser(user);
 }
 ```
-## 使用@Param标识参数
-- 可以通过@Param注解标识mapper接口中的方法参数，此时，会将这些参数放在map集合中 
+## 五、使用@Param标识参数
+- 可以通过@Param注解标识mapper接口中的方法参数，此时，会将这些参数放在map集合中 ；**相当于二和三的合体**
 
 	1. 以@Param注解的value属性值为键，以参数为值；
 	2. 以param1,param2...为键，以参数为值；
@@ -423,11 +445,10 @@ public void checkLoginByParam() {
 	mapper.CheckLoginByParam("admin","123456");
 }
 ```
-## 总结
+## 总结***
 - 建议分成两种情况进行处理
-
-	1. 实体类类型的参数
-	2. 使用@Param标识参数
+	- `实体类类型的参数`
+	- `使用@Param标识参数`
 # MyBatis的各种查询功能
 1. 如果查询出的数据只有一条，可以通过
 	1. 实体类对象接收
@@ -437,7 +458,7 @@ public void checkLoginByParam() {
 	1. 实体类类型的LIst集合接收
 	2. Map类型的LIst集合接收
 	3. 在mapper接口的方法上添加@MapKey注解
-## 查询一个实体类对象
+## 一、查询一个实体类对象
 ```java
 /**
  * 根据用户id查询用户信息
@@ -452,7 +473,7 @@ User getUserById(@Param("id") int id);
 	select * from t_user where id = #{id}
 </select>
 ```
-## 查询一个List集合
+## 二、查询一个List集合
 ```java
 /**
  * 查询所有用户信息
@@ -466,15 +487,15 @@ List<User> getUserList();
 	select * from t_user
 </select>
 ```
-## 查询单个数据
+## 三、查询单个数据
 ```java
 /**  
  * 查询用户的总记录数  
  * @return  
  * 在MyBatis中，对于Java中常用的类型都设置了类型别名  
- * 例如：java.lang.Integer-->int|integer  
- * 例如：int-->_int|_integer  
- * 例如：Map-->map,List-->list  
+ * 例如：java.lang.Integer-->int,integer  
+ * 例如：int-->_int,_integer  
+ * 例如：Map-->map;List-->list  
  */  
 int getCount();
 ```
@@ -484,7 +505,7 @@ int getCount();
 	select count(id) from t_user
 </select>
 ```
-## 查询一条数据为map集合
+## 四、查询一条数据为map集合
 ```java
 /**  
  * 根据用户id查询用户信息为map集合  
@@ -500,7 +521,7 @@ Map<String, Object> getUserToMap(@Param("id") int id);
 </select>
 <!--结果：{password=123456, sex=男, id=1, age=23, username=admin}-->
 ```
-## 查询多条数据为map集合
+## 五、查询多条数据为map集合
 ### 方法一
 ```java
 /**  
@@ -527,7 +548,10 @@ List<Map<String, Object>> getAllUserToMap();
 /**
  * 查询所有用户信息为map集合
  * @return
- * 将表中的数据以map集合的方式查询，一条数据对应一个map；若有多条数据，就会产生多个map集合，并且最终要以一个map的方式返回数据，此时需要通过@MapKey注解设置map集合的键，值是每条数据所对应的map集合
+ * 将表中的数据以map集合的方式查询，
+ * 一条数据对应一个map；若有多条数据，
+ * 就会产生多个map集合，并且最终要以一个map的方式返回数据，
+ * 此时需要通过@MapKey注解设置map集合的键，值是每条数据所对应的map集合
  */
 @MapKey("id")
 Map<String, Object> getAllUserToMap();
@@ -567,7 +591,7 @@ List<User> getUserByLike(@Param("username") String username);
 ```
 - 其中`select * from t_user where username like "%"#{mohu}"%"`是最常用的
 ## 批量删除
-- 只能使用\${}，如果使用#{}，则解析后的sql语句为`delete from t_user where id in ('1,2,3')`，这样是将`1,2,3`看做是一个整体，只有id为`1,2,3`的数据会被删除。正确的语句应该是`delete from t_user where id in (1,2,3)`，或者`delete from t_user where id in ('1','2','3')`
+- **只能使用\${}**，如果使用#{}，则解析后的sql语句为`delete from t_user where id in ('1,2,3')`，这样是将`1,2,3`看做是一个整体，只有id为`1,2,3`的数据会被删除。正确的语句应该是`delete from t_user where id in (1,2,3)`，或者`delete from t_user where id in ('1','2','3')`
 ```java
 /**
  * 根据id批量删除
@@ -615,10 +639,10 @@ List<User> getUserByTable(@Param("tableName") String tableName);
 	- t_student(student_id,student_name,clazz_id)  
 	1. 添加班级信息  
 	2. 获取新添加的班级的id  
-	3. 为班级分配学生，即将某学的班级id修改为新添加的班级的id
+	3. 为班级分配学生，即将某学生的班级id修改为新添加的班级的id
 - 在mapper.xml中设置两个属性
 	- useGeneratedKeys：设置使用自增的主键  
-	* keyProperty：因为增删改有统一的返回值是受影响的行数，因此只能将获取的自增的主键放在传输的参数user对象的某个属性中
+	* keyProperty：因为增删改有统一的返回值是受影响的行数，因此只能**将获取的自增的主键放在传输的参数user对象的某个属性**中
 ```java
 /**
  * 添加用户信息
@@ -648,15 +672,24 @@ public void insertUser() {
 # 自定义映射resultMap
 ## resultMap处理字段和属性的映射关系
 - resultMap：设置自定义映射  
+
 	- 属性：  
 		- id：表示自定义映射的唯一标识，不能重复
-		- type：查询的数据要映射的实体类的类型  
+	
+	 - type：查询的数据要映射的实体类的类型  
+	
 	- 子标签：  
+	
 		- id：设置主键的映射关系  
+	
 		- result：设置普通字段的映射关系  
+	
 		- 子标签属性：  
+	
 			- property：设置映射关系中实体类中的属性名  
+	
 			- column：设置映射关系中表中的字段名
+	
 - 若字段名和实体类中的属性名不一致，则可以通过resultMap设置自定义映射，即使字段名和属性名一致的属性也要映射，也就是全部属性都要列出来
 ```xml
 <resultMap id="empResultMap" type="Emp">
@@ -673,19 +706,20 @@ public void insertUser() {
 ```
 - 若字段名和实体类中的属性名不一致，但是字段名符合数据库的规则（使用_），实体类中的属性名符合Java的规则（使用驼峰）。此时也可通过以下两种方式处理字段名和实体类中的属性的映射关系  
 
-	1. 可以通过为字段起别名的方式，保证和实体类中的属性名保持一致  
-		```xml
-		<!--List<Emp> getAllEmp();-->
-		<select id="getAllEmp" resultType="Emp">
-			select eid,emp_name empName,age,sex,email from t_emp
-		</select>
-		```
-	2. 可以在MyBatis的核心配置文件中的`setting`标签中，设置一个全局配置信息mapUnderscoreToCamelCase，可以在查询表中数据时，自动将_类型的字段名转换为驼峰，例如：字段名user_name，设置了mapUnderscoreToCamelCase，此时字段名就会转换为userName。[核心配置文件详解](#核心配置文件详解)
-		```xml
+1. 可以通过为字段起别名的方式，保证和实体类中的属性名保持一致  
+	```xml
+	<!--List<Emp> getAllEmp();-->
+	<select id="getAllEmp" resultType="Emp">
+		select eid,emp_name empName,age,sex,email from t_emp
+	</select>
+	```
+2. 可以在MyBatis的核心配置文件中的`setting`标签中，设置一个全局配置信息mapUnderscoreToCamelCase，可以在查询表中数据时，自动将_类型的字段名转换为驼峰，例如：字段名user_name，设置了mapUnderscoreToCamelCase，此时字段名就会转换为userName。[核心配置文件详解](#核心配置文件详解)
+	```xml
 	<settings>
-	    <setting name="mapUnderscoreToCamelCase" value="true"/>
+   	<setting name="mapUnderscoreToCamelCase" value="true"/>
 	</settings>
-		```
+	```
+
 ## 多对一映射处理
 >查询员工信息以及员工所对应的部门信息
 ```java
@@ -699,7 +733,7 @@ public class Emp {
 	//...构造器、get、set方法等
 }
 ```
-### 级联方式处理映射关系
+### 1、级联方式处理映射关系
 ```xml
 <resultMap id="empAndDeptResultMapOne" type="Emp">
 	<id property="eid" column="eid"></id>
@@ -715,7 +749,7 @@ public class Emp {
 	select * from t_emp left join t_dept on t_emp.eid = t_dept.did where t_emp.eid = #{eid}
 </select>
 ```
-### 使用association处理映射关系
+### 2、使用association处理映射关系
 - association：处理多对一的映射关系
 - property：需要处理多对的映射关系的属性名
 - javaType：该属性的类型
@@ -736,10 +770,10 @@ public class Emp {
 	select * from t_emp left join t_dept on t_emp.eid = t_dept.did where t_emp.eid = #{eid}
 </select>
 ```
-### 分步查询
-#### 1. 查询员工信息
-- select：设置分布查询的sql的唯一标识（namespace.SQLId或mapper接口的全类名.方法名）
-- column：设置分步查询的条件
+### 3、分步查询***
+#### a>查询员工信息
+- select：设置分布查询的sql的唯一标识（namespace.SQLId或mapper**接口**的全类名.方法名）
+- column：设置分步查询的条件，第二个sql该怎么去查，就是第二个的参数名
 ```java
 //EmpMapper里的方法
 /**
@@ -767,7 +801,7 @@ Emp getEmpAndDeptByStepOne(@Param("eid") Integer eid);
 	select * from t_emp where eid = #{eid}
 </select>
 ```
-#### 2. 查询部门信息
+#### b>查询部门信息
 ```java
 //DeptMapper里的方法
 /**
@@ -862,10 +896,12 @@ List<Emp> getDeptAndEmpByStepTwo(@Param("did") Integer did);
 </select>
 ```
 ## 延迟加载
-- 分步查询的优点：可以实现延迟加载，但是必须在核心配置文件中设置全局配置信息：
-	- lazyLoadingEnabled：延迟加载的全局开关。当开启时，所有关联对象都会延迟加载  
-	- aggressiveLazyLoading：当开启时，任何方法的调用都会加载该对象的所有属性。 否则，每个属性会按需加载  
-- 此时就可以实现按需加载，获取的数据是什么，就只会执行相应的sql。此时可通过association和collection中的fetchType属性设置当前的分步查询是否使用延迟加载，fetchType="lazy(延迟加载)|eager(立即加载)"
+- **分步查询的优点**：可以实现延迟加载，但是必须在核心配置文件中设置全局配置信息：
+ - lazyLoadingEnabled：延迟加载的全局开关。当开启时，所有关联对象都会延迟加载  
+ - aggressiveLazyLoading：当开启时，任何方法的调用都会加载该对象的所有属性。 否则，每个属性会按需加载
+ - `使用延迟加载的时候，设置lazyLoadingEnabled = true;aggressiveLazyLoading = false（默认）`
+- 此时就可以实现按需加载，获取的数据是什么，就只会执行相应的sql。
+- 此时可通过association和collection中的fetchType属性设置当前的分步查询是否使用延迟加载，`fetchType="lazy(延迟加载)|eager(立即加载)"`
 ```xml
 <settings>
 	<!--开启延迟加载-->
@@ -894,24 +930,26 @@ public void getEmpAndDeptByStepOne() {
 	System.out.println(emp.getEmpName());
 	System.out.println("----------------");
 	System.out.println(emp.getDept());
+    // 获取部门的信息只会调用部门的sql
 }
 ```
 - 开启后，需要用到查询dept的时候才会调用相应的SQL语句![](Resources/延迟加载测试3.png)
 - fetchType：当开启了全局的延迟加载之后，可以通过该属性手动控制延迟加载的效果，fetchType="lazy(延迟加载)|eager(立即加载)"
 
-	```xml
-	<resultMap id="empAndDeptByStepResultMap" type="Emp">
-		<id property="eid" column="eid"></id>
-		<result property="empName" column="emp_name"></result>
-		<result property="age" column="age"></result>
-		<result property="sex" column="sex"></result>
-		<result property="email" column="email"></result>
-		<association property="dept"
-					 select="com.atguigu.mybatis.mapper.DeptMapper.getEmpAndDeptByStepTwo"
-					 column="did"
-					 fetchType="lazy"></association>
-	</resultMap>
-	```
+```xml
+<resultMap id="empAndDeptByStepResultMap" type="Emp">
+	<id property="eid" column="eid"></id>
+	<result property="empName" column="emp_name"></result>
+	<result property="age" column="age"></result>
+	<result property="sex" column="sex"></result>
+	<result property="email" column="email"></result>
+	<association property="dept"
+				 select="com.atguigu.mybatis.mapper.DeptMapper.getEmpAndDeptByStepTwo"
+				 column="did"
+				 fetchType="lazy"></association>
+</resultMap>
+```
+
 # 动态SQL
 - Mybatis框架的动态SQL技术是一种根据特定条件动态拼装SQL语句的功能，它存在的意义是为了解决拼接SQL语句字符串时的痛点问题
 ## if
