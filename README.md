@@ -42,6 +42,7 @@
 
 ### Redis
 
+- [Redis](./docs/redis/Redis.md)
 - [20道Redis经典面试题](./docs/redis/20道Redis经典面试题.md)
 
 ### else

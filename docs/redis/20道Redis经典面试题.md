@@ -69,7 +69,7 @@ Redis是key-value数据库，key的类型只能是String，但是value的数据�
 * Set
 * Sorted Set
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201018222748.png" width="300"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204162042741.png" width="300"/>
 
 **（1）String字符串**
 

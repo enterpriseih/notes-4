@@ -116,7 +116,7 @@ Redis是key-value数据库，key的类型只能是String，但是value的数据�
 * Set
 * Sorted Set
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025211352.png" width="300"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204162042741.png" width="300"/>
 
 ## 1.  String字符串
 
@@ -1201,8 +1201,3 @@ master0:name=mymaster,status=ok,address=172.17.0.3:6379,slaves=2,sentinels=3
 根据回显可以看出主ip已经换为172.17.0.3
 --- 至此哨兵模式已经测试完毕。
 
-# 公众号
-
-公众号比Github早一到两天更新，如果大家想要实时关注我更新的文章以及分享的干货，可以关注我的公众号。
-
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/wechat-01.jpg" width=""/> </div><br>

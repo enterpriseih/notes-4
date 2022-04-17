@@ -1,10 +1,36 @@
 # 第八章：树
 
+### 树的深度
+
+```java
+public int maxDepth(TreeNode root) {
+    if (root == null) {
+        return 0;
+    } else {
+        int leftHeight = maxDepth(root.left);
+        int rightHeight = maxDepth(root.right);
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+}
+```
+
+
+
 ## 8.1 二叉树的深度优先搜索
+
+树为
+
+1，
+
+2，3，
+
+4，5，6，7
 
 ### 中序遍历
 
-```java
+4，2，5，1，6，3，7
+
+````java
 // 递归
 public List<Integer> inorderTraversal(TreeNode root) {
     List<Integer> nodes = new LinkedList<>();
@@ -19,7 +45,12 @@ private void dfs(TreeNode root, List<Integer> nodes) {
         dfs(root.right, nodes);
     }
 }
+````
 
+顺着左子节点遍历，因为中序遍历，所以先不读取左子节点，将其先存入栈中
+直至没有左子节点，此时的栈顶元素就是中序需要去读取的元素
+
+```java
 // 迭代
 public List<Integer> inorderTraversal(TreeNode root) {
     List<Integer> nodes = new LinkedList<>();
@@ -36,11 +67,14 @@ public List<Integer> inorderTraversal(TreeNode root) {
     }
     return nodes;
 }
+
 ```
 
 
 
 ### 前序遍历
+
+1，2，4，5，3，6，7
 
 ```java
 // 递归
@@ -57,7 +91,9 @@ private void dfs(TreeNode root, List<Integer> nodes) {
         dfs(root.right, nodes);
     }
 }
+````
 
+```java
 // 迭代
 public List<Integer> inorderTraversal(TreeNode root) {
     List<Integer> nodes = new LinkedList<>();
@@ -80,6 +116,8 @@ public List<Integer> inorderTraversal(TreeNode root) {
 
 ### 后序遍历
 
+4，5，2，6，3，7，1
+
 ```java
 // 递归
 public List<Integer> inorderTraversal(TreeNode root) {
@@ -95,7 +133,12 @@ private void dfs(TreeNode root, List<Integer> nodes) {
         nodes.add(root,val);
     }
 }
+````
+当到达某个节点时，若已经遍历过其右子树就遍历这个节点
+否则先去遍历右子树；
+设置一个prev记录前一个遍历的节点
 
+```java
 // 迭代
 public List<Integer> inorderTraversal(TreeNode root) {
     List<Integer> nodes = new LinkedList<>();
@@ -108,7 +151,7 @@ public List<Integer> inorderTraversal(TreeNode root) {
             cur = cur.left;
         }
         cur = stack.peek();
-        while(cur.right != null && cur.right != prev){
+        if(cur.right != null && cur.right != prev){
             cur = cur.right;
         }else {
             stack.pop();
