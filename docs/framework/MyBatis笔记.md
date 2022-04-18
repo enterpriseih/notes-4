@@ -372,6 +372,7 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
 ```
 ## 2、多个字面量类型的参数
 - 若mapper接口中的方法参数为多个时，此时MyBatis会自动将这些参数放在一个map集合中
+
 	1. 以arg0,arg1...为键，以参数为值；
 	2. 以param1,param2...为键，以参数为值；
 
@@ -1219,6 +1220,7 @@ public void insertMoreByList() {
 ## MyBatis的一级缓存
 - `一级缓存是SqlSession级别的`，通过同一个SqlSession查询的数据会被缓存，下次查询相同的数据，就会从缓存中直接获取，不会从数据库重新访问  
 - **一级缓存失效的四种情况**：  
+
 	1. 不同的SqlSession对应不同的一级缓存  
 	2. 同一个SqlSession但是查询条件不同
 	3. 同一个SqlSession两次查询期间执行了任何一次增删改操作
@@ -1227,6 +1229,7 @@ public void insertMoreByList() {
 ## MyBatis的二级缓存
 - `二级缓存是SqlSessionFactory级别`，通过同一个SqlSessionFactory创建的SqlSession查询的结果会被缓存；此后若再次执行相同的查询语句，结果就会从缓存中获取  
 - **二级缓存开启的条件**
+
 	1. 在核心配置文件中，设置全局配置属性cacheEnabled="true"，默认为true，不需要设置
 	2. 在映射文件中设置标签`<cache />`
 	3. 二级缓存必须在SqlSession关闭或提交之后有效
@@ -1350,6 +1353,9 @@ public void insertMoreByList() {
 | diskExpiryThreadIntervalSeconds | 否 | 磁盘缓存的清理线程运行间隔，默认是120秒。每个120s， 相应的线程会进行一次EhCache中数据的清理工作 |
 | memoryStoreEvictionPolicy | 否 | 当内存缓存达到最大，有新的element加入的时候， 移除缓存中element的策略。 默认是LRU（最近最少使用），可选的有LFU（最不常使用）和FIFO（先进先出 |
 # 十二、MyBatis的逆向工程
+
+MybatisGenerator，MBG
+
 - 正向工程：先创建Java实体类，由框架负责根据实体类生成数据库表。Hibernate是支持正向工程的
 - 逆向工程：先创建数据库表，由框架负责根据数据库表，反向生成如下资源：  
 	- Java实体类  
@@ -1490,7 +1496,7 @@ public void insertMoreByList() {
 </generatorConfiguration>
 ```
 ### 执行MBG插件的generate目标
-- <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204162128601.png" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204162128601.png" style="zoom:67%;" />
 
 - 如果出现报错：`Exception getting JDBC Driver`，可能是pom.xml中，**数据库驱动配置**错误
 
@@ -1498,6 +1504,7 @@ public void insertMoreByList() {
 
 	- mybatis-generator-maven-plugin插件中的mysql驱动
 	- 两者的驱动版本应该相同
+
 ## QBC（Query By Criteria）
 ### 查询
 - `selectByExample`：按条件查询，需要传入一个example对象或者null；如果传入一个null，则表示没有条件，也就是查询所有数据
@@ -1519,15 +1526,15 @@ public void insertMoreByList() {
 	emps.forEach(System.out::println);
 }
 ```
-<img src="Resources/example测试结果.png" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204182026882.png" style="zoom:67%;" />
 
 ### 增改
 - `updateByPrimaryKey`：通过主键进行数据修改，如果某一个值为null，也会将对应的字段改为null
 	- `mapper.updateByPrimaryKey(new Emp(1,"admin",22,null,"456@qq.com",3));`
-	- <img src="Resources/增删改测试结果1.png" style="zoom:67%;" />
+	- <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204182026365.png" style="zoom:67%;" />
 - `updateByPrimaryKeySelective()`：通过主键进行选择性数据修改，如果某个值为null，则不修改这个字段
 	- `mapper.updateByPrimaryKeySelective(new Emp(2,"admin2",22,null,"456@qq.com",3));`
-	- <img src="Resources/增删改测试结果2.png" style="zoom:67%;" />
+	- <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204182026288.png" style="zoom:67%;" />
 # 十三、分页插件
 ## 分页插件使用步骤
 ### 添加依赖
@@ -1569,7 +1576,7 @@ public void testPageHelper() throws IOException {
 }
 ```
 
-<img src="Resources/分页测试结果.png" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204182026524.png" style="zoom:67%;" />
 
 ### 分页相关数据
 #### 方法一：直接输出

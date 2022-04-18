@@ -14,6 +14,30 @@ public int maxDepth(TreeNode root) {
 }
 ```
 
+### 树的最小深度
+
+```java
+/**
+ * 递归法，相比求MaxDepth要复杂点
+ * 因为最小深度是从根节点到最近**叶子节点**的最短路径上的节点数量
+ */
+public int minDepth(TreeNode root) {
+    if (root == null) {
+        return 0;
+    }
+    int leftDepth = minDepth(root.left);
+    int rightDepth = minDepth(root.right);
+    if (root.left == null) {
+        return rightDepth + 1;
+    }
+    if (root.right == null) {
+        return leftDepth + 1;
+    }
+    // 左右结点都不为null
+    return Math.min(leftDepth, rightDepth) + 1;
+}
+```
+
 
 
 ## 8.1 二叉树的深度优先搜索
@@ -391,6 +415,30 @@ class Solution {
 
 
 ## 8.2 二叉搜索树
+
+## 补：验证二叉搜索树
+
+#### 方法一：中序遍历
+
+中序遍历二叉搜索树的结果就是递增的，如果不是二叉搜索树，则会出现当前值比前一个的值小的情况
+
+#### 方法二：
+
+```java
+// 上下界，左子树的所有节点都必须比当前节点小
+public boolean isValidBST(TreeNode root) {
+    long lower = Long.MIN_VALUE;
+    long upper = Long.MAX_VALUE;
+    return dfs(root, lower, upper);
+}
+private boolean dfs(TreeNode root, long lower, long upper) {
+    if (root == null) return true;
+    if (root.val >= upper || root.val <= lower) return false;
+    return dfs(root.left, lower, root.val) && dfs(root.right, root.val, upper);
+}
+```
+
+
 
 ## 面试题52：展平二叉搜索树
 

@@ -7,6 +7,64 @@
   - 例如：SNAPSHOT 表示快照版本，正在迭代过程中，不稳定的版本
   - 例如：RELEASE 表示正式版本
 
+# 配置
+
+[下载地址](https://maven.apache.org/download.cgi)
+
+解压至无中文目录下
+
+Maven 的核心配置文件：**conf/settings.xml**
+
+## 1、指定本地仓库
+
+```xml
+<!-- localRepository
+| The path to the local repository maven will use to store artifacts.
+|
+| Default: ${user.home}/.m2/repository
+<localRepository>/path/to/local/repo</localRepository>
+-->
+<localRepository>D:\maven-repository</localRepository>
+```
+
+**记住**：一定要把 localRepository 标签**从注释中拿出来**。
+
+**注意**：本地仓库本身也需要使用一个**非中文、没有空格**的目录。
+
+## 2、镜像文件
+
+原有的注释掉，加入下面的
+
+```xml
+<mirror>
+    <id>nexus-aliyun</id>
+    <mirrorOf>central</mirrorOf>
+    <name>Nexus aliyun</name>
+    <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+</mirror>
+```
+
+
+
+## 3、基础JDK版本
+
+```xml
+<profile>
+    <id>jdk-1.8</id>
+    <activation>
+        <activeByDefault>true</activeByDefault>
+        <jdk>1.8</jdk>
+    </activation>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+    </properties>
+</profile>
+```
+
+
+
 # 基础概念
 
 ## 1、依赖范围

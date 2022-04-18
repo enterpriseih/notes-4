@@ -56,6 +56,34 @@ public int maxSubArray(int[] nums) {
 }
 ```
 
+## 不同的二叉搜索树
+
+[代码随想录](https://programmercarl.com/0096.%E4%B8%8D%E5%90%8C%E7%9A%84%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91.html#%E6%80%9D%E8%B7%AF)
+
+**dp[i] ： 1到i为节点组成的二叉搜索树的个数为dp[i]**。
+
+`dp[i] = \sum_1^i(dp[j-1] * dp[i-j])`
+
+`j-1 为 j 为头结点左子树节点数量，i-j 为以 j 为头结点右子树节点数量`
+
+```java
+public int numTrees(int n) {
+    //初始化 dp 数组
+    int[] dp = new int[n + 1];
+    //初始化0个节点和1个节点的情况
+    dp[0] = 1;
+    dp[1] = 1;
+    for (int i = 2; i <= n; i++) {
+        for (int j = 1; j <= i; j++) {
+            //对于第i个节点，需要考虑1作为根节点直到i作为根节点的情况，所以需要累加
+            //一共i个节点，对于根节点j时,左子树的节点个数为j-1，右子树的节点个数为i-j
+            dp[i] += dp[j - 1] * dp[i - j];
+        }
+    }
+    return dp[n];
+}
+```
+
 
 
 ## 面试题88：爬楼梯的最少成本
@@ -1380,3 +1408,4 @@ public void testMultiPack2(){
 }
 ```
 
+## 
