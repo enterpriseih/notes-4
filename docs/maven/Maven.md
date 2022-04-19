@@ -86,6 +86,22 @@ Maven 的核心配置文件：**conf/settings.xml**
 
 
 
+# POM的层次
+
+单继承关系
+
+`当前pom` -继承-> `父pom` -继承-> `超级pom`
+
+- 超级 POM：所有 POM 默认继承，只是有直接和间接之分。
+- 父 POM：这一层可能没有，可能有一层，也可能有很多层。
+- 当前 pom.xml 配置的 POM：我们最多关注和最多使用的一层。
+
+> 有效 POM：隐含的一层，但是实际上真正生效的一层。
+>
+> 查看：mvn help:effective-pom
+
+
+
 # 基础概念
 
 ## 1、依赖范围
@@ -103,7 +119,38 @@ Maven 的核心配置文件：**conf/settings.xml**
 - 在开发过程中需要用到的“服务器上的 jar 包”通常以 provided 范围依赖进来。
 - 比如 servlet-api、jsp-api。而这个范围的 jar 包之所以不参与部署、不放进 war 包，就是避免和服务器上已有的同类 jar 包产生冲突，同时减轻服务器的负担。说白了就是：“**服务器上已经有了，你就别带啦！**”
 
-system/runtime/import
+**import**
+
+管理依赖最基本的办法是继承父工程，但是和 Java 类一样，Maven 也是单继承的。如果不同体系的依赖信息封装在不同 POM 中了，没办法继承多个父工程怎么办？这时就可以使用 import 依赖范围。
+
+典型案例是在项目中引入 SpringBoot、SpringCloud 依赖。
+
+import 依赖范围使用要求：
+
+- 打包类型必须是 pom
+- 必须放在 dependencyManagement 中
+
+**system**
+
+以 Windows 系统环境下开发为例，假设现在 D:\tempare\atguigu-maven-test-aaa-1.0-SNAPSHOT.jar 想要引入到我们的项目中，此时我们就可以将依赖配置为 system 范围。
+
+但是很明显：这样引入依赖完全不具有可移植性，所以**不要使用**。如果需要引入体系外 jar 包后面会有专门的办法。
+
+**runtime**
+
+专门用于编译时不需要，但是运行时需要的 jar 包。比如：编译时我们根据接口调用方法，但是实际运行时需要的是接口的实现类。典型案例是：
+
+```xml
+<!--热部署 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <scope>runtime</scope>
+    <optional>true</optional>
+</dependency>
+```
+
+
 
 ## 2、依赖传递
 
@@ -215,9 +262,79 @@ Maven工程之间，A 工程继承 B 工程
 
 - 配置聚合之后，各个模块工程会在总工程中展示一个列表，让项目中的各个模块一目了然。
 
+## 6、可选依赖
 
+```xml
+<optional>true</optional>
+```
 
+其核心含义是：Project X 依赖 Project A，A 中一部分 X 用不到的代码依赖了 B，那么对 X 来说 B 就是『可有可无』的。
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191324834.png" alt="image-20220419132420155" style="zoom: 33%;" />
+
+## 7、版本仲裁
+
+### a>最短路径优先
+
+对pro25来说，Maven 会采纳 1.2.12 版本
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191325080.png" alt="image-20220419132520830" style="zoom:50%;" />
+
+### b>路径相同时先声明者优先
+
+此时 Maven 采纳哪个版本，取决于在 pro29-module-x 中，对 pro30-module-y 和 pro31-module-z 两个模块的依赖哪一个先声明。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191326793.png" alt="image-20220419132650890" style="zoom: 33%;" />
 
 # jar包冲突***
 
+## 1、面对者
+
+编订依赖列表的程序员。
+
+## 2、表现形式
+
+一般来说，由于我们自己编写代码、配置文件写错所导致的问题通常能够在异常信息中看到我们自己类的全类名或配置文件的所在路径。如果整个错误信息中完全没有我们负责的部分，全部是框架、第三方工具包里面的类报错，这往往就是 jar 包的问题所引起的。
+
+而具体的表现形式中，主要体现为**找不到类**或**找不到方法**、**没报错但结果不对**
+
+## 3、本质
+
+- 同一 jar 包的不同版本
+- 不同 jar 包中包含同名类
+
+具体例子是有的同学在实际工作中遇到过：项目中部分模块使用 log4j 打印日志；其它模块使用 logback，编译运行都不会冲突，但是会引起日志服务降级，让你的 log 配置文件失效。比如：你指定了 error 级别输出，但是冲突就会导致 info、debug 都在输出。
+
+## 4、解决方法
+
+- 第一步：把彼此冲突的 jar 包找到
+- 第二步：在冲突的 jar 包中选定一个。具体做法无非是通过 exclusions 排除依赖，或是明确声明依赖。
+
+1. IDEA 的 Maven Helper 插件
+2. Maven 的 enforcer 插件
+
+# 外部 jar 包导入
+
+使用的 jar 包不是 maven 导入的，maven 也没有。
+
+- 将该 jar 包安装到 Maven 仓库
+
+```
+mvn install:install-file -Dfile=[体系外 jar 包路径] \
+-DgroupId=[给体系外 jar 包强行设定坐标] \
+-DartifactId=[给体系外 jar 包强行设定坐标] \
+-Dversion=1 \
+-Dpackage=jar
+```
+
+例如（Windows 系统下使用 ^ 符号换行；Linux 系统用 \）：
+
+```
+mvn install:install-file -Dfile=D:\idea2019workspace\atguigu-maven-outer\out\artifacts\atguigu_maven_outer\atguigu-maven-outer.jar ^
+-DgroupId=com.atguigu.maven ^
+-DartifactId=atguigu-maven-outer ^
+-Dversion=1 ^
+-Dpackaging=jar
+```
+
+查看本地仓库是否存在，存在就可以使用了。
