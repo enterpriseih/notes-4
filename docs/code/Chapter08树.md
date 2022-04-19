@@ -38,6 +38,46 @@ public int minDepth(TreeNode root) {
 }
 ```
 
+### 根据中序遍历和后序遍历还原二叉树
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/iShot2022-04-19_17.21.46.png" alt="在这里插入图片描述" style="zoom: 40%;" />
+
+```java
+int postId;
+int[] inorder;
+int[] postorder;
+Map<Integer, Integer> mapId = new HashMap<>();
+public TreeNode buildTree(int[] inorder, int[] postorder) {
+    this.inorder = inorder;
+    this.postorder = postorder;
+    postId = postorder.length - 1;
+
+    // 建立 元素-下标 的哈希表
+    int i = 0;
+    for (int num : inorder) {
+        mapId.put(num, i++);
+    }
+    return helper(0, inorder.length - 1);
+}
+private TreeNode helper(int inleft, int inright) {
+    // 如果这里没有节点构造二叉树了，就结束
+    if (inright < inleft) return null;
+
+    // 选择 postId 位置的元素作为当前子树根节点
+    TreeNode root = new TreeNode(postorder[postId]);
+    // 根据 root 所在位置分成左右两棵子树
+    int index = mapId.get(postorder[postId]);
+    postId--;
+
+    root.right = helper(index + 1, inright);
+    root.left = helper(inleft, index - 1);
+
+    return root; 
+}
+```
+
+
+
 
 
 ## 8.1 二叉树的深度优先搜索

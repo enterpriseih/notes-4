@@ -123,7 +123,7 @@ public int[] relativeSortArray(int[] arr1, int[] arr2) {
 3. 向右移动p2，当p2指向一个小于中间值的数时，移动p1，并交换p1和p2指向的数字，继续；
 4. 最后将中间值与p1++互换，此时p1指向的是本次的中间值 
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122146644.png" alt="iShot2022-04-12_21.44.25" style="zoom: 33%;" />                                                                                                                                                                                                                                                            
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202204122146644.png" alt="iShot2022-04-12_21.44.25" style="zoom: 33%;" />                                                                                                                                                                                                                                                            
 
 ```java
 public int[] sortArray(int[] nums) {
