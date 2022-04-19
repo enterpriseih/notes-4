@@ -83,9 +83,11 @@ git 入门网站
 
 进入 Git官网 下载合适你的安装包，安装好 `Git` 后，打开命令行工具，进入工作文件夹（*为了便于理解我们在系统桌面上演示*），创建一个新的demo文件夹。
 
-![img](https://cdn.jsdelivr.net/gh/CoderLeixiaoshuai/assets/202105/20210527225650.png)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191529166.png)
 
 进入 Github网站 注册一个账号并登录，进入 我的博客，点击 `Clone or download`，再点击 `Use HTTPS` ，复制项目地址 `https://github.com/gafish/gafish.github.com.git` 备用。
+
+`https://github.com/YiENx1205/notes.git`
 
 再回到命令行工具，一切就绪，接下来进入本文的重点。
 
@@ -331,13 +333,13 @@ build/
 
 ### 工作区（*Working Directory*）
 
-就是你在电脑里能看到的目录，比如上文中的 `gafish.github.com` 文件夹就是一个工作区![img](https://cdn.jsdelivr.net/gh/CoderLeixiaoshuai/assets/202105/20210527225751.jpeg)
+就是你在电脑里能看到的目录，比如上文中的 `gafish.github.com` 文件夹就是一个工作区![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191530832.jpeg)
 
 ### 本地版本库（*Local Repository*）
 
 工作区有一个隐藏目录 `.git`，这个不算工作区，而是 `Git` 的版本库。
 
-![img](https://cdn.jsdelivr.net/gh/CoderLeixiaoshuai/assets/202105/20210527225805.jpeg)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191530369.jpeg)
 
 ### 暂存区（*stage*）
 
@@ -345,25 +347,25 @@ build/
 
 ### 远程版本库（*Remote Repository*）
 
-一般指的是 `Git` 服务器上所对应的仓库，本文的示例所在的`github`仓库就是一个远程版本库![img](https://cdn.jsdelivr.net/gh/CoderLeixiaoshuai/assets/202105/20210527225823.jpeg)
+一般指的是 `Git` 服务器上所对应的仓库，本文的示例所在的`github`仓库就是一个远程版本库![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191530358.jpeg)
 
 ### 以上概念之间的关系
 
 `工作区`、`暂存区`、`本地版本库`、`远程版本库`之间几个常用的 `Git` 操作流程如下图所示：
 
-![img](https://cdn.jsdelivr.net/gh/CoderLeixiaoshuai/assets/202105/20210527225831.jpeg)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191530230.jpeg)
 
 ### 分支（*Branch*）
 
 分支是为了将修改记录的整个流程分开存储，让分开的分支不受其它分支的影响，所以在同一个数据库里可以同时进行多个不同的修改
 
-![img](https://cdn.jsdelivr.net/gh/CoderLeixiaoshuai/assets/202105/20210527225839.png)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191530662.png)
 
 ### 主分支（*Master*）
 
 前面提到过 `master` 是 `Git` 为我们自动创建的第一个分支，也叫主分支，其它分支开发完成后都要合并到 `master`
 
-![img](https://cdn.jsdelivr.net/gh/CoderLeixiaoshuai/assets/202105/20210527225845.png)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191530910.png)
 
 
 
@@ -375,7 +377,7 @@ build/
 
 `HEAD` 指向的就是当前分支的最新提交
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/kChlCQZAfH5eBrzeP4kHVbwcqAicZkgowxN49635dB9zuiaElVicSmgcnnhZicTElUqKkKg31eMsGQSnjHhc2eH5pw/640?wx_fmt=png)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191531377.png)
 
 > 以上概念了解的差不多，那就可以继续往下看，下面将以具体的操作类型来讲解 `Git` 的高阶用法
 >
@@ -544,7 +546,7 @@ git branch -vv
 
 查看带有最后提交id、最近提交原因等信息的本地版本库分支列表
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/kChlCQZAfH5eBrzeP4kHVbwcqAicZkgowU49NhDrc0SXtGWqNUoNQ71NRCnmicZgtFQzgnunugP4pML52jChNFoA/640?wx_fmt=png)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191531116.png)
 
 ### git merge
 
@@ -555,7 +557,9 @@ git branch -vv
 git merge --squash
 ```
 
-将待合并分支上的 `commit` 合并成一个新的 `commit` 放入当前分支，适用于待合并分支的提交记录不需要保留的情况![img](https://mmbiz.qpic.cn/mmbiz_gif/JdLkEI9sZfd5v84p7lS2Mr1pThtnyVebF8X289ibrNSus6ibMHfT8BviaUJuVibFvdZ8zokaCQlsrqZOKs1W7QZl5Q/640?wx_fmt=gif)
+将待合并分支上的 `commit` 合并成一个新的 `commit` 放入当前分支，适用于待合并分支的提交记录不需要保留的情况
+
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191531657.gif)
 
 ```
 git merge --no-ff
@@ -563,7 +567,7 @@ git merge --no-ff
 
 默认情况下，`Git` 执行"`快进式合并`"（fast-farward merge），会直接将 `Master`分支指向 `Develop` 分支，使用 `--no-ff` 参数后，会执行正常合并，在 `Master`分支上生成一个新节点，保证版本演进更清晰。
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/kChlCQZAfH5eBrzeP4kHVbwcqAicZkgowMRTMOI4wPj7ZZSURhODgT5QGEicfXIS3icW6LJRTwf4YdJUWOnugxQoA/640?wx_fmt=png)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191531553.png)
 
 ```
 git merge --no-edit
@@ -795,7 +799,7 @@ git rebase branch_name
 
 合并分支，这跟 `merge` 很像，但还是有本质区别，看下图：
 
-![img](https://mmbiz.qpic.cn/mmbiz_jpg/kChlCQZAfH5eBrzeP4kHVbwcqAicZkgowJVnNZciaQfnn8vbqXet2mRj9aoR4HKQ230T4hggwJwgh5CbfVAwGQsw/640?wx_fmt=jpeg)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191531662.jpeg)
 
 合并过程中可能需要先解决冲突，然后执行 `git rebase --continue`
 
@@ -850,7 +854,7 @@ git revert -n HEAD
 > 查看工作区、暂存区、本地版本库之间的文件差异，用一张图来解释
 >
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/kChlCQZAfH5eBrzeP4kHVbwcqAicZkgowbTtpHas5ZBpKFGFU8FxcaR8cCeANrcGmBwtpiaHkib8SQxJBLhOxEbOA/640?wx_fmt=png)
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191532596.png)
 
 ```
 git diff --stat
@@ -865,7 +869,7 @@ git diff --stat
 
 ### git reflog
 
-`reflog` 可以查看所有分支的所有操作记录（包括commit和reset的操作、已经被删除的commit记录，跟 `git log` 的区别在于它不能查看已经删除了的commit记录![img](https://mmbiz.qpic.cn/mmbiz_jpg/kChlCQZAfH5eBrzeP4kHVbwcqAicZkgow9g0GgTQppOgauVPMguPXWE8qOQqsic0j3IL9NxNns5D16qa9HvOn9rA/640?wx_fmt=jpeg)
+`reflog` 可以查看所有分支的所有操作记录（包括commit和reset的操作、已经被删除的commit记录，跟 `git log` 的区别在于它不能查看已经删除了的commit记录![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191532241.jpeg)
 
 ## 远程版本库连接
 
