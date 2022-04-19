@@ -307,15 +307,15 @@ public static void main(String[] args) {
 ```
 
 - 默认的包结构
-	- 主程序所在包及其下面的所有子包里面的组件都会被默认扫描进来
+	- `主程序MainApplication.java所在包及其下面的所有子包里面的组件都会被默认扫描进来`
 	- 无需以前的包扫描配置
-	- 想要改变扫描路径
+	- **想要改变扫描路径**
 		- @SpringBootApplication(scanBasePackages="com.lun")
-		- @ComponentScan 指定扫描路径
+		- @ComponentScan 指定扫描路径（后面讲）
 
 ```java
 @SpringBootApplication
-等同于
+// 等同于
 @SpringBootConfiguration
 @EnableAutoConfiguration
 @ComponentScan("com.lun")
@@ -328,7 +328,7 @@ public static void main(String[] args) {
 - 按需加载所有自动配置项
 	- 非常多的starter
 	- 引入了哪些场景这个场景的自动配置才会开启
-	- SpringBoot所有的自动配置功能都在 spring-boot-autoconfigure 包里面
+	- `SpringBoot所有的自动配置功能都在 spring-boot-autoconfigure 包里面`
 	- 
 - ......
 
@@ -346,8 +346,10 @@ public static void main(String[] args) {
  * 3、proxyBeanMethods：代理bean的方法
  *      Full(proxyBeanMethods = true)（保证每个@Bean方法被调用多少次返回的组件都是单实例的）（默认）
  *      Lite(proxyBeanMethods = false)（每个@Bean方法被调用多少次返回的组件都是新创建的）
+ *		组件依赖
  */
-@Configuration(proxyBeanMethods = false) //告诉SpringBoot这是一个配置类 == 配置文件
+@Configuration(proxyBeanMethods = false) 
+//告诉SpringBoot这是一个配置类 == 配置文件
 public class MyConfig {
 
     /**
@@ -362,6 +364,7 @@ public class MyConfig {
         return zhangsan;
     }
 
+    // 自定义tom为组件的id
     @Bean("tom")
     public Pet tomcatPet(){
         return new Pet("tomcat");
@@ -415,21 +418,17 @@ public class MainApplication {
 	- 配置 类组件之间**无依赖关系**用Lite模式加速容器启动过程，减少判断
 	- 配置 类组件之间**有依赖关系**，方法会被调用得到之前单实例组件，用Full模式（默认）
 
-> lite 英 [laɪt]   美 [laɪt]  
-> adj. 低热量的，清淡的(light的一种拼写方法);类似…的劣质品
-
 ---
 
 IDEA快捷键：
 
-- `Alt + Ins`:生成getter，setter、构造器等代码。
-- `Ctrl + Alt + B`:查看类的具体实现代码。
+- `Cmd + Alt + B`:查看类的具体实现代码。
 
 ## 09、底层注解-@Import导入组件
 
 @Bean、@Component、@Controller、@Service、@Repository，它们是Spring的基本标签，在Spring Boot中并未改变它们原来的功能。
 
-@ComponentScan 在[07、基础入门-SpringBoot-自动配置特性](#)有用例。
+@ComponentScan 在[07、基础入门-SpringBoot-自动配置特性](#07、基础入门-SpringBoot-自动配置特性)有用例。
 
 
 @Import({User.class, DBHelper.class})给容器中**自动创建出这两个类型的组件**、默认组件的名字就是全类名
@@ -465,7 +464,7 @@ System.out.println(bean1);
 
 **条件装配：满足Conditional指定的条件，则进行组件注入**
 
-![在这里插入图片描述](image/20210205005453173.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204182205107.png" alt="在这里插入图片描述" style="zoom:67%;" />
 
 
 用@ConditionalOnMissingBean举例说明
