@@ -43,7 +43,7 @@ public int minDepth(TreeNode root) {
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/iShot2022-04-19_17.21.46.png" alt="在这里插入图片描述" style="zoom: 40%;" />
 
 ```java
-int postId;
+int postId;// 用postId[0]也可以跟随递归
 int[] inorder;
 int[] postorder;
 Map<Integer, Integer> mapId = new HashMap<>();
@@ -68,7 +68,8 @@ private TreeNode helper(int inleft, int inright) {
     // 根据 root 所在位置分成左右两棵子树
     int index = mapId.get(postorder[postId]);
     postId--;
-
+	
+    // 根是右侧的先
     root.right = helper(index + 1, inright);
     root.left = helper(inleft, index - 1);
 
@@ -495,7 +496,7 @@ public TreeNode increasingBST(TreeNode root) {
     Stack<TreeNode> stack = new Stack<>();
     TreeNode cur = root;
     TreeNode prev = null;
-    TreeNode first = null;
+    TreeNode head = null;
     while (cur != null || !stack.isEmpty()) {
         while (cur != null) {
             stack.push(cur);
@@ -506,7 +507,7 @@ public TreeNode increasingBST(TreeNode root) {
         if (prev != null) {
             prev.right = cur;
         } else {
-            first = cur;
+            head = cur;
         }
 
         prev = cur;
@@ -514,9 +515,73 @@ public TreeNode increasingBST(TreeNode root) {
         cur = cur.right;
     }
 
-    return first;
+    return head;
 }
 ```
+
+> 如果是前序展平普通二叉树，这种遍历方法不可行
+>
+> 会在读取左节点的时候丢失左节点的信息
+
+## 前序展平二叉树
+
+```java
+public void flatten(TreeNode root) {
+    Stack<TreeNode> st = new Stack<>();
+    if (root == null) {
+        return;
+    }
+    st.push(root);
+    TreeNode prev = null;
+    TreeNode cur = null;
+    while (!st.isEmpty()) {
+        cur = st.pop();
+        if (prev != null) {
+            prev.left = null;
+            prev.right = cur;
+        }
+        if (cur.right != null) 
+            st.push(cur.right);
+        if (cur.left != null) 
+            st.push(cur.left);
+        prev = cur;
+    }
+}
+```
+
+- 空间复杂度`O(1)`
+
+注意到前序遍历访问各节点的顺序是根节点、左子树、右子树。如果一个节点的左子节点为空，则该节点不需要进行展开操作。
+
+如果一个节点的左子节点不为空，则该节点的左子树中的最后一个节点被访问之后，该节点的右子节点被访问。
+
+该节点的左子树中最后一个被访问的节点是左子树中的最右边的节点，也是该节点的前驱节点。因此，问题转化成寻找当前节点的前驱节点。
+
+具体做法是，对于当前节点，如果其左子节点不为空，则在其左子树中找到最右边的节点，作为前驱节点，将当前节点的右子节点赋给前驱节点的右子节点，然后将当前节点的左子节点赋给当前节点的右子节点，并将当前节点的左子节点设为空。对当前节点处理结束后，继续处理链表中的下一个节点，直到所有节点都处理结束。
+
+
+```java
+// 空间复杂度O(1)
+public void flatten(TreeNode root) {
+    TreeNode curr = root;
+    while (curr != null) {
+        if (curr.left != null) {
+            TreeNode next = curr.left;
+            TreeNode predecessor = next;
+            while (predecessor.right != null) {
+                predecessor = predecessor.right;
+            }
+            predecessor.right = curr.right;
+            curr.left = null;
+            curr.right = next;
+        }
+        curr = curr.right;
+    }
+}
+
+```
+
+
 
 ## 面试题53：二叉搜索树的下一个结点
 

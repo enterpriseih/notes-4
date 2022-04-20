@@ -474,6 +474,7 @@ System.out.println(bean1);
 @ConditionalOnMissingBean(name = "tom")//没有tom名字的Bean时，MyConfig类的Bean才能生效。
 public class MyConfig {
 
+    
     @Bean
     public User user01(){
         User zhangsan = new User("zhangsan", 18);
@@ -579,7 +580,7 @@ public class getProperties {
 
 Spring Boot一种配置配置绑定：
 
-@ConfigurationProperties + @Component
+`@ConfigurationProperties + @Component`
 
 假设有配置文件application.properties
 
@@ -602,7 +603,7 @@ public class Car {
 
 Spring Boot另一种配置配置绑定：
 
-@EnableConfigurationProperties + @ConfigurationProperties
+`@EnableConfigurationProperties + @ConfigurationProperties`
 
 1. 开启Car配置绑定功能
 2. 把这个Car这个组件自动注册到容器中
@@ -616,6 +617,7 @@ public class MyConfig {
 ```
 
 ```java
+// 如果car是第三方包里的，没带@component，就只能用这种方法
 @ConfigurationProperties(prefix = "mycar")
 public class Car {
 ...
@@ -724,7 +726,7 @@ public @interface AutoConfigurationPackage {
 ```
 
 1. 利用Registrar给容器中导入一系列组件
-2. 将指定的一个包下的所有组件导入进MainApplication所在包下。
+2. 将指定的一个包（即MainApplication所在包com.yienx.boot）下的所有组件导入进 MainApplication 所在包下。
 
 ## 14、自动配置【源码分析】-初始加载自动配置类
 
@@ -733,11 +735,11 @@ public @interface AutoConfigurationPackage {
 1. 利用`getAutoConfigurationEntry(annotationMetadata);`给容器中批量导入一些组件
 2. 调用`List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes)`获取到所有需要导入到容器中的配置类
 3. 利用工厂加载 `Map<String, List<String>> loadSpringFactories(@Nullable ClassLoader classLoader);`得到所有的组件
-4. 从`META-INF/spring.factories`位置来加载一个文件。
+4. 3的方法是从`META-INF/spring.factories`位置来加载一个文件。
     - 默认扫描我们当前系统里面所有`META-INF/spring.factories`位置的文件
     - `spring-boot-autoconfigure-2.3.4.RELEASE.jar`包里面也有`META-INF/spring.factories`
 
-![在这里插入图片描述](image/20210205005536620.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204192221643.png" alt="在这里插入图片描述"  />
 
 ```properties
 # 文件里面写死了spring-boot一启动就要给容器中加载的所有配置类
@@ -749,7 +751,11 @@ org.springframework.boot.autoconfigure.aop.AopAutoConfiguration,\
 ...
 ```
 
-虽然我们127个场景的所有自动配置启动的时候默认全部加载，但是`xxxxAutoConfiguration`按照条件装配规则（`@Conditional`），最终会按需配置。
+虽然我们127个场景的所有自动配置启动的时候**默认全部加载**，
+
+但是`xxxxAutoConfiguration`按照条件装配规则（`@Conditional`），
+
+最终会**按需配置**。
 
 如`AopAutoConfiguration`类：
 
@@ -777,14 +783,17 @@ public class AopAutoConfiguration {
 
 ```java
 @Bean
-@ConditionalOnBean(MultipartResolver.class)  //容器中有这个类型组件
-@ConditionalOnMissingBean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME) //容器中没有这个名字 multipartResolver 的组件
+@ConditionalOnBean(MultipartResolver.class)  
+// 容器中有这个类型组件
+@ConditionalOnMissingBean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME) 
+// 但是容器中没有这个名字 multipartResolver 的组件
 public MultipartResolver multipartResolver(MultipartResolver resolver) {
-	//给@Bean标注的方法传入了对象参数，这个参数的值就会从容器中找。
-	//SpringMVC multipartResolver。防止有些用户配置的文件上传解析器不符合规范
+	// 给@Bean标注的方法传入了对象参数，这个参数的值就会从容器中找。
+	// SpringMVC multipartResolver。防止有些用户配置的文件上传解析器不符合规范
 	// Detect if the user has created a MultipartResolver but named it incorrectly
-	return resolver;//给容器中加入了文件上传解析器；
+	return resolver;
 }
+//给容器中加入了文件上传解析器；
 ```
 
 SpringBoot默认会在底层配好所有的组件，但是**如果用户自己配置了以用户的优先**。
@@ -801,6 +810,8 @@ SpringBoot默认会在底层配好所有的组件，但是**如果用户自己�
 	- 用户去看这个组件是获取的配置文件什么值就去修改。
 
 **xxxxxAutoConfiguration ---> 组件 ---> xxxxProperties里面拿值  ----> application.properties**
+
+> 先判断有没有，再判断需不需要，后判断到底谁用
 
 ## 16、最佳实践-SpringBoot应用如何编写
 
