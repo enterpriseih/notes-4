@@ -11,6 +11,7 @@
 - [深浅拷贝](./docs/base/深浅拷贝.md)
 - [JavaIO&NIO](./docs/base/JavaIO&NIO.md)
 - [设计模式](./docs/设计模式.md)
+- [Lambda&StreamAPI](./docs/base/Lambda&StreamAPI.md)
 
 ### J.U.C
 
@@ -52,6 +53,7 @@
 - [计算机网络](./docs/计算机网络.md)
 - [Web](./docs/Web.md)
 - [Maven](./docs/maven/Maven.md)
+- [MyDebug](./docs/MyDebug.md)
 
 ### 工具
 

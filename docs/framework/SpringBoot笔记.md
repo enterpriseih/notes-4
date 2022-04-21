@@ -2039,13 +2039,7 @@ protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
 
     ServletWebRequest webRequest = new ServletWebRequest(request, response);
     try {
-        WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
-        ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
-
-        ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
-        if (this.argumentResolvers != null) {
-            invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
-        }
+        ...
         if (this.returnValueHandlers != null) {//<---关注点
             invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
         }
@@ -2089,29 +2083,8 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		handlers.add(new HttpHeadersReturnValueHandler());
 		handlers.add(new CallableMethodReturnValueHandler());
 		handlers.add(new DeferredResultMethodReturnValueHandler());
-		handlers.add(new AsyncTaskMethodReturnValueHandler(this.beanFactory));
-
-		// Annotation-based return value types
-		handlers.add(new ServletModelAttributeMethodProcessor(false));
-		handlers.add(new RequestResponseBodyMethodProcessor(getMessageConverters(),
-				this.contentNegotiationManager, this.requestResponseBodyAdvice));
-
-		// Multi-purpose return value types
-		handlers.add(new ViewNameMethodReturnValueHandler());
-		handlers.add(new MapMethodProcessor());
-
-		// Custom return value types
-		if (getCustomReturnValueHandlers() != null) {
-			handlers.addAll(getCustomReturnValueHandlers());
-		}
-
-		// Catch-all
-		if (!CollectionUtils.isEmpty(getModelAndViewResolvers())) {
-			handlers.add(new ModelAndViewResolverMethodReturnValueHandler(getModelAndViewResolvers()));
-		}
-		else {
-			handlers.add(new ServletModelAttributeMethodProcessor(true));
-		}
+		// .......
+        // add了各种handler
 
 		return handlers;
 	}
@@ -2286,6 +2259,16 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 ### 5>如何确定目标方法每一个参数的值
 
+#### a_挨个判断所有参数解析器那个支持解析这个参数
+
+by `getArgumentResolver`
+
+#### b_解析参数值
+
+调用各自 HandlerMethodArgumentResolver 的 `resolveArgument` 方法即可
+
+#### c_自定义类型参数 封装POJO（后序章节）
+
 重点分析`ServletInvocableHandlerMethod`的`getMethodArgumentValues`方法
 
 ```java
@@ -2343,26 +2326,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 ```java
 public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgumentResolver {
-    
-	@Override
-	public boolean supportsParameter(MethodParameter parameter) {
-		return getArgumentResolver(parameter) != null;
-	}
-
-	@Override
-	@Nullable
-	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
-
-		HandlerMethodArgumentResolver resolver = getArgumentResolver(parameter);
-		if (resolver == null) {
-			throw new IllegalArgumentException("Unsupported parameter type [" +
-					parameter.getParameterType().getName() + "]. supportsParameter should be called first.");
-		}
-		return resolver.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
-	}
-    
-    
+    ...
     @Nullable
 	private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
 		HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
@@ -2381,6 +2345,16 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 }
 ```
 
+### 6>目标方法执行完成
+
+将所有的数据都放在 **ModelAndViewContainer**；包含要去的页面地址View。还包含Model数据。
+
+### 7>处理派发结果
+
+**processDispatchResult**(processedRequest, response, mappedHandler, mv, dispatchException);
+
+renderMergedOutputModel(mergedModel, getRequestToExpose(request), response);
+
 ### 小结
 
 本节描述，一个请求发送到DispatcherServlet后的具体处理流程，也就是SpringMVC的主要原理。
@@ -2391,39 +2365,13 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 
 ## 33、请求处理-【源码分析】-Servlet API参数解析原理
 
-- WebRequest
-- ServletRequest
-- MultipartRequest
-- HttpSession
-- javax.servlet.http.PushBuilder
-- Principal
-- InputStream
-- Reader
-- HttpMethod
-- Locale
-- TimeZone
-- ZoneId
+WebRequest、ServletRequest、MultipartRequest、 HttpSession、javax.servlet.http.PushBuilder、Principal、InputStream、Reader、HttpMethod、Locale、TimeZone、ZoneId
 
 **ServletRequestMethodArgumentResolver**用来处理以上的参数
 
 ```java
 public class ServletRequestMethodArgumentResolver implements HandlerMethodArgumentResolver {
-
-	@Nullable
-	private static Class<?> pushBuilder;
-
-	static {
-		try {
-			pushBuilder = ClassUtils.forName("javax.servlet.http.PushBuilder",
-					ServletRequestMethodArgumentResolver.class.getClassLoader());
-		}
-		catch (ClassNotFoundException ex) {
-			// Servlet 4.0 PushBuilder not found - not supported for injection
-			pushBuilder = null;
-		}
-	}
-
-
+	...
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> paramType = parameter.getParameterType();
@@ -2440,119 +2388,14 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 				TimeZone.class == paramType ||
 				ZoneId.class == paramType);
 	}
-
-	@Override
-	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
-
-		Class<?> paramType = parameter.getParameterType();
-
-		// WebRequest / NativeWebRequest / ServletWebRequest
-		if (WebRequest.class.isAssignableFrom(paramType)) {
-			if (!paramType.isInstance(webRequest)) {
-				throw new IllegalStateException(
-						"Current request is not of type [" + paramType.getName() + "]: " + webRequest);
-			}
-			return webRequest;
-		}
-
-		// ServletRequest / HttpServletRequest / MultipartRequest / MultipartHttpServletRequest
-		if (ServletRequest.class.isAssignableFrom(paramType) || MultipartRequest.class.isAssignableFrom(paramType)) {
-			return resolveNativeRequest(webRequest, paramType);
-		}
-
-		// HttpServletRequest required for all further argument types
-		return resolveArgument(paramType, resolveNativeRequest(webRequest, HttpServletRequest.class));
-	}
-
-	private <T> T resolveNativeRequest(NativeWebRequest webRequest, Class<T> requiredType) {
-		T nativeRequest = webRequest.getNativeRequest(requiredType);
-		if (nativeRequest == null) {
-			throw new IllegalStateException(
-					"Current request is not of type [" + requiredType.getName() + "]: " + webRequest);
-		}
-		return nativeRequest;
-	}
-
-	@Nullable
-	private Object resolveArgument(Class<?> paramType, HttpServletRequest request) throws IOException {
-		if (HttpSession.class.isAssignableFrom(paramType)) {
-			HttpSession session = request.getSession();
-			if (session != null && !paramType.isInstance(session)) {
-				throw new IllegalStateException(
-						"Current session is not of type [" + paramType.getName() + "]: " + session);
-			}
-			return session;
-		}
-		else if (pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) {
-			return PushBuilderDelegate.resolvePushBuilder(request, paramType);
-		}
-		else if (InputStream.class.isAssignableFrom(paramType)) {
-			InputStream inputStream = request.getInputStream();
-			if (inputStream != null && !paramType.isInstance(inputStream)) {
-				throw new IllegalStateException(
-						"Request input stream is not of type [" + paramType.getName() + "]: " + inputStream);
-			}
-			return inputStream;
-		}
-		else if (Reader.class.isAssignableFrom(paramType)) {
-			Reader reader = request.getReader();
-			if (reader != null && !paramType.isInstance(reader)) {
-				throw new IllegalStateException(
-						"Request body reader is not of type [" + paramType.getName() + "]: " + reader);
-			}
-			return reader;
-		}
-		else if (Principal.class.isAssignableFrom(paramType)) {
-			Principal userPrincipal = request.getUserPrincipal();
-			if (userPrincipal != null && !paramType.isInstance(userPrincipal)) {
-				throw new IllegalStateException(
-						"Current user principal is not of type [" + paramType.getName() + "]: " + userPrincipal);
-			}
-			return userPrincipal;
-		}
-		else if (HttpMethod.class == paramType) {
-			return HttpMethod.resolve(request.getMethod());
-		}
-		else if (Locale.class == paramType) {
-			return RequestContextUtils.getLocale(request);
-		}
-		else if (TimeZone.class == paramType) {
-			TimeZone timeZone = RequestContextUtils.getTimeZone(request);
-			return (timeZone != null ? timeZone : TimeZone.getDefault());
-		}
-		else if (ZoneId.class == paramType) {
-			TimeZone timeZone = RequestContextUtils.getTimeZone(request);
-			return (timeZone != null ? timeZone.toZoneId() : ZoneId.systemDefault());
-		}
-
-		// Should never happen...
-		throw new UnsupportedOperationException("Unknown parameter type: " + paramType.getName());
-	}
-
-
-	/**
-	 * Inner class to avoid a hard dependency on Servlet API 4.0 at runtime.
-	 */
-	private static class PushBuilderDelegate {
-
-		@Nullable
-		public static Object resolvePushBuilder(HttpServletRequest request, Class<?> paramType) {
-			PushBuilder pushBuilder = request.newPushBuilder();
-			if (pushBuilder != null && !paramType.isInstance(pushBuilder)) {
-				throw new IllegalStateException(
-						"Current push builder is not of type [" + paramType.getName() + "]: " + pushBuilder);
-			}
-			return pushBuilder;
-
-		}
-	}
+    ...
 }
 ```
 
 用例：
 
 ```java
+// 此处的HttpServletRequest
 @Controller
 public class RequestController {
 
@@ -2597,27 +2440,6 @@ public String testParam(Map<String,Object> map,
     response.addCookie(cookie);
     return "forward:/success";
 }
-
-@ResponseBody
-@GetMapping("/success")
-public Map success(@RequestAttribute(value = "msg",required = false) String msg,
-                   @RequestAttribute(value = "code",required = false)Integer code,
-                   HttpServletRequest request){
-    Object msg1 = request.getAttribute("msg");
-
-    Map<String,Object> map = new HashMap<>();
-    Object hello = request.getAttribute("hello");//得出testParam方法赋予的值 world666
-    Object world = request.getAttribute("world");//得出testParam方法赋予的值 hello666
-    Object message = request.getAttribute("message");//得出testParam方法赋予的值 HelloWorld
-
-    map.put("reqMethod_msg",msg1);
-    map.put("annotation_msg",msg);
-    map.put("hello",hello);
-    map.put("world",world);
-    map.put("message",message);
-
-    return map;
-}
 ```
 
 - `Map<String,Object> map`
@@ -2630,6 +2452,10 @@ public Map success(@RequestAttribute(value = "msg",required = false) String msg,
 上面三位都是可以给request域中放数据，用`request.getAttribute()`获取
 
 接下来我们看看，`Map<String,Object> map`与`Model model`用什么参数处理器。
+
+```
+HandlerMethodArgumentResolverComposite.java
+```
 
 ---
 
@@ -2716,10 +2542,11 @@ public class ModelMethodProcessor implements HandlerMethodArgumentResolver, Hand
 }
 ```
 
-`return mavContainer.getModel();`这跟`MapMethodProcessor`的一致
+Map、Model都会返回`return mavContainer.getModel();`
 
-![在这里插入图片描述](image/20210205010247689.png)
+----> BindingAwareModelMap是 model 也是 map 
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204210949768.png" alt="在这里插入图片描述" style="zoom:67%;" />
 
 `Model`也是另一种意义的`Map`。
 
@@ -2727,7 +2554,7 @@ public class ModelMethodProcessor implements HandlerMethodArgumentResolver, Hand
 
 **接下来看看**`Map<String,Object> map`与`Model model`值是如何做到用`request.getAttribute()`获取的。
 
-众所周知，所有的数据都放在 **ModelAndView**包含要去的页面地址View，还包含Model数据。
+众所周知，所有的数据都放在 **ModelAndViewContainer**，包含要去的页面地址View，还包含Model数据。
 
 先看**ModelAndView**接下来是如何处理的？
 
@@ -2807,7 +2634,9 @@ public class DispatcherServlet extends FrameworkServlet {
 }
 ```
 
-在Debug模式下，`view`属为`InternalResourceView`类。
+在Debug模式下，`view`属于`InternalResourceView`类。
+
+（处理派发结果）
 
 ```java
 public class InternalResourceView extends AbstractUrlBasedView {
@@ -2909,7 +2738,12 @@ public class Pet {
 }
 ```
 
-封装过程用到`ServletModelAttributeMethodProcessor`
+自定义类型封装过程用到`ServletModelAttributeMethodProcessor`
+
+（这个有两个，用的是最后一个）
+
+- 先判断是否为简单类型isSimpleProperty，不是再进行处理
+- 
 
 ```java
 public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodProcessor {
@@ -2942,6 +2776,7 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
 		else {
 			// Create attribute instance
 			try {
+                // 创建一个空Person实例
 				attribute = createAttribute(name, parameter, binderFactory, webRequest);
 			}
 			catch (BindException ex) {
@@ -2982,7 +2817,9 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
 
 **WebDataBinder 利用它里面的 Converters 将请求数据转成指定的数据类型。再次封装到JavaBean中**
 
-**在过程当中，用到GenericConversionService：在设置每一个值的时候，找它里面的所有converter那个可以将这个数据类型（request带来参数的字符串）转换到指定的类型**
+（底层有很converter转换器）
+
+**在过程当中，用到GenericConversionService：在设置每一个值的时候，找它里面的所有converter那个可以将这个数据类型（request带来参数的字符串）转换到指定的类型（JavaBean -- Integer）**
 
 
 
@@ -2997,7 +2834,7 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
     @Bean
     public WebMvcConfigurer webMvcConfigurer(){
         return new WebMvcConfigurer() {
-
+			///
             @Override
             public void addFormatters(FormatterRegistry registry) {
                 registry.addConverter(new Converter<String, Pet>() {
@@ -3016,6 +2853,7 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
                     }
                 });
             }
+            ///
         };
     }
 ```
@@ -3023,7 +2861,7 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
 
 
 ## 37、响应处理-【源码分析】-ReturnValueHandler原理
-![在这里插入图片描述](image/20210205010403920.jpg)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211001631.jpg" alt="在这里插入图片描述" style="zoom:67%;" />
 
 假设给前端自动返回json数据，需要引入相关的依赖
 
