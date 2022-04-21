@@ -798,7 +798,6 @@ public MultipartResolver multipartResolver(MultipartResolver resolver) {
 
 SpringBoot默认会在底层配好所有的组件，但是**如果用户自己配置了以用户的优先**。
 
-
 **总结**：
 
 - SpringBoot先加载所有的自动配置类  xxxxxAutoConfiguration
@@ -809,9 +808,9 @@ SpringBoot默认会在底层配好所有的组件，但是**如果用户自己�
 	- 用户直接自己@Bean替换底层的组件
 	- 用户去看这个组件是获取的配置文件什么值就去修改。
 
-**xxxxxAutoConfiguration ---> 组件 ---> xxxxProperties里面拿值  ----> application.properties**
+**xxxxxAutoConfiguration ---> 组件 ---> xxxxProperties里面看prefix  ----> 写入application.properties**
 
-> 先判断有没有，再判断需不需要，后判断到底谁用
+
 
 ## 16、最佳实践-SpringBoot应用如何编写
 
@@ -819,7 +818,7 @@ SpringBoot默认会在底层配好所有的组件，但是**如果用户自己�
 	- [官方文档](https://docs.spring.io/spring-boot/docs/current/reference/html/using-spring-boot.html#using-boot-starter)
 - 查看自动配置了哪些（选做）
 	- 自己分析，引入场景对应的自动配置一般都生效了
-	- 配置文件中debug=true开启自动配置报告。
+	- 配置文件中 `debug=true` 开启自动配置报告。
 	  - Negative（不生效）
 	  - Positive（生效）
 - 是否需要修改
@@ -831,7 +830,7 @@ SpringBoot默认会在底层配好所有的组件，但是**如果用户自己�
 	- 自定义器  XXXXXCustomizer；
 	- ......
 
-## 17、最佳实践-Lombok简化开发
+## 17、最佳实践-Lombok简化开发（不建议使用）
 
 Lombok用标签方式代替构造器、getter/setter、toString()等鸡肋代码。
 
@@ -847,22 +846,17 @@ spring boot已经管理Lombok。引入依赖：
 IDEA中File->Settings->Plugins，搜索安装Lombok插件。
 
 ```java
-@NoArgsConstructor
-//@AllArgsConstructor
-@Data
-@ToString
-@EqualsAndHashCode
+@NoArgsConstructor // 无参构造
+@AllArgsConstructor // 有参构造
+@Data // getter/setter方法
+@ToString // toString方法
+@EqualsAndHashCode // euqals 和 hashcode
 public class User {
 
     private String name;
     private Integer age;
 
     private Pet pet;
-
-    public User(String name,Integer age){
-        this.name = name;
-        this.age = age;
-    }
 }
 ```
 
@@ -884,16 +878,7 @@ public class HelloController {
 
 ## 18、最佳实践-dev-tools
 
-> Spring Boot includes an additional set of tools that can make the application development experience a little more pleasant. The `spring-boot-devtools` module can be included in any project to provide additional development-time features.——[link](https://docs.spring.io/spring-boot/docs/2.3.8.RELEASE/reference/html/using-spring-boot.html#using-boot-devtools)
->
-> Applications that use `spring-boot-devtools` automatically restart whenever files on the classpath change. This can be a useful feature when working in an IDE, as it gives a very fast feedback loop for code changes. By default, any entry on the classpath that points to a directory is monitored for changes. Note that certain resources, such as static assets and view templates, [do not need to restart the application](https://docs.spring.io/spring-boot/docs/2.3.8.RELEASE/reference/html/using-spring-boot.html#using-boot-devtools-restart-exclude).——[link](https://docs.spring.io/spring-boot/docs/2.3.8.RELEASE/reference/html/using-spring-boot.html#using-boot-devtools-restart)
->
-> Triggering a restart
->
-> As DevTools monitors classpath resources, the only way to trigger a restart is to update the classpath. The way in which you cause the classpath to be updated depends on the IDE that you are using:
->
-> - In Eclipse, saving a modified file causes the classpath to be updated and triggers a restart.
-> - In IntelliJ IDEA, building the project (`Build -> Build Project`)(shortcut: Ctrl+F9) has the same effect.
+热部署[link](https://docs.spring.io/spring-boot/docs/2.3.8.RELEASE/reference/html/using-spring-boot.html#using-boot-devtools)
 
 添加依赖：
 
@@ -916,21 +901,38 @@ public class HelloController {
 
 ## 20、配置文件-yaml的用法
 
-同以前的properties用法
+**同以前的properties用法**
 
 YAML 是 "YAML Ain't Markup Language"（YAML 不是一种标记语言）的递归缩写。在开发的这种语言时，YAML 的意思其实是："Yet Another Markup Language"（仍是一种标记语言）。 
 
 **非常适合用来做以数据为中心的配置文件**。
 
+> properties里面的配置优先级比yaml高，其实是被覆盖
+>
+> 加载顺序：yml、yaml、properties
+
 ### 基本语法
 
-- key: value；kv之间有空格
+- key: value；kv之间有空格，`: 后有空格，只要:就加空格`
+
 - 大小写敏感
+
 - 使用缩进表示层级关系
-- 缩进不允许使用tab，只允许空格
+
+- 缩进不允许使用tab，只允许空格（IDEA中自动将tab转化成了对应的空格数）
+
 - 缩进的空格数不重要，只要相同层级的元素左对齐即可
+
 - '#'表示注释
-- 字符串无需加引号，如果要加，单引号''、双引号""表示字符串内容会被 转义、不转义
+
+- 字符串无需加引号，如果要加，单引号''、双引号""表示字符串内容会被 转义/不转义
+
+	- 这里的转义是针对程序的
+
+		```yml
+		k: "zhangsan \n lisi"
+		# 单引号将\n作为字符串输出，双引号将\n作为换行输出
+		```
 
 ### 数据类型
 
@@ -1030,6 +1032,8 @@ person:
 
 自定义的类和配置文件绑定一般没有提示。若要提示，添加如下依赖：
 
+note：2.5之后移除了配置器打包机制，自动取消了
+
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -1116,13 +1120,22 @@ The auto-configuration adds the following features on top of Spring’s defaults
 
 原理： 静态映射/**。
 
-请求进来，先去找Controller看能不能处理。不能处理的所有请求又都交给静态资源处理器。静态资源也找不到则响应404页面。
+1. 请求进来，先去找Controller看能不能处理。
+2. 不能处理的所有请求又都交给静态资源处理器。
+3. 静态资源也找不到则响应404页面。
 
 也可以改变默认的静态资源路径，`/static`，`/public`,`/resources`, `/META-INF/resources`失效
 
 ```yaml
-resources:
-  static-locations: [classpath:/haha/]
+spring:
+  resources:
+    static-locations: [classpath:/haha/]
+  
+# 2.5.6之后弃用，改为
+spring:
+  web:
+    resources:
+      static-locations: [classpath:/haha/]
 ```
 
 ### 静态资源访问前缀
@@ -1178,7 +1191,7 @@ spring:
 
 指网页标签上的小图标。
 
-favicon.ico 放在静态资源目录下即可。
+改成这个名字 favicon.ico 放在静态资源目录下即可。
 
 ```yaml
 spring:
@@ -1205,12 +1218,14 @@ public class WebMvcAutoConfiguration {
 ```
 
 - 给容器中配置的内容：
-  - 配置文件的相关属性的绑定：WebMvcProperties==**spring.mvc**、ResourceProperties==**spring.resources**
+  - 配置文件的相关属性的绑定：
+  	- WebMvcProperties == spring.mvc
+  	- WebProperties == spring.web
 
 ```java
 @Configuration(proxyBeanMethods = false)
 @Import(EnableWebMvcConfiguration.class)
-@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
+@EnableConfigurationProperties({ WebMvcProperties.class, WebProperties.class })
 @Order(0)
 public static class WebMvcAutoConfigurationAdapter implements WebMvcConfigurer {
     ...
@@ -1279,8 +1294,9 @@ public class WebMvcAutoConfiguration {
 
 ```yaml
 spring:
-  resources:
-    add-mappings: false   #禁用所有静态资源规则
+  web:
+    resources:
+      add-mappings: false #禁用所有静态资源规则 
 ```
 
 静态资源规则：
@@ -1364,7 +1380,7 @@ WelcomePageHandlerMapping(TemplateAvailabilityProviders templateAvailabilityProv
     - DELETE-删除用户
     - PUT-修改用户
     - POST-保存用户
-  - 核心Filter；HiddenHttpMethodFilter
+  - 核心Filter：HiddenHttpMethodFilter
 
 - **用法**
   - 开启页面表单的Rest功能
@@ -1377,53 +1393,10 @@ spring:
     hiddenmethod:
       filter:
         enabled: true   #开启页面表单的Rest功能
+# 2.6.6默认 true
 ```
 
-```html
-<form action="/user" method="get">
-    <input value="REST-GET提交" type="submit" />
-</form>
 
-<form action="/user" method="post">
-    <input value="REST-POST提交" type="submit" />
-</form>
-
-<form action="/user" method="post">
-    <input name="_method" type="hidden" value="DELETE"/>
-    <input value="REST-DELETE 提交" type="submit"/>
-</form>
-
-<form action="/user" method="post">
-    <input name="_method" type="hidden" value="PUT" />
-    <input value="REST-PUT提交"type="submit" />
-<form>
-```
-
-```java
-@GetMapping("/user")
-//@RequestMapping(value = "/user",method = RequestMethod.GET)
-public String getUser(){
-    return "GET-张三";
-}
-
-@PostMapping("/user")
-//@RequestMapping(value = "/user",method = RequestMethod.POST)
-public String saveUser(){
-    return "POST-张三";
-}
-
-@PutMapping("/user")
-//@RequestMapping(value = "/user",method = RequestMethod.PUT)
-public String putUser(){
-    return "PUT-张三";
-}
-
-@DeleteMapping("/user")
-//@RequestMapping(value = "/user",method = RequestMethod.DELETE)
-public String deleteUser(){
-    return "DELETE-张三";
-}
-```
 
 - Rest原理（表单提交要使用REST的时候）
   - 表单提交会带上`\_method=PUT`
@@ -1441,21 +1414,7 @@ public class HiddenHttpMethodFilter extends OncePerRequestFilter {
 			Collections.unmodifiableList(Arrays.asList(HttpMethod.PUT.name(),
 					HttpMethod.DELETE.name(), HttpMethod.PATCH.name()));
 
-	/** Default method parameter: {@code _method}. */
-	public static final String DEFAULT_METHOD_PARAM = "_method";
-
-	private String methodParam = DEFAULT_METHOD_PARAM;
-
-
-	/**
-	 * Set the parameter name to look for HTTP methods.
-	 * @see #DEFAULT_METHOD_PARAM
-	 */
-	public void setMethodParam(String methodParam) {
-		Assert.hasText(methodParam, "'methodParam' must not be empty");
-		this.methodParam = methodParam;
-	}
-
+	...
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -1471,30 +1430,22 @@ public class HiddenHttpMethodFilter extends OncePerRequestFilter {
 				}
 			}
 		}
-
 		filterChain.doFilter(requestToUse, response);
 	}
-
-
-	/**
-	 * Simple {@link HttpServletRequest} wrapper that returns the supplied method for
-	 * {@link HttpServletRequest#getMethod()}.
-	 */
-	private static class HttpMethodRequestWrapper extends HttpServletRequestWrapper {
-
+    
+    private static class HttpMethodRequestWrapper extends HttpServletRequestWrapper {
 		private final String method;
-
 		public HttpMethodRequestWrapper(HttpServletRequest request, String method) {
 			super(request);
 			this.method = method;
 		}
-
+        // 过滤器链放行的时候用wrapper。
+        // 以后的方法调用getMethod是调用requesWrapper的。
 		@Override
 		public String getMethod() {
 			return this.method;
 		}
 	}
-
 }
 ```
 
@@ -1544,15 +1495,9 @@ public class WebConfig{
 
 将`\_method`改成`_m`。
 
-```html
-<form action="/user" method="post">
-    <input name="_m" type="hidden" value="DELETE"/>
-    <input value="REST-DELETE 提交" type="submit"/>
-</form>
-```
-
 ## 28、请求处理-【源码分析】-请求映射原理
-![在这里插入图片描述](image/20210205005703527.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204201625788.png" alt="在这里插入图片描述" style="zoom:67%;" />
+
 SpringMVC功能分析都从 `org.springframework.web.servlet.DispatcherServlet` -> `doDispatch()`
 
 ```java
@@ -1596,17 +1541,18 @@ protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Ex
 }
 ```
 
-`this.handlerMappings`在Debug模式下展现的内容：
+`this.handlerMappings`在 Debug 模式下展现的内容：
 
-![在这里插入图片描述](image/20210205005802305.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204201942861.png" alt="在这里插入图片描述" style="zoom:67%;" />
+
 其中，保存了所有`@RequestMapping` 和`handler`的映射规则。
 
-![在这里插入图片描述](image/20210205005926474.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204201941115.png" alt="在这里插入图片描述" style="zoom:67%;" />
 
 所有的请求映射都在HandlerMapping中：
 
 - SpringBoot自动配置欢迎页的 WelcomePageHandlerMapping 。访问 /能访问到index.html；
-- SpringBoot自动配置了默认 的 RequestMappingHandlerMapping
+- SpringBoot自动配置了默认的 RequestMappingHandlerMapping
 - 请求进来，挨个尝试所有的HandlerMapping看是否有请求信息。
 
   - 如果有就找到这个请求对应的handler
@@ -1646,16 +1592,17 @@ public class ParameterTestController {
 
     //  car/2/owner/zhangsan
     @GetMapping("/car/{id}/owner/{username}")
-    public Map<String,Object> getCar(@PathVariable("id") Integer id,
-                                     @PathVariable("username") String name,
-                                     @PathVariable Map<String,String> pv,
-                                     @RequestHeader("User-Agent") String userAgent,
-                                     @RequestHeader Map<String,String> header,
-                                     @RequestParam("age") Integer age,
-                                     @RequestParam("inters") List<String> inters,
-                                     @RequestParam Map<String,String> params,
-                                     @CookieValue("_ga") String _ga,
-                                     @CookieValue("_ga") Cookie cookie){
+    public Map<String,Object> getCar(
+        	@PathVariable("id") Integer id,
+        	@PathVariable("username") String name,
+        	@PathVariable Map<String,String> pv,
+        	@RequestHeader("User-Agent") String userAgent,
+        	@RequestHeader Map<String,String> header,
+        	@RequestParam("age") Integer age,
+        	@RequestParam("inters") List<String> inters,
+        	@RequestParam Map<String,String> params,
+        	@CookieValue("_ga") String _ga,
+        	@CookieValue("_ga") Cookie cookie){
 
         Map<String,Object> map = new HashMap<>();
 
@@ -1684,52 +1631,24 @@ public class ParameterTestController {
 
 ## 30、请求处理-@RequestAttribute
 
+获取request域中的属性
+
 用例：
 
 ```java
 @Controller
 public class RequestController {
-
-    @GetMapping("/goto")
-    public String goToPage(HttpServletRequest request){
-
-        request.setAttribute("msg","成功了...");
-        request.setAttribute("code",200);
-        return "forward:/success";  //转发到  /success请求
-    }
-
-    @GetMapping("/params")
-    public String testParam(Map<String,Object> map,
-                            Model model,
-                            HttpServletRequest request,
-                            HttpServletResponse response){
-        map.put("hello","world666");
-        model.addAttribute("world","hello666");
-        request.setAttribute("message","HelloWorld");
-
-        Cookie cookie = new Cookie("c1","v1");
-        response.addCookie(cookie);
-        return "forward:/success";
-    }
-
     ///<-----------------主角@RequestAttribute在这个方法
     @ResponseBody
     @GetMapping("/success")
     public Map success(@RequestAttribute(value = "msg",required = false) String msg,
-                       @RequestAttribute(value = "code",required = false)Integer code,
                        HttpServletRequest request){
         Object msg1 = request.getAttribute("msg");
 
-        Map<String,Object> map = new HashMap<>();
-        Object hello = request.getAttribute("hello");
-        Object world = request.getAttribute("world");
-        Object message = request.getAttribute("message");
+        Map<String,Object> map = new HashMap<>();     
 
         map.put("reqMethod_msg",msg1);
         map.put("annotation_msg",msg);
-        map.put("hello",hello);
-        map.put("world",world);
-        map.put("message",message);
 
         return map;
     }
@@ -1738,7 +1657,63 @@ public class RequestController {
 
 ## 31、请求处理-@MatrixVariable与UrlPathHelper
 
+```html
+/cars/{path}?xxx=xxx&aaa=ccc queryString 查询字符串。@RequestParam；<br/>
+/cars/sell;low=34;brand=byd,audi,yd  ；矩阵变量 <br/>
+
+举例：
+页面开发，cookie禁用了，session里面的内容怎么使用；
+session.set(a,b)---> jsessionid ---> cookie ----> 每次发请求携带。
+url重写：/abc;jsesssionid=xxxx 把cookie的值使用矩阵变量的方式进行传递.
+
+/boss/1/2
+
+/boss/1;age=20/2;age=20
+
+<a href="/cars/sell;low=34;brand=byd,audi,yd">@MatrixVariable（矩阵变量）</a>
+<a href="/cars/sell;low=34;brand=byd;brand=audi;brand=yd">@MatrixVariable（矩阵变量）</a>
+<a href="/boss/1;age=20/2;age=10">@MatrixVariable（矩阵变量）/boss/{bossId}/{empId}</a>
+```
+
+; 后都是矩阵变量的方式
+
 1. 语法： 请求路径：`/cars/sell;low=34;brand=byd,audi,yd`
+
+**`@MatrixVariable`的用例**
+
+```java
+@RestController
+public class ParameterTestController {
+
+    // /cars/sell;low=34;brand=byd,audi,yd
+    @GetMapping("/cars/{path}")
+    public Map carsSell(@MatrixVariable("low") Integer low,
+                        @MatrixVariable("brand") List<String> brand,
+                        @PathVariable("path") String path){
+        Map<String,Object> map = new HashMap<>();
+
+        map.put("low",low); // 34
+        map.put("brand",brand); // byd,audi,yd
+        map.put("path",path); // sell
+        return map;
+    }
+
+    
+    // /boss/1;age=20/2;age=10
+    @GetMapping("/boss/{bossId}/{empId}")
+    public Map boss(@MatrixVariable(value = "age",pathVar = "bossId") Integer bossAge,
+                    @MatrixVariable(value = "age",pathVar = "empId") Integer empAge){
+        Map<String,Object> map = new HashMap<>();
+
+        map.put("bossAge",bossAge); // 20
+        map.put("empAge",empAge); // 10
+        return map;
+
+    }
+
+}
+```
+
 
 2. SpringBoot默认是禁用了矩阵变量的功能
    - 手动开启：原理。对于路径的处理。UrlPathHelper的removeSemicolonContent设置为false，让其支持矩阵变量的。
@@ -1749,31 +1724,32 @@ public class RequestController {
 
 **手动开启矩阵变量**：
 
-- 实现`WebMvcConfigurer`接口：
+- 写法一：实现`WebMvcConfigurer`接口
 
 ```java
 @Configuration(proxyBeanMethods = false)
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         // 不移除；后面的内容。矩阵变量功能就可以生效
         urlPathHelper.setRemoveSemicolonContent(false);
         configurer.setUrlPathHelper(urlPathHelper);
     }
+    
 }
 ```
 
-- 创建返回`WebMvcConfigurer`Bean：
+- 写法二：创建返回`WebMvcConfigurer`Bean
 
 ```java
 @Configuration(proxyBeanMethods = false)
 public class WebConfig{
+    
     @Bean
     public WebMvcConfigurer webMvcConfigurer(){
         return new WebMvcConfigurer() {
-                        @Override
+            @Override
             public void configurePathMatch(PathMatchConfigurer configurer) {
                 UrlPathHelper urlPathHelper = new UrlPathHelper();
                 // 不移除；后面的内容。矩阵变量功能就可以生效
@@ -1787,40 +1763,6 @@ public class WebConfig{
 
 
 
-**`@MatrixVariable`的用例**
-
-```java
-@RestController
-public class ParameterTestController {
-
-    ///cars/sell;low=34;brand=byd,audi,yd
-    @GetMapping("/cars/{path}")
-    public Map carsSell(@MatrixVariable("low") Integer low,
-                        @MatrixVariable("brand") List<String> brand,
-                        @PathVariable("path") String path){
-        Map<String,Object> map = new HashMap<>();
-
-        map.put("low",low);
-        map.put("brand",brand);
-        map.put("path",path);
-        return map;
-    }
-
-    // /boss/1;age=20/2;age=10
-
-    @GetMapping("/boss/{bossId}/{empId}")
-    public Map boss(@MatrixVariable(value = "age",pathVar = "bossId") Integer bossAge,
-                    @MatrixVariable(value = "age",pathVar = "empId") Integer empAge){
-        Map<String,Object> map = new HashMap<>();
-
-        map.put("bossAge",bossAge);
-        map.put("empAge",empAge);
-        return map;
-
-    }
-
-}
-```
 
 
 
@@ -1862,7 +1804,7 @@ public class DispatcherServlet extends FrameworkServlet {
 - 为当前Handler 找一个适配器 `HandlerAdapter`，用的最多的是**RequestMappingHandlerAdapter**。
 - 适配器执行目标方法并确定方法参数的每一个值。
 
-### HandlerAdapter
+### 1>HandlerAdapter
 
 默认会加载所有`HandlerAdapter`
 
@@ -1892,7 +1834,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 有这些`HandlerAdapter`：
 
-![在这里插入图片描述](image/20210205010047654.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204202147607.png" alt="在这里插入图片描述" style="zoom:67%;" />
 
 
 0. 支持方法上标注`@RequestMapping` 
@@ -1901,7 +1843,7 @@ public class DispatcherServlet extends FrameworkServlet {
 2. ...
 3. ...
 
-### 执行目标方法
+### 2>执行目标方法
 
 ```java
 public class DispatcherServlet extends FrameworkServlet {
@@ -1954,7 +1896,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 }
 ```
 
-### 参数解析器
+### 3>参数解析器
 
 确定将要执行的目标方法的每一个参数的值是什么;
 
@@ -2086,7 +2028,7 @@ public interface HandlerMethodArgumentResolver {
 
 ```
 
-### 返回值处理器
+### 4>返回值处理器
 
 **ValueHandler**
 
@@ -2210,7 +2152,7 @@ public interface HandlerMethodReturnValueHandler {
 }
 ```
 
-### 回顾执行目标方法
+### >回顾执行目标方法
 
 ```java
 public class DispatcherServlet extends FrameworkServlet {
@@ -2342,7 +2284,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 
 
-### 如何确定目标方法每一个参数的值
+### 5>如何确定目标方法每一个参数的值
 
 重点分析`ServletInvocableHandlerMethod`的`getMethodArgumentValues`方法
 
@@ -2425,7 +2367,7 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
 		HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
 		if (result == null) {
-            //挨个判断所有参数解析器那个支持解析这个参数
+            //挨个判断所有参数解析器哪个支持解析这个参数
 			for (HandlerMethodArgumentResolver resolver : this.argumentResolvers) {
 				if (resolver.supportsParameter(parameter)) {
 					result = resolver;
