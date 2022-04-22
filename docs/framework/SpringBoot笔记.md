@@ -2899,7 +2899,7 @@ public class ResponseTestController {
 }
 ```
 
-[32、请求处理-【源码分析】-各种类型参数解析原理 - 返回值处理器](#)有讨论**ReturnValueHandler**。现在直接看看重点：
+[32、请求处理-【源码分析】-各种类型参数解析原理 - 返回值处理器](#)有讨论**ReturnValueHandler**。
 
 ```java
 public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
@@ -3028,6 +3028,30 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 
 
 
+springMVC支持的返回值
+
+```java
+ModelAndView
+Model
+View
+ResponseEntity 
+ResponseBodyEmitter
+StreamingResponseBody
+HttpEntity
+HttpHeaders
+Callable
+DeferredResult
+ListenableFuture
+CompletionStage
+WebAsyncTask
+有 @ModelAttribute 且为对象类型的
+@ResponseBody 注解 ---> RequestResponseBodyMethodProcessor；
+```
+
+
+
+
+
 ## 38、响应处理-【源码分析】-HTTPMessageConverter原理
 
 返回值处理器`ReturnValueHandler`原理：
@@ -3036,7 +3060,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 2. 返回值处理器调用 `handleReturnValue` 进行处理
 3. `RequestResponseBodyMethodProcessor` 可以处理返回值标了`@ResponseBody` 注解的。
 	- 利用 `MessageConverters` 进行处理 将数据写为json
-		1. 内容协商（浏览器默认会以请求头的方式告诉服务器他能接受什么样的内容类型）
+		1. 内容协商（浏览器默认会以请求头的方式告诉服务器他能接受什么样的内容类型）：浏览器请求头的Accept
 		2. 服务器最终根据自己自身的能力，决定服务器能生产出什么样内容类型的数据，
 		3. SpringMVC会挨个遍历所有容器底层的 `HttpMessageConverter` ，看谁能处理？
 			1. 得到`MappingJackson2HttpMessageConverter`可以将对象写为json
@@ -3087,13 +3111,14 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
             else {
                 HttpServletRequest request = inputMessage.getServletRequest();
                 List<MediaType> acceptableTypes = getAcceptableMediaTypes(request);
-                //服务器最终根据自己自身的能力，决定服务器能生产出什么样内容类型的数据
+                // 服务器最终根据自己自身的能力，决定服务器能生产出什么样内容类型的数据
                 List<MediaType> producibleTypes = getProducibleMediaTypes(request, valueType, targetType);
 
                 if (body != null && producibleTypes.isEmpty()) {
                     throw new HttpMessageNotWritableException(
                             "No converter found for return value of type: " + valueType);
                 }
+                // 服务器能响应和浏览器能接收的挨个匹配，能匹配的都放进去
                 List<MediaType> mediaTypesToUse = new ArrayList<>();
                 for (MediaType requestedType : acceptableTypes) {
                     for (MediaType producibleType : producibleTypes) {
@@ -3114,7 +3139,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 
                 MediaType.sortBySpecificityAndQuality(mediaTypesToUse);
 
-                //选择一个MediaType
+                //选择一个MediaType，选择第一个能匹配的，优先级（权重）
                 for (MediaType mediaType : mediaTypesToUse) {
                     if (mediaType.isConcrete()) {
                         selectedMediaType = mediaType;
@@ -3132,7 +3157,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
                 }
             }
 
-        	
+        	// 找谁能去读写
             if (selectedMediaType != null) {
                 selectedMediaType = selectedMediaType.removeQualityValue();
                 //本节主角：HttpMessageConverter
@@ -3175,48 +3200,30 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 
 `HTTPMessageConverter`接口：
 
-```java
-/**
- * Strategy interface for converting from and to HTTP requests and responses.
- */
-public interface HttpMessageConverter<T> {
-
-	/**
-	 * Indicates whether the given class can be read by this converter.
-	 */
-	boolean canRead(Class<?> clazz, @Nullable MediaType mediaType);
-
-	/**
-	 * Indicates whether the given class can be written by this converter.
-	 */
-	boolean canWrite(Class<?> clazz, @Nullable MediaType mediaType);
-
-	/**
-	 * Return the list of {@link MediaType} objects supported by this converter.
-	 */
-	List<MediaType> getSupportedMediaTypes();
-
-	/**
-	 * Read an object of the given type from the given input message, and returns it.
-	 */
-	T read(Class<? extends T> clazz, HttpInputMessage inputMessage)
-			throws IOException, HttpMessageNotReadableException;
-
-	/**
-	 * Write an given object to the given output message.
-	 */
-	void write(T t, @Nullable MediaType contentType, HttpOutputMessage outputMessage)
-			throws IOException, HttpMessageNotWritableException;
-
-}
-
-```
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204212217740.png" alt="image-20220421221715934" style="zoom:50%;" />
 
 `HttpMessageConverter`: 看是否支持将 此 `Class`类型的对象，转为`MediaType`类型的数据。
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204212239764.png" alt="image-20220421223903133" style="zoom:40%;" />
+
+```
+0 - 只支持Byte类型的
+1 - String
+2 - String
+3 - Resource
+4 - ResourceRegion
+5 - DOMSource.class \ SAXSource.class) \ StAXSource.class \StreamSource.class \Source.class
+6 - MultiValueMap
+7 - true 
+8 - true
+9 - 支持注解方式xml处理的。
+```
+
+
+
 例子：`Person`对象转为JSON，或者 JSON转为`Person`，这将用到`MappingJackson2HttpMessageConverter`
 
-![在这里插入图片描述](image/20210205010509984.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204212213257.png" alt="在这里插入图片描述" style="zoom:67%;" />
 
 ```java
 public class MappingJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
@@ -3232,9 +3239,7 @@ public class MappingJackson2HttpMessageConverter extends AbstractJackson2HttpMes
 
 ```java
 public class DispatcherServlet extends FrameworkServlet {
-    
     ...
-    
 	private void initHandlerAdapters(ApplicationContext context) {
 		this.handlerAdapters = null;
 
@@ -3519,143 +3524,11 @@ Http协议中规定的，Accept字段告诉服务器本客户端可以接收的�
    - `HeaderContentNegotiationStrategy`  确定客户端可以接收的内容类型 
 3. 遍历循环所有当前系统的 `MessageConverter`，看谁支持操作这个对象（Person）
 4. 找到支持操作Person的converter，把converter支持的媒体类型统计出来。
-5. 客户端需要application/xml，服务端有10种MediaType。
+5. 客户端需要application/xml，服务端有10种MediaType（json、xml）。
 6. 进行内容协商的最佳匹配媒体类型
 7. 用 支持 将对象转为 最佳匹配媒体类型 的converter。调用它进行转化 。
 
-
-
-```java
-
-//RequestResponseBodyMethodProcessor继承这类
-public abstract class AbstractMessageConverterMethodProcessor extends AbstractMessageConverterMethodArgumentResolver
-		implements HandlerMethodReturnValueHandler {
-
-    ...
-    
-    //跟上一节的代码一致
-    protected <T> void writeWithMessageConverters(@Nullable T value, MethodParameter returnType,
-                ServletServerHttpRequest inputMessage, ServletServerHttpResponse outputMessage)
-                throws IOException, HttpMediaTypeNotAcceptableException, HttpMessageNotWritableException {
-
-            Object body;
-            Class<?> valueType;
-            Type targetType;
-
-            if (value instanceof CharSequence) {
-                body = value.toString();
-                valueType = String.class;
-                targetType = String.class;
-            }
-            else {
-                body = value;
-                valueType = getReturnValueType(body, returnType);
-                targetType = GenericTypeResolver.resolveType(getGenericType(returnType), returnType.getContainingClass());
-            }
-
-			...
-
-            //本节重点
-            //内容协商（浏览器默认会以请求头(参数Accept)的方式告诉服务器他能接受什么样的内容类型）
-            MediaType selectedMediaType = null;
-            MediaType contentType = outputMessage.getHeaders().getContentType();
-            boolean isContentTypePreset = contentType != null && contentType.isConcrete();
-            if (isContentTypePreset) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Found 'Content-Type:" + contentType + "' in response");
-                }
-                selectedMediaType = contentType;
-            }
-            else {
-                HttpServletRequest request = inputMessage.getServletRequest();
-                List<MediaType> acceptableTypes = getAcceptableMediaTypes(request);
-                //服务器最终根据自己自身的能力，决定服务器能生产出什么样内容类型的数据
-                List<MediaType> producibleTypes = getProducibleMediaTypes(request, valueType, targetType);
-
-                if (body != null && producibleTypes.isEmpty()) {
-                    throw new HttpMessageNotWritableException(
-                            "No converter found for return value of type: " + valueType);
-                }
-                List<MediaType> mediaTypesToUse = new ArrayList<>();
-                for (MediaType requestedType : acceptableTypes) {
-                    for (MediaType producibleType : producibleTypes) {
-                        if (requestedType.isCompatibleWith(producibleType)) {
-                            mediaTypesToUse.add(getMostSpecificMediaType(requestedType, producibleType));
-                        }
-                    }
-                }
-                if (mediaTypesToUse.isEmpty()) {
-                    if (body != null) {
-                        throw new HttpMediaTypeNotAcceptableException(producibleTypes);
-                    }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("No match for " + acceptableTypes + ", supported: " + producibleTypes);
-                    }
-                    return;
-                }
-
-                MediaType.sortBySpecificityAndQuality(mediaTypesToUse);
-
-                //选择一个MediaType
-                for (MediaType mediaType : mediaTypesToUse) {
-                    if (mediaType.isConcrete()) {
-                        selectedMediaType = mediaType;
-                        break;
-                    }
-                    else if (mediaType.isPresentIn(ALL_APPLICATION_MEDIA_TYPES)) {
-                        selectedMediaType = MediaType.APPLICATION_OCTET_STREAM;
-                        break;
-                    }
-                }
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Using '" + selectedMediaType + "', given " +
-                            acceptableTypes + " and supported " + producibleTypes);
-                }
-            }
-
-        	
-            if (selectedMediaType != null) {
-                selectedMediaType = selectedMediaType.removeQualityValue();
-                //本节主角：HttpMessageConverter
-                for (HttpMessageConverter<?> converter : this.messageConverters) {
-                    GenericHttpMessageConverter genericConverter = (converter instanceof GenericHttpMessageConverter ?
-                            (GenericHttpMessageConverter<?>) converter : null);
-                    
-                    //判断是否可写
-                    if (genericConverter != null ?
-                            ((GenericHttpMessageConverter) converter).canWrite(targetType, valueType, selectedMediaType) :
-                            converter.canWrite(valueType, selectedMediaType)) {
-                        body = getAdvice().beforeBodyWrite(body, returnType, selectedMediaType,
-                                (Class<? extends HttpMessageConverter<?>>) converter.getClass(),
-                                inputMessage, outputMessage);
-                        if (body != null) {
-                            Object theBody = body;
-                            LogFormatUtils.traceDebug(logger, traceOn ->
-                                    "Writing [" + LogFormatUtils.formatValue(theBody, !traceOn) + "]");
-                            addContentDispositionHeader(inputMessage, outputMessage);
-							//开始写入
-                            if (genericConverter != null) {
-                                genericConverter.write(body, targetType, selectedMediaType, outputMessage);
-                            }
-                            else {
-                                ((HttpMessageConverter) converter).write(body, selectedMediaType, outputMessage);
-                            }
-                        }
-                        else {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Nothing to write: null body");
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
-			...
-        }
-```
-
-
+`AbstractMessageConverterMethodProcessor.java`，前章节有
 
 ## 40、响应处理-【源码分析】-基于请求参数的内容协商原理
 
@@ -3663,7 +3536,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 
 获取客户端（PostMan、浏览器）支持接收的内容类型。（获取客户端Accept请求头字段application/xml）
 
-- `contentNegotiationManager` 内容协商管理器 默认使用基于请求头的策略
+- `ContentNegotiationManager` 内容协商管理器，得配置（默认使用基于请求头的策略）
 - `HeaderContentNegotiationStrategy`  确定客户端可以接收的内容类型 
 
 ```java
@@ -3677,14 +3550,8 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
     protected <T> void writeWithMessageConverters(@Nullable T value, MethodParameter returnType,
                 ServletServerHttpRequest inputMessage, ServletServerHttpResponse outputMessage)
                 throws IOException, HttpMediaTypeNotAcceptableException, HttpMessageNotWritableException {
-
-            Object body;
-            Class<?> valueType;
-            Type targetType;
-        
         	...
         
-                    //本节重点
             //内容协商（浏览器默认会以请求头(参数Accept)的方式告诉服务器他能接受什么样的内容类型）
             MediaType selectedMediaType = null;
             MediaType contentType = outputMessage.getHeaders().getContentType();
@@ -3719,26 +3586,12 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 
 ```java
 public class ContentNegotiationManager implements ContentNegotiationStrategy, MediaTypeFileExtensionResolver {
-	
-    ...
-    
+	...    
     public ContentNegotiationManager() {
-		this(new HeaderContentNegotiationStrategy());//内容协商管理器 默认使用基于请求头的策略
+		this(new HeaderContentNegotiationStrategy());
+        //内容协商管理器 默认使用基于请求头的策略
 	}
-    
-    @Override
-	public List<MediaType> resolveMediaTypes(NativeWebRequest request) throws HttpMediaTypeNotAcceptableException {
-		for (ContentNegotiationStrategy strategy : this.strategies) {
-			List<MediaType> mediaTypes = strategy.resolveMediaTypes(request);
-			if (mediaTypes.equals(MEDIA_TYPE_ALL_LIST)) {
-				continue;
-			}
-			return mediaTypes;
-		}
-		return MEDIA_TYPE_ALL_LIST;
-	}
-    ...
-    
+    ...    
 }
 ```
 
@@ -3789,6 +3642,18 @@ spring:
       favor-parameter: true  #开启请求参数内容协商模式
 ```
 
+然后，浏览器地址输入带format参数的URL：
+
+```
+http://localhost:8080/test/person?format=json
+或
+http://localhost:8080/test/person?format=xml
+```
+
+这样，后端会根据参数format的值，返回对应json或xml格式的数据。
+
+
+
 内容协商管理器，就会多了一个`ParameterContentNegotiationStrategy`（由Spring容器注入）
 
 ```java
@@ -3824,9 +3689,10 @@ public class ParameterContentNegotiationStrategy extends AbstractMappingContentN
 	protected String getMediaTypeKey(NativeWebRequest request) {
 		return request.getParameter(getParameterName());
 	}
-    
+} 
+
     //---以下方法在AbstractMappingContentNegotiationStrategy类
-    
+   
     @Override
 	public List<MediaType> resolveMediaTypes(NativeWebRequest webRequest)
 			throws HttpMediaTypeNotAcceptableException {
@@ -3857,19 +3723,7 @@ public class ParameterContentNegotiationStrategy extends AbstractMappingContentN
 		return MEDIA_TYPE_ALL_LIST;
 	}
     
-
-}
 ```
-
-然后，浏览器地址输入带format参数的URL：
-
-```
-http://localhost:8080/test/person?format=json
-或
-http://localhost:8080/test/person?format=xml
-```
-
-这样，后端会根据参数format的值，返回对应json或xml格式的数据。
 
 
 
@@ -3887,9 +3741,42 @@ http://localhost:8080/test/person?format=xml
 
 4. 内容协商找到最终的 `messageConverter`
 
-SpringMVC的什么功能，一个入口给容器中添加一个  `WebMvcConfigurer`
+```java
+@Controller
+public class ResponseTestController {
+
+    /**
+     * 1、浏览器发请求直接返回 xml    [application/xml]        jacksonXmlConverter
+     * 2、如果是ajax请求 返回 json   [application/json]      jacksonJsonConverter
+     * 3、如果硅谷app发请求，返回自定义协议数据  [appliaction/x-guigu]   xxxxConverter
+     *          属性值1;属性值2;
+     *
+     * 步骤：
+     * 1、添加自定义的MessageConverter进系统底层
+     * 2、系统底层就会统计出所有MessageConverter能操作哪些类型
+     * 3、客户端内容协商 [guigu--->guigu]
+     *
+     * 作业：如何以参数的方式进行内容协商
+     * @return
+     */
+    @ResponseBody  //利用返回值处理器里面的消息转换器进行处理
+    @GetMapping(value = "/test/person")
+    public Person getPerson(){
+        Person person = new Person();
+        person.setAge(28);
+        person.setBirth(new Date());
+        person.setUserName("zhangsan");
+        return person;
+    }
+
+}
+```
 
 
+
+无论SpringMVC的什么功能，都在同一个入口，给容器中添加一个  `WebMvcConfigurer`
+
+> 在interface WebMvcConfigurer{}中
 
 ```java
 @Configuration(proxyBeanMethods = false)
@@ -3898,6 +3785,7 @@ public class WebConfig {
     public WebMvcConfigurer webMvcConfigurer(){
         return new WebMvcConfigurer() {
 
+            // entend扩展，原有的还存在
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new GuiguMessageConverter());
@@ -3947,7 +3835,6 @@ public class GuiguMessageConverter implements HttpMessageConverter<Person> {
         //自定义协议数据的写出
         String data = person.getUserName()+";"+person.getAge()+";"+person.getBirth();
 
-
         //写出去
         OutputStream body = outputMessage.getBody();
         body.write(data.getBytes());
@@ -3955,44 +3842,17 @@ public class GuiguMessageConverter implements HttpMessageConverter<Person> {
 }
 ```
 
-
-
-```java
-import java.util.Date;
-
-@Controller
-public class ResponseTestController {
-
-    /**
-     * 1、浏览器发请求直接返回 xml    [application/xml]        jacksonXmlConverter
-     * 2、如果是ajax请求 返回 json   [application/json]      jacksonJsonConverter
-     * 3、如果硅谷app发请求，返回自定义协议数据  [appliaction/x-guigu]   xxxxConverter
-     *          属性值1;属性值2;
-     *
-     * 步骤：
-     * 1、添加自定义的MessageConverter进系统底层
-     * 2、系统底层就会统计出所有MessageConverter能操作哪些类型
-     * 3、客户端内容协商 [guigu--->guigu]
-     *
-     * 作业：如何以参数的方式进行内容协商
-     * @return
-     */
-    @ResponseBody  //利用返回值处理器里面的消息转换器进行处理
-    @GetMapping(value = "/test/person")
-    public Person getPerson(){
-        Person person = new Person();
-        person.setAge(28);
-        person.setBirth(new Date());
-        person.setUserName("zhangsan");
-        return person;
-    }
-
-}
-```
-
-
-
 用Postman发送`/test/person`（请求头`Accept:application/x-guigu`)，将返回自定义协议数据的写出。
+
+
+
+有可能我们添加的自定义的功能会覆盖默认很多功能，导致一些默认的功能失效。
+
+考虑，上述功能除了完全自定义外？SpringBoot有没有提供基于配置文件的快速修改媒体类型功能？怎么配置？【提示：参照SpringBoot官方文档web开发内容协商章节】
+
+下一节
+
+
 
 ## 42、响应处理-【源码分析】-浏览器与PostMan内容协商完全适配
 
@@ -4040,15 +3900,28 @@ public class WebConfig /*implements WebMvcConfigurer*/ {
 
 日后开发要注意，**有可能我们添加的自定义的功能会覆盖默认很多功能，导致一些默认的功能失效。**
 
+```java
+// 这种不会覆盖
+@Configuration(proxyBeanMethods = false)
+public class WebConfig {
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer(){
+        return new WebMvcConfigurer() {
+
+       		@Override
+            public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+                configurer.mediaType("x-guigu", MediaType.parseMediaType("application/x-guigu"));
+            }
+        }
+    }
+}
+```
+
+
+
 
 
 ## 43、视图解析-Thymeleaf初体验
-
-> **Thymeleaf** is a modern server-side Java template engine for both web and standalone environments.
->
-> Thymeleaf's main goal is to bring elegant *natural templates* to your development workflow — HTML that can be correctly displayed in browsers and also work as static prototypes, allowing for stronger collaboration in development teams.
->
-> With modules for Spring Framework, a host of integrations with your favourite tools, and the ability to plug in your own functionality, Thymeleaf is ideal for modern-day HTML5 JVM web development — although there is much more it can do.——[Link](https://www.thymeleaf.org/)
 
 [Thymeleaf官方文档](https://www.thymeleaf.org/documentation.html)
 
@@ -4183,27 +4056,14 @@ server:
 
 - 无操作： _
 
-### 设置属性值-th:attr
-
-- 设置单个值
+### 设置属性值
 
 ```html
-<form action="subscribe.html" th:attr="action=@{/subscribe}">
-  <fieldset>
-    <input type="text" name="email" />
-    <input type="submit" value="Subscribe!" th:attr="value=#{subscribe.submit}"/>
-  </fieldset>
-</form>
+<input type="submit" value="Subscribe!" th:value="#{subscribe.submit}"/>
+<form action="subscribe.html" th:action="@{/subscribe}">
 ```
 
-- 设置多个值
 
-```html
-<img src="../../images/gtvglogo.png"  
-     th:attr="src=@{/images/gtvglogo.png},title=#{logo},alt=#{logo}" />
-```
-
-[官方文档 - 5 Setting Attribute Values](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#setting-attribute-values)
 
 ### 迭代
 
@@ -4259,273 +4119,6 @@ server:
 
 ## 44、web实验-后台管理系统基本功能
 
-### 项目创建
-
-使用IDEA的Spring Initializr。
-
-- thymeleaf、
-- web-starter、
-- devtools、
-- lombok
-
-### 登陆页面
-
-- `/static` 放置 css，js等静态资源
-
-- `/templates/login.html` 登录页
-
-```html
-<html lang="en" xmlns:th="http://www.thymeleaf.org"><!-- 要加这玩意thymeleaf才能用 -->
-
-<form class="form-signin" action="index.html" method="post" th:action="@{/login}">
-
-    ...
-    
-    <!-- 消息提醒 -->
-    <label style="color: red" th:text="${msg}"></label>
-    
-    <input type="text" name="userName" class="form-control" placeholder="User ID" autofocus>
-    <input type="password" name="password" class="form-control" placeholder="Password">
-    
-    <button class="btn btn-lg btn-login btn-block" type="submit">
-        <i class="fa fa-check"></i>
-    </button>
-    
-    ...
-    
-</form>
-```
-
-- `/templates/main.html` 主页
-
-thymeleaf内联写法：
-
-```html
-<p>Hello, [[${session.user.name}]]!</p>
-```
-
-### 登录控制层
-
-```java
-@Controller
-public class IndexController {
-    /**
-     * 来登录页
-     * @return
-     */
-    @GetMapping(value = {"/","/login"})
-    public String loginPage(){
-
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String main(User user, HttpSession session, Model model){ //RedirectAttributes
-
-        if(StringUtils.hasLength(user.getUserName()) && "123456".equals(user.getPassword())){
-            //把登陆成功的用户保存起来
-            session.setAttribute("loginUser",user);
-            //登录成功重定向到main.html;  重定向防止表单重复提交
-            return "redirect:/main.html";
-        }else {
-            model.addAttribute("msg","账号密码错误");
-            //回到登录页面
-            return "login";
-        }
-    }
-    
-     /**
-     * 去main页面
-     * @return
-     */
-    @GetMapping("/main.html")
-    public String mainPage(HttpSession session, Model model){
-        
-        //最好用拦截器,过滤器
-        Object loginUser = session.getAttribute("loginUser");
-        if(loginUser != null){
-        	return "main";
-        }else {
-            //session过期，没有登陆过
-        	//回到登录页面
-	        model.addAttribute("msg","请重新登录");
-    	    return "login";
-        }
-    }
-    
-}
-```
-
-
-
-### 模型
-
-```java
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class User {
-    private String userName;
-    private String password;
-}
-```
-
-
-## 45、web实验-抽取公共页面
-
-[官方文档 - Template Layout](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#template-layout)
-
-- 公共页面`/templates/common.html`
-
-```html
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"><!--注意要添加xmlns:th才能添加thymeleaf的标签-->
-<head th:fragment="commonheader">
-    <!--common-->
-    <link href="css/style.css" th:href="@{/css/style.css}" rel="stylesheet">
-    <link href="css/style-responsive.css" th:href="@{/css/style-responsive.css}" rel="stylesheet">
-    ...
-</head>
-<body>
-<!-- left side start-->
-<div id="leftmenu" class="left-side sticky-left-side">
-	...
-
-    <div class="left-side-inner">
-		...
-
-        <!--sidebar nav start-->
-        <ul class="nav nav-pills nav-stacked custom-nav">
-            <li><a th:href="@{/main.html}"><i class="fa fa-home"></i> <span>Dashboard</span></a></li>
-            ...
-            <li class="menu-list nav-active"><a href="#"><i class="fa fa-th-list"></i> <span>Data Tables</span></a>
-                <ul class="sub-menu-list">
-                    <li><a th:href="@{/basic_table}"> Basic Table</a></li>
-                    <li><a th:href="@{/dynamic_table}"> Advanced Table</a></li>
-                    <li><a th:href="@{/responsive_table}"> Responsive Table</a></li>
-                    <li><a th:href="@{/editable_table}"> Edit Table</a></li>
-                </ul>
-            </li>
-            ...
-        </ul>
-        <!--sidebar nav end-->
-    </div>
-</div>
-<!-- left side end-->
-
-
-<!-- header section start-->
-<div th:fragment="headermenu" class="header-section">
-
-    <!--toggle button start-->
-    <a class="toggle-btn"><i class="fa fa-bars"></i></a>
-    <!--toggle button end-->
-	...
-
-</div>
-<!-- header section end-->
-
-<div id="commonscript">
-    <!-- Placed js at the end of the document so the pages load faster -->
-    <script th:src="@{/js/jquery-1.10.2.min.js}"></script>
-    <script th:src="@{/js/jquery-ui-1.9.2.custom.min.js}"></script>
-    <script th:src="@{/js/jquery-migrate-1.2.1.min.js}"></script>
-    <script th:src="@{/js/bootstrap.min.js}"></script>
-    <script th:src="@{/js/modernizr.min.js}"></script>
-    <script th:src="@{/js/jquery.nicescroll.js}"></script>
-    <!--common scripts for all pages-->
-    <script th:src="@{/js/scripts.js}"></script>
-</div>
-</body>
-</html>
-```
-
-
-
-- `/templates/table/basic_table.html`
-
-```html
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="description" content="">
-  <meta name="author" content="ThemeBucket">
-  <link rel="shortcut icon" href="#" type="image/png">
-
-  <title>Basic Table</title>
-    <div th:include="common :: commonheader"> </div><!--将common.html的代码段 插进来-->
-</head>
-
-<body class="sticky-header">
-
-<section>
-<div th:replace="common :: #leftmenu"></div>
-    
-    <!-- main content start-->
-    <div class="main-content" >
-
-        <div th:replace="common :: headermenu"></div>
-        ...
-    </div>
-    <!-- main content end-->
-</section>
-
-<!-- Placed js at the end of the document so the pages load faster -->
-<div th:replace="common :: #commonscript"></div>
-
-
-</body>
-</html>
-
-```
-
-[Difference between `th:insert` and `th:replace` (and `th:include`)](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#difference-between-thinsert-and-threplace-and-thinclude)
-
-
-
-## 46、web实验-遍历数据与页面bug修改
-
-控制层代码：
-
-```java
-@GetMapping("/dynamic_table")
-public String dynamic_table(Model model){
-    //表格内容的遍历
-    List<User> users = Arrays.asList(new User("zhangsan", "123456"),
-                                     new User("lisi", "123444"),
-                                     new User("haha", "aaaaa"),
-                                     new User("hehe ", "aaddd"));
-    model.addAttribute("users",users);
-
-    return "table/dynamic_table";
-}
-```
-
-页面代码：
-
-```html
-<table class="display table table-bordered" id="hidden-table-info">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>用户名</th>
-            <th>密码</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr class="gradeX" th:each="user,stats:${users}">
-            <td th:text="${stats.count}">Trident</td>
-            <td th:text="${user.userName}">Internet</td>
-            <td >[[${user.password}]]</td>
-        </tr>
-    </tbody>
-</table>
-```
-
-
-
 ## 47、视图解析-【源码分析】-视图解析器与视图
 
 **视图解析原理流程**：
@@ -4551,9 +4144,7 @@ public String dynamic_table(Model model){
 
 
 
----
 
-阅读源码：最好自己在IDE，打断点，且Debug模式运行实例，这样比较没那么沉闷。
 
 ## 48、拦截器-登录检查与静态资源放行
 
