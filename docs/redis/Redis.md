@@ -1213,7 +1213,31 @@ master 以写为主，slave 以读为主
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242138042.png"/>
 
+- 一主二仆
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242219106.png" alt="image-20220424221934993" style="zoom:50%;" />
+
+主机挂掉，重启即可，从机还是其从机
+
+从机挂掉需要重新 slaveof，并且会从头复制数据
+
+- 薪火相传
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242218660.png" alt="image-20220424221800702" style="zoom:50%;" />
+
+上一个 Slave 可以是下一个 slave 的 Master
+
+中途变更转向：会清除之前的数据，重新建立拷贝最新的 
+
+风险是一旦某个 slave 宕机，后面的 slave 都没法备份
+
+主机挂了，从机还是从机，但是无法写数据了
+
+- 反客为主
+
+当一个 master 宕机后，后面的 slave 可以立刻升为 master，其后面的 slave 不用做任何修改。
+
+用 slaveof no one 将从机变为主机。
 
 ### 主从复制实现原理
 
@@ -1257,11 +1281,18 @@ slaveof命令是异步的，在从节点上执行slaveof命令，从节点立即
 
 身份验证之后，从节点会向主节点发送其监听的端口号（前述例子中为6380），主节点将该信息保存到该从节点对应的客户端的slave_listening_port字段中；该端口信息除了在主节点中执行info Replication时显示以外，没有其他作用。
 
-#### 数据同步阶段
+#### 数据同步阶段***
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242214035.png" alt="03-主从复制原理" style="zoom:75%;" />
 
 主从节点之间的连接建立以后，便可以开始进行数据同步，该阶段可以理解为从节点数据的初始化。具体执行的方式是：从节点向主节点发送psync命令（Redis2.8以前是sync命令），开始同步。
 
-数据同步阶段是主从复制最核心的阶段，根据主从节点当前状态的不同，可以分为全量复制和部分复制，后面再讲解这两种复制方式以及psync命令的执行过程，这里不再详述。
+数据同步阶段是主从复制最核心的阶段，根据主从节点当前状态的不同，可以分为全量复制和增量复制。
+
+Master接到命令启动后台的存盘进程，同时收集所有接收到的用于修改数据集命令， 在后台进程执行完毕之后，master 将传送整个数据文件到 slave，以完成一次完全同步
+
+- **全量复制**：而slave服务在接收到数据库文件数据后，将其存盘并加载到内存中
+- **增量复制**：Master 继续将新的所有收集到的修改命令依次传给 slave,完成同步
 
 #### 命令传播阶段
 
@@ -1271,11 +1302,13 @@ slaveof命令是异步的，在从节点上执行slaveof命令，从节点立即
 
 ## Sentinel（哨兵模式）
 
-### 为什么要引入哨兵模式？
-
-Redis 的主从复制模式下，一旦主节点由于故障不能提供服务，需要手动将从节点晋升为主节点，同时还要通知客户端更新主节点地址，这种故障处理方式从一定程度上是无法接受的。
+Redis 的主从复制模式下，一旦主节点由于故障不能提供服务，需要手动将从节点晋升为主节点，同时还要通知客户端更新主节点地址。
 
 Redis 2.8 以后提供了 Redis Sentinel 哨兵机制来解决这个问题。
+
+“反客为主的自动版”
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242226447.png" alt="image-20220424222615034" style="zoom:50%;" />
 
 ### 什么是哨兵模式？
 
@@ -1284,6 +1317,34 @@ Redis Sentinel 是 Redis 高可用的实现方案。Sentinel 是一个管理多�
 Redis Sentinel架构图如下：
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242127151.png" width="500"/>
+
+### 配置方式
+
+见pdf
+
+sentinel monitor mymaster 127.0.0.1 6379 1
+
+- 其中 mymaster 为监控对象起的服务器名称， 
+
+- 1 为至少有多少个哨兵同意迁移的数量；设置多个哨兵后可以降低哨兵误判的几率
+
+### 复制延时
+
+由于所有的写操作都是先在 Master 上操作，然后同步更新到 Slave 上，所以从 Master 同步到 Slave 机器有一定的延迟，
+
+当系统很繁忙的时候，延迟问题会更加严重，Slave 机器数量的增加也会使这个问题更加严重。
+
+### 故障恢复
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242241592.png" alt="image-20220424224133011" style="zoom:50%;" />
+
+优先级在 redis.conf 中默认：replica-priority 100，值越小优先级越高（0永远不会被选为主机）
+
+偏移量是指获得原主机数据的数量
+
+每个 redis 实例启动后都会随机生成一个 40 位的 runid
+
+
 
 ### 哨兵模式的原理
 
@@ -1295,13 +1356,9 @@ Redis Sentinel架构图如下：
 
 Redis Sentinel 是一个特殊的 Redis 节点。在哨兵模式创建时，需要通过配置指定 Sentinel 与 Redis Master Node 之间的关系，然后 Sentinel 会从主节点上获取所有从节点的信息，之后 Sentinel 会定时向主节点和从节点发送 info 命令获取其拓扑结构和状态信息。
 
-
-
 （2）Sentinel与Sentinel
 
 基于 Redis 的订阅发布功能， 每个 Sentinel 节点会向主节点的 __sentinel__：hello 频道上发送该 Sentinel 节点对于主节点的判断以及当前 Sentinel 节点的信息 ，同时每个 Sentinel 节点也会订阅该频道， 来获取其他 Sentinel 节点的信息以及它们对主节点的判断。
-
-
 
 通过以上两步所有的 Sentinel 节点以及它们与所有的 Redis 节点之间都已经彼此感知到，之后每个 Sentinel 节点会向主节点、从节点、以及其余 Sentinel 节点定时发送 ping 命令作为心跳检测， 来确认这些节点是否可达。
 
@@ -1311,11 +1368,7 @@ Redis Sentinel 是一个特殊的 Redis 节点。在哨兵模式创建时，需�
 
 之后该 Sentinel 节点会通过 sentinel ismaster-down-by-addr 命令向其他 Sentinel 节点询问对主节点的判断， 当 quorum（法定人数） 个 Sentinel 节点都认为该节点故障时，则执行**客观下线**，即认为该节点已经不可用。这也同时解释了为什么必须需要一组 Sentinel 节点，因为单个 Sentinel 节点很容易对故障状态做出误判。
 
-
-
 >这里 quorum 的值是我们在哨兵模式搭建时指定的，后文会有说明，通常为 Sentinel节点总数/2+1，即半数以上节点做出主观下线判断就可以执行客观下线。
-
-
 
 因为故障转移的工作只需要一个 Sentinel 节点来完成，所以 Sentinel 节点之间会再做一次选举工作， 基于 Raft 算法选出一个 Sentinel 领导者来进行故障转移的工作。
 
@@ -1338,7 +1391,15 @@ Redis Sentinel 是一个特殊的 Redis 节点。在哨兵模式创建时，需�
 
 ### 为什么要引入Cluster模式？
 
-不管是主从模式还是哨兵模式都只能由一个master在写数据，在海量数据高并发场景，一个节点写数据容易出现瓶颈，引入Cluster模式可以实现多个节点同时写数据。
+容量不够，redis 如何进行扩容? 
+
+并发写操作， redis 如何分摊?
+
+另外，主从模式，薪火相传模式，主机宕机，导致 ip 地址发生变化，应用程序中配置需要修改对应的主机地址、端口等信息。
+
+之前通过代理主机来解决，但是 redis3.0 中提供了解决方案。就是无中心化集群配置。
+
+> 不管是主从模式还是哨兵模式都只能由一个master在写数据，在海量数据高并发场景，一个节点写数据容易出现瓶颈，引入Cluster模式可以实现多个节点同时写数据。
 
 ### 什么是Cluster模式？
 
@@ -1359,9 +1420,6 @@ Redis-Cluster采用无中心结构，每个节点都保存数据，节点之间�
 #### Redis集群数据分片
 
 
-# 常见应用场景
-
-todo
 
 # 实战篇
 
