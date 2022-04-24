@@ -29,6 +29,7 @@
 
 - [Spring](./docs/framework/Spring.md)
 - [MyBatis](./docs/framework/MyBatis.md)
+- [MyBatis-plus](./docs/framework/MyBatis-plus.md)
 - [SpringMVC笔记](./docs/framework/SpringMVC笔记.md)
 - [MyBatis笔记](./docs/framework/MyBatis笔记.md)
 - [SpringBoot笔记](./docs/framework/SpringBoot笔记.md)
@@ -58,4 +59,6 @@
 ### 工具
 
 - [git教程](./docs/tools/git/git教程.md)
+- [JUnit5](./docs/tools/JUnit5Test.md)
+- [Linux](./docs/tools/Linux.md)
 

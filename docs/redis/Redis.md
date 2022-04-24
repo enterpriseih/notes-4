@@ -1,112 +1,101 @@
-<!-- MarkdownTOC -->
+# 概述
 
-- [Redis数据结构和常用命令](#redis数据结构和常用命令)
-	- [1.  String字符串](#1-string字符串)
-	- [2. Hash哈希](#2-hash哈希)
-	- [3. List列表](#3-list列表)
-	- [4. Set集合](#4-set集合)
-	- [5. Sorted Set有序集合](#5-sorted-set有序集合)
-	- [6. Redis常用命令参考](#6-redis常用命令参考)
-- [Redis事务机制](#redis事务机制)
-	- [1. Redis事务生命周期](#1-redis事务生命周期)
-	- [2. Redis事务到底是不是原子性的？](#2-redis事务到底是不是原子性的)
-	- [3. Redis为什么不支持回滚（roll back）？](#3-redis为什么不支持回滚roll-back)
-	- [4. Redis事务失败场景](#4-redis事务失败场景)
-	- [5. Redis事务相关命令](#5-redis事务相关命令)
-		- [（1）WATCH](#1watch)
-		- [（2）MULTI](#2multi)
-		- [（3）UNWATCH](#3unwatch)
-		- [（4）DISCARD](#4discard)
-		- [（5）EXEC](#5exec)
-- [Redis持久化策略](#redis持久化策略)
-	- [什么是持久化？](#什么是持久化)
-	- [Redis为什么要持久化？](#redis为什么要持久化)
-	- [Redis如何实现持久化？](#redis如何实现持久化)
-	- [RDB持久化](#rdb持久化)
-	- [AOF持久化](#aof持久化)
-	- [RDB和AOF的优缺点](#rdb和aof的优缺点)
-- [Redis内存淘汰策略](#redis内存淘汰策略)
-	- [什么是淘汰策略？](#什么是淘汰策略)
-	- [如何配置最大内存？](#如何配置最大内存)
-	- [淘汰策略的分类](#淘汰策略的分类)
-		- [noeviction](#noeviction)
-		- [allkeys-lru](#allkeys-lru)
-		- [volatile-lru](#volatile-lru)
-		- [allkeys-random](#allkeys-random)
-		- [volatile-random](#volatile-random)
-		- [volatile-ttl](#volatile-ttl)
-		- [allkeys-lfu](#allkeys-lfu)
-		- [volatile-lfu](#volatile-lfu)
-	- [LRU算法](#lru算法)
-	- [LFU算法](#lfu算法)
-- [Redis内存失效策略](#redis内存失效策略)
-	- [定时清除（主动）](#定时清除主动)
-	- [惰性清除（被动）](#惰性清除被动)
-	- [定期扫描清除（主动）](#定期扫描清除主动)
-- [缓存更新策略](#缓存更新策略)
-	- [Cache aside（旁路缓存）](#cache-aside旁路缓存)
-	- [Cache aside踩坑](#cache-aside踩坑)
-		- [踩坑一：先更新数据库，再更新缓存](#踩坑一：先更新数据库再更新缓存)
-		- [踩坑二：先删缓存，再更新数据库](#踩坑二：先删缓存再更新数据库)
-		- [最佳实践：先更新数据库，再删除缓存](#最佳实践：先更新数据库再删除缓存)
-	- [Read through](#read-through)
-	- [Write through](#write-through)
-	- [Write behind](#write-behind)
-- [缓存异常场景](#缓存异常场景)
-	- [缓存穿透](#缓存穿透)
-		- [什么是缓存穿透？](#什么是缓存穿透)
-		- [缓存穿透常用的解决方案](#缓存穿透常用的解决方案)
-	- [缓存击穿](#缓存击穿)
-		- [什么是缓存击穿？](#什么是缓存击穿)
-		- [缓存击穿危害](#缓存击穿危害)
-		- [如何解决](#如何解决)
-	- [缓存雪崩](#缓存雪崩)
-		- [什么是缓存雪崩？](#什么是缓存雪崩)
-		- [缓存雪崩解决方案](#缓存雪崩解决方案)
-	- [缓存预热](#缓存预热)
-		- [什么是缓存预热？](#什么是缓存预热)
-		- [缓存预热的操作方法](#缓存预热的操作方法)
-	- [缓存降级](#缓存降级)
-- [高可用架构](#高可用架构)
-	- [Replication（主从复制）](#replication主从复制)
-		- [什么是主从复制？](#什么是主从复制)
-		- [主从复制的作用](#主从复制的作用)
-		- [主从复制实现原理](#主从复制实现原理)
-			- [连接建立阶段](#连接建立阶段)
-			- [数据同步阶段](#数据同步阶段)
-			- [命令传播阶段](#命令传播阶段)
-	- [Sentinel（哨兵模式）](#sentinel哨兵模式)
-		- [为什么要引入哨兵模式？](#为什么要引入哨兵模式)
-		- [什么是哨兵模式？](#什么是哨兵模式)
-		- [哨兵模式的原理](#哨兵模式的原理)
-			- [心跳机制](#心跳机制)
-			- [故障转移](#故障转移)
-	- [Cluster（集群）](#cluster集群)
-		- [为什么要引入Cluster模式？](#为什么要引入cluster模式)
-		- [什么是Cluster模式？](#什么是cluster模式)
-		- [Cluster模式的原理](#cluster模式的原理)
-			- [Redis集群TCP端口](#redis集群tcp端口)
-			- [Redis集群数据分片](#redis集群数据分片)
-- [常见应用场景](#常见应用场景)
-- [实战篇](#实战篇)
-	- [使用docker搭建redis主从复制集群](#使用docker搭建redis主从复制集群)
-		- [0. 目标](#0-目标)
-		- [1. 安装docker，运行docker](#1-安装docker运行docker)
-		- [2. 拉取redis镜像文件](#2-拉取redis镜像文件)
-		- [3. 准备好redis配置文件redis.conf](#3-准备好redis配置文件redisconf)
-		- [4. 启动redis实例](#4-启动redis实例)
-		- [5. 配置主从复制集群](#5-配置主从复制集群)
-		- [6. 测试主从复制效果](#6-测试主从复制效果)
-	- [使用docker搭建redis主从复制+哨兵模式](#使用docker搭建redis主从复制哨兵模式)
-		- [0. 哨兵作用](#0-哨兵作用)
-		- [1. 准备好哨兵配置文件sentinel.conf](#1-准备好哨兵配置文件sentinelconf)
-		- [2. 启动sentinel哨兵实例](#2-启动sentinel哨兵实例)
-		- [3. 测试哨兵模式](#3-测试哨兵模式)
-- [公众号](#公众号)
+SQL 是持久化到硬盘，IO 读取慢
 
-<!-- /MarkdownTOC -->
+NoSQL (Not Only SQL) 是内存级别，读取速度快，减少 IO 操作
+
+- 不遵循 SQL 标准
+- 不支持 ACID
+- **用不着 sql 的和用了 sql 也不行的情况，请考虑用 NoSql**
+
+
+
+Redis：key-value 数据库
+
+MongoDB：document 数据库
+
+
+
+查看默认安装目录: /usr/local/bin
+
+redis-benchmark:性能测试工具，可以在自己本子运行，看看自己本子性能如何 
+
+redis-check-aof:修复有问题的 AOF 文件，rdb 和 aof 后面讲 
+
+redis-check-dump:修复有问题的 dump.rdb 文件
+
+redis-sentinel:Redis 集群使用
+
+redis-server:Redis 服务器启动命令
+
+redis-cli:客户端，操作入口
+
+```
+复制解压文件里的redis.conf到其他目录
+修改复制的文件中的后台启动设置 daemonize no 改成 yes
+后台启动启动
+redis-server /etc/redis/redis.conf
+
+进入redis
+redis-cli -p 6379 -a stackstreammaptointtoarray
+
+关闭
+redis-cli -p 6379 shutdown
+
+选择库，0～15
+select 0
+
+查看当前数据库的key的数量
+dbsize
+
+清空当前库
+flushdb
+
+通杀全部库
+flushall
+
+```
+
+
+
+Redis 是单线程+多路 IO 复用技术
+
+串行 vs 多线程+锁(memcached) vs 单线程+多路 IO 复用(Redis)
+
+Redis 单命令的原子性主要得益于 Redis 的单线程
+
+
 
 # Redis数据结构和常用命令
+
+[常用命令](http://www.redis.cn/commands.html)
+
+```
+keys *
+查看当前库所有 key (匹配:keys *1) 
+
+exists key 
+判断某个 key 是否存在
+
+type key 
+查看你的 key 是什么类型
+
+del key 
+删除指定的 key 数据
+
+unlink key 
+根据 value 选择非阻塞删除
+仅将 keys 从 keyspace 元数据中删除，真正的删除会在后续异步操作。
+
+expire key 10 
+10秒钟:为给定的 key 设置过期时间
+
+ttl key 
+查看还有多少秒过期，-1 表示永不过期，-2 表示已过期
+
+```
+
+
 
 Redis是key-value数据库，key的类型只能是String，但是value的数据类型就比较丰富了，主要包括五种：
 
@@ -125,8 +114,64 @@ Redis是key-value数据库，key的类型只能是String，但是value的数据�
 ```plain
 SET KEY_NAME VALUE
 ```
-string类型是二进制安全的。意思是redis的string可以包含任何数据。比如jpg图片或者序列化的对象。
-string类型是Redis最基本的数据类型，一个键最大能存储512MB。
+string 类型是二进制安全的。意思是 redis 的 string 可以包含任何数据。比如 jpg 图片或者序列化的对象。
+
+string 类型是 Redis 最基本的数据类型，一个 value 最大能存储512MB。
+
+```
+*EX:key 的超时秒数
+
+setnx key value
+只有在key不存在时设置key的值。
+
+get key
+查询对应键值
+
+append key value
+将给定的value追加到原值的末尾 strlen key 获得值的长度
+若没有key，则创建
+
+setnx key value
+只有在key不存在时，设置key的值
+
+incr <key>
+将 key 中储存的数字值增 1
+只能对数字值操作，如果为空，新增值为 1 
+
+decr <key>
+将 key 中储存的数字值减 1
+只能对数字值操作，如果为空，新增值为-1
+
+incrby / decrby <key><步长>
+将 key 中储存的数字值增减。自定义步长。
+
+mset <key1><value1><key2><value2> ..... 
+同时设置一个或多个 key-value 对
+原子性，有一个失败则都失败
+
+mget <key1><key2><key3> ..... 
+同时获取一个或多个 value
+原子性，有一个失败则都失败
+
+msetnx <key1><value1><key2><value2> .....
+同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在。
+原子性，有一个失败则都失败
+
+setex <key><过期时间><value>
+设置键值的同时，设置过期时间，单位秒
+
+getset <key><value>
+以新换旧，设置了新值同时获得旧值。
+
+```
+
+
+
+**数据结构**
+
+类似ArrayList
+
+
 
 ## 2. Hash哈希
 
@@ -136,24 +181,104 @@ string类型是Redis最基本的数据类型，一个键最大能存储512MB。
 HSET KEY_NAME FIELD VALUE
 ```
 Redis hash 是一个键值(key=>value)对集合。
-Redis hash是一个string类型的field和value的映射表，hash特别适合用于存储对象。
+
+Redis hash 是一个string类型的field和value的映射表，hash特别适合用于存储对象。
+
+就是说 value 存的是 field=>value，像是两层map，key里面还是一个映射表
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204241128839.png" alt="image-20220424112848212" style="zoom:50%;" />
+
+通过 `key(用户ID) + field(属性标签)` 就可以操作对应属性数据了，既不需要重复存储数 据，也不会带来序列化和并发修改控制的问题
+
+```
+hget <key1><field>
+从<key1>集合<field>取出 value
+
+hmset <key1><field1><value1><field2><value2>... 
+批量设置 hash 的值 
+
+hexists <key1><field>查看哈希表 key 中，
+给定域 field 是否存在。 
+
+hkeys <key>
+列出该 hash 集合的所有 field
+
+hvals <key>
+列出该 hash 集合的所有 value
+
+hincrby <key><field><increment>
+为哈希表 key 中的域 field 的值加上增量
+
+hsetnx <key><field><value>
+将哈希表 key 中的域 field 的值设置为 value ，当且仅当域 field 不存在
+
+```
+
+**数据结构**
+
+Hash 类型对应的数据结构是两种:ziplist(压缩列表)，hashtable(哈希表)。
+
+当field-value 长度较短且个数较少时，使用 ziplist，否则使用 hashtable。
 
 ## 3. List列表
 
 **语法**
 
 ```plain
-//在 key 对应 list 的头部添加字符串元素
+在 key 对应 list 的头部添加字符串元素
 LPUSH KEY_NAME VALUE1.. VALUEN
-//在 key 对应 list 的尾部添加字符串元素
+
+在 key 对应 list 的尾部添加字符串元素
 RPUSH KEY_NAME VALUE1..VALUEN
-//对应 list 中删除 count 个和 value 相同的元素
+
+对应 list 中删除 count 个和 value 相同的元素
 LREM KEY_NAME COUNT VALUE
-//返回 key 对应 list 的长度
+
+返回 key 对应 list 的长度
 LLEN KEY_NAME 
+
 ```
-Redis 列表是简单的字符串列表，按照插入顺序排序。
+Redis 列表是简单的字符串列表，按照插入顺序排序，双向链表。
+
 可以添加一个元素到列表的头部（左边）或者尾部（右边）
+
+```
+lrange <key><start><stop> 
+按照索引下标获得元素(从左到右)
+lrange mylist 0 -1 
+0 左边第一个，-1 右边第一个，(0 -1 表示获取所有)
+
+lpop/rpop <key>
+从左边/右边吐出一个值。值在键在，值忘键亡。
+
+rpoplpush <key1><key2>
+从<key1>列表右边吐出一个值，插到<key2>列表左边
+
+lindex <key><index>
+按照索引下标获得元素(从左到右)
+
+lset<key><index><value>
+将列表 key 下标为 index 的值替换成 value
+
+linsert <key> before/after <value><newvalue>
+在<value>的前面/后面插入<newvalue>插入值
+```
+
+
+
+**数据结构**
+
+快速链表 quickList
+
+首先在列表元素较少的情况下会使用一块连续的内存存储，这个结构是 ziplist，也即是 压缩列表。
+
+它将所有的元素紧挨着一起存储，分配的是一块连续的内存。 当数据量比较多的时候才会改成 quicklist。
+
+因为普通的链表需要的附加指针空间太大，会比较浪费空间。比如这个列表里存的只是 int 类型的数据，结构上还需要两个额外的指针 prev 和 next。
+
+Redis 将多个 ziplist 用链表结合起来组成了 quicklist。
+
+
 
 ## 4. Set集合
 
@@ -161,11 +286,52 @@ Redis 列表是简单的字符串列表，按照插入顺序排序。
 
 ```plain
 SADD KEY_NAME VALUE1...VALUEn
+将一个或多个 member 元素加入到集合 key 中，已经存在的 member 元素将被忽略
 ```
-Redis的Set是string类型的无序集合。
+Redis的Set是string类型的**无序**集合。
 集合是通过哈希表实现的，所以添加，删除，查找的复杂度都是O(1)。
 
-## 5. Sorted Set有序集合
+```
+smembers <key>
+取出该集合的所有值。
+
+sismember <key><value>
+判断集合<key>是否为含有该<value>值，
+有 1，没有 0 
+
+scard <key>
+返回该集合的元素个数。
+
+srem <key><value1><value2> .... 
+删除集合中的某个元素。
+
+spop <key>
+随机从该集合中吐出一个值。
+
+srandmember <key><n>
+随机从该集合中取出n个值。不会从集合中删除
+
+smove source destination value 
+把集合中一个值从一个集合移动到另一个集合 
+
+sinter <key1><key2>
+返回两个集合的交集元素。
+
+sunion <key1><key2>
+返回两个集合的并集元素。
+
+sdiff <key1><key2>
+返回两个集合的差集元素(key1 中的，不包含 key2 中的)
+
+```
+
+**数据结构**
+
+dict 字典，字典是用哈希表实现
+
+
+
+## 5. Sorted Set有序集合(Zset)
 
 **语法**
 
@@ -173,11 +339,49 @@ Redis的Set是string类型的无序集合。
 ZADD KEY_NAME SCORE1 VALUE1.. SCOREN VALUEN
 ```
 Redis zset 和 set 一样也是string类型元素的集合,且不允许重复的成员。
+
 不同的是每个元素都会关联一个double类型的分数。
 
 redis正是通过分数来为集合中的成员进行从小到大的排序。
 
-zset的成员是唯一的,但分数(score)却可以重复。
+zset的成员是唯一的，但分数(score)却可以重复。
+
+```
+zadd <key><score1><value1><score2><value2>...
+将一个或多个 member 元素及其 score 值加入到有序集 key 当中。 
+
+zrange <key><start><stop> [WITHSCORES]
+返回有序集 key 中，下标在<start><stop>之间的元素
+带 WITHSCORES，可以让分数一起和值返回到结果集。 
+
+zrangebyscore key min max [withscores] [limit offset count]
+返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )的成员。 
+有序集成员按 score 值递增(从小到大)次序排列。
+
+zrevrangebyscore key max min [withscores] [limit offset count] 
+同上，改为从大到小排列。
+
+zincrby <key><increment><value> 
+为元素的 score 加上增量 
+
+zrem <key><value>
+删除该集合下，指定值的元素
+
+zcount <key><min><max>
+统计该集合，分数区间内的元素个数 
+
+zrank <key><value>
+返回该值在集合中的排名，从 0 开始。
+
+```
+
+zset 底层使用了两个数据结构
+
+(1)hash，hash 的作用就是关联元素 value 和权重 score，保障元素 value 的唯一性，可以通过元素 value 找到相应的 score 值。
+
+ (2)跳跃表，跳跃表的目的在于给元素 value 排序，根据 score 的范围获取元素列表。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204241155884.png" alt="image-20220424115528332" style="zoom:50%;" />
 
 ## 6. Redis常用命令参考
 
@@ -185,7 +389,49 @@ zset的成员是唯一的,但分数(score)却可以重复。
 
 [https://www.redis.net.cn/order/](https://www.redis.net.cn/order/)
 
----完毕
+## 7. Bitmaps
+
+Bitmaps 本身不是一种数据类型， 实际上它就是字符串(key-value) ，但是它可以对字符串的位进行操作。
+
+内部存储的是0和1，其下标叫做偏移量 offset
+
+**语法**
+
+```
+setbit<key><offset><value>
+设置 Bitmaps 中某个偏移量的值(0 或 1)
+```
+
+存储用户活跃量
+
+
+
+## 8. HyperLogLog
+
+求集合中不重复元素个数的问题称为**基数问题**
+
+Redis HyperLogLog 是用来做基数统计的算法。
+
+HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。
+
+因为 HyperLogLog 只会根据输入元素来计算基数，而不会储存输入元素 本身，所以 HyperLogLog 不能像集合那样，返回输入的各个元素。
+
+**语法**
+
+```
+pfadd <key>< element> [element ...] 
+添加指定元素到 HyperLogLog 中
+```
+
+
+
+## 9. Geospatial
+
+GEO类型：就是是元素的 2 维坐标，在地图上就是经纬度。
+
+redis 基于该类型，提供了经纬度设置，查询，范围查询，距离查询，经纬度 Hash 等常见操作。
+
+
 
 # Redis事务机制
 
@@ -203,9 +449,14 @@ zset的成员是唯一的,但分数(score)却可以重复。
 官方文档对事务的定义：
 
 * **事务是一个单独的隔离操作**：事务中的所有命令都会序列化、按顺序地执行。事务在执行的过程中，不会被其他客户端发送来的命令请求所打断。
-* **事务是一个原子操作**：事务中的命令要么全部被执行，要么全部都不执行。EXEC 命令负责触发并执行事务中的所有命令：如果客户端在使用 MULTI 开启了一个事务之后，却因为断线而没有成功执行 EXEC ，那么事务中的所有命令都不会被执行。另一方面，如果客户端成功在开启事务之后执行 EXEC ，那么事务中的所有命令都会被执行。
+
+	Redis 事务的主要作用就是串联多个命令防止别的命令插队。
+
+* 事务是一个原子操作：事务中的命令要么全部被执行，要么全部都不执行。EXEC 命令负责触发并执行事务中的所有命令：如果客户端在使用 MULTI 开启了一个事务之后，却因为断线而没有成功执行 EXEC ，那么事务中的所有命令都不会被执行。另一方面，如果客户端成功在开启事务之后执行 EXEC ，那么事务中的所有命令都会被执行。
 
 官方认为Redis事务是一个原子操作，这是站在执行与否的角度考虑的。但是从ACID原子性定义来看，**严格意义上讲Redis事务是非原子型的**，因为在命令顺序执行过程中，一旦发生命令执行错误Redis是不会停止执行然后回滚数据。
+
+**Redis 没有隔离级别概念**：队列中的命令没有提交之前都不会实际被执行，因为事务提交前任何指令都不会被实际执行
 
 ## 3. Redis为什么不支持回滚（roll back）？
 
@@ -234,8 +485,8 @@ QUEUED
 (error) ERR unknown command `setset`, with args beginning with: `name`, `zhangsan2`,
 127.0.0.1:6379> exec # 提交事务，发现由于上条命令的错误导致事务已经自动取消了
 (error) EXECABORT Transaction discarded because of previous errors.
-127.0.0.1:6379> get name # 查询name，发现未被修改
-"xiaoming"
+127.0.0.1:6379> get name # 查询name，发现未被修改 "xiaoming"
+
 ```
 （2）事务提交后开始顺序执行命令，之前缓存在队列中的命令有可能执行失败。
 ```plain
@@ -251,11 +502,10 @@ QUEUED
 1) OK
 2) OK
 3) (error) WRONGTYPE Operation against a key holding the wrong kind of value
-127.0.0.1:6379> get name # 第三条命令失败没有将前两条命令回滚
-"xiaoming"
+127.0.0.1:6379> get name # 第三条命令失败没有将前两条命令回滚 "xiaoming"
+
 ```
-（3）由于乐观锁失败，事务提交时将丢弃之前缓存的所有命令序列。
-通过开启两个redis客户端并结合watch命令模拟这种失败场景。
+（3）由于乐观锁失败，事务提交时将丢弃之前缓存的所有命令序列。通过开启两个redis客户端并结合watch命令模拟这种失败场景。
 
 ```plain
 # 客户端1
@@ -277,6 +527,7 @@ QUEUED
 (nil)
 127.0.0.1:6379> get name # 客户端1查询name，发现name没有被修改为lisi
 "zhangsan"
+
 ```
 在事务过程中监控的key被其他客户端改变，则当前客户端的乐观锁失败，事务提交时将丢弃所有命令缓存队列。
 ## 5. Redis事务相关命令
@@ -291,7 +542,11 @@ QUEUED
 
 ### （3）UNWATCH
 
-取消 WATCH 命令对所有 key 的监视，一般用于DISCARD和EXEC命令之前。如果在执行 WATCH 命令之后， EXEC 命令或 DISCARD 命令先被执行了的话，那么就不需要再执行 UNWATCH 了。因为 EXEC 命令会执行事务，因此 WATCH 命令的效果已经产生了；而 DISCARD 命令在取消事务的同时也会取消所有对 key 的监视，因此这两个命令执行之后，就没有必要执行 UNWATCH 了。
+取消 WATCH 命令对所有 key 的监视，一般用于DISCARD和EXEC命令之前。
+
+如果在执行 WATCH 命令之后， EXEC 命令或 DISCARD 命令先被执行了的话，那么就不需要再执行 UNWATCH 了。
+
+因为 EXEC 命令会执行事务，因此 WATCH 命令的效果已经产生了；而 DISCARD 命令在取消事务的同时也会取消所有对 key 的监视，因此这两个命令执行之后，就没有必要执行 UNWATCH 了。
 
 ### （4）DISCARD
 
@@ -311,7 +566,7 @@ QUEUED
 
 持久化（Persistence），即把数据（如内存中的对象）保存到可永久保存的存储设备中（如磁盘）。持久化的主要应用是将内存中的对象存储在数据库中，或者存储在磁盘文件中、XML数据文件中等等。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025211500.png" width=""/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204241613825.png" width=""/>
 
 还可以从如下两个层面简单的理解持久化 ：
 
@@ -325,7 +580,7 @@ Redis是内存数据库，为了保证效率所有的操作都是在内存中完
 
 Redis官方提供了不同级别的持久化方式：
 
-* RDB持久化：能够在指定的时间间隔能对你的数据进行快照存储。
+* RDB持久化：能够在指定的**时间间隔**内将内存中的**数据集快照**写入磁盘。
 * AOF持久化：记录每次对服务器写的操作，当服务器重启的时候会重新执行这些命令来恢复原始的数据，AOF命令以redis协议追加保存每次写的操作到文件末尾。Redis还能对AOF文件进行后台重写，使得AOF文件的体积不至于过大。
 * 不使用持久化：如果你只希望你的数据在服务器运行的时候存在，你也可以选择不使用任何持久化方式。
 * 同时开启RDB和AOF：你也可以同时开启两种持久化方式，在这种情况下当redis重启的时候会优先载入AOF文件来恢复原始的数据，因为在通常情况下AOF文件保存的数据集要比RDB文件保存的数据集要完整。
@@ -336,11 +591,11 @@ Redis官方提供了不同级别的持久化方式：
 
 RDB(Redis Database)持久化是把当前内存数据生成快照保存到硬盘的过程，触发RDB持久化过程分为**手动触发**和**自动触发**。
 
-（1）手动触发
+（1）手动触发save
 
 手动触发对应save命令，会阻塞当前Redis服务器，直到RDB过程完成为止，对于内存比较大的实例会造成长时间阻塞，线上环境不建议使用。
 
-（2）自动触发
+（2）自动触发bgsave
 
 自动触发对应bgsave命令，Redis进程执行fork操作创建子进程，RDB持久化过程由子进程负责，完成后自动结束。阻塞只发生在fork阶段，一般时间很短。
 
@@ -357,45 +612,89 @@ save ""
 ```
 还有其他常见可以触发bgsave，如：
 * 如果从节点执行全量复制操作，主节点自动执行bgsave生成RDB文件并发送给从节点。
-* 默认情况下执行shutdown命令时，如果没有开启AOF持久化功能则 自动执行bgsave。
+* 默认情况下执行shutdown命令时，如果没有开启AOF持久化功能则自动执行bgsave。
 
-**bgsave工作机制**
+**备份的过程**
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025211619.png" width="300"/> </div><br>
+Redis 会单独创建(fork)一个子进程来进行持久化，会先将数据写入到 一个临时文件 中，待持久化过程都结束了，再用这个临时文件替换上次持久化好的文件。 
 
-（1）执行bgsave命令，Redis父进程判断当前是否存在正在执行的子进 程，如RDB/AOF子进程，如果存在，bgsave命令直接返回。
+整个过程中，主进程是不进行任何 IO 操作的，这就确保了极高的性能。
 
-（2）父进程执行fork操作创建子进程，fork操作过程中父进程会阻塞，通 过info stats命令查看latest_fork_usec选项，可以获取最近一个fork操作的耗时，单位为微秒
+- **Fork**
+
+Fork 的作用是复制一个与当前进程一样的进程。新进程的所有数据(变量、环境变量、 程序计数器等) 数值都和原进程一致，但是是一个全新的进程，并作为原进程的子进程
+
+该过程叫做**写时复制技术**
+
+- **RDB的优势**
+
+适合大规模的数据恢复
+
+对数据完整性和一致性要求不高更适合使用
+
+节省磁盘空间，恢复速度快
+
+- **RDB的缺点**
+
+写时复制，会需要两倍的内存空间
+
+如果数据庞大时还是比较消耗性能。
+
+在备份周期在一定间隔时间做一次备份，所以如果 Redis 意外 down 掉的话， 就会丢失最后一次快照后的所有修改。
+
+- **bgsave工作机制**
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242002261.png" width="400"/>
+
+ 
+
+（1）执行bgsave命令，Redis父进程判断当前是否存在正在执行的子进程，如RDB/AOF子进程，如果存在，bgsave命令直接返回。
+
+（2）父进程执行fork操作创建子进程，fork操作过程中父进程会阻塞，通过info stats命令查看latest_fork_usec选项，可以获取最近一个fork操作的耗时，单位为微秒
 
 （3）父进程fork完成后，bgsave命令返回“Background saving started”信息并不再阻塞父进程，可以继续响应其他命令。
 
-（4）子进程创建RDB文件，根据父进程内存生成临时快照文件，完成后对原有文件进行原子替换。执行lastsave命令可以获取最后一次生成RDB的 时间，对应info统计的rdb_last_save_time选项。
+（4）子进程创建RDB文件（**dump.rdb**），根据父进程内存生成临时快照文件，完成后对原有文件进行原子替换。执行lastsave命令可以获取最后一次生成RDB的 时间，对应info统计的rdb_last_save_time选项。
 
 （5）进程发送信号给父进程表示完成，父进程更新统计信息，具体见 info Persistence下的rdb_*相关选项。
 
 ## AOF持久化
 
-AOF（append only file）持久化：以独立日志的方式记录每次写命令， 重启时再重新执行AOF文件中的命令达到恢复数据的目的。AOF的主要作用是解决了数据持久化的实时性，目前已经是Redis持久化的主流方式。
+AOF（append only file）
+
+以独立**日志**的方式**记录**每次**写命令**， 重启时再重新执行AOF文件中的命令达到恢复数据的目的。只许追加文件，不可以改写文件。
+
+AOF的主要作用是解决了数据持久化的实时性，目前已经是Redis持久化的主流方式。
 
 **AOF持久化工作机制**
 
-开启AOF功能需要配置：appendonly yes，默认不开启。
+- 开启AOF功能需要配置：appendonly yes，默认不开启。
 
-AOF文件名 通过appendfilename配置设置，默认文件名是appendonly.aof。保存路径同 RDB持久化方式一致，通过dir配置指定。
+- AOF文件名 通过appendfilename配置设置，默认文件名是appendonly.aof。
+
+- 保存路径同 RDB持久化方式一致，通过dir配置指定。
 
 AOF的工作流程操作：命令写入 （append）、文件同步（sync）、文件重写（rewrite）、重启加载 （load）。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025211644.png" width="200"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204232121992.png" width="200"/>
 
-（1）所有的写入命令会追加到aof_buf（缓冲区）中。
+（1）所有的写命令会追加到aof_buf（缓冲区）中。
 
-（2）AOF缓冲区根据对应的策略向硬盘做同步操作。
+（2）AOF缓冲区根据对应的持久化策略[always,everysec,no]向硬盘做同步操作。
 
-AOF为什么把命令追加到aof_buf中？Redis使用单线程响应命令，如果每次写AOF文件命令都直接追加到硬盘，那么性能完全取决于当前硬盘负载。先写入缓冲区aof_buf中，还有另一个好处，Redis可以提供多种缓冲区同步硬盘的策略，在性能和安全性方面做出平衡。
+- always：每次写指令都会立刻记入日志
+- everysec：每秒同步，如果宕机，本秒的数据可能丢失
+- no：不主动进行同步，把同步时机交给操作系统
 
-（3）随着AOF文件越来越大，需要定期对AOF文件进行重写，达到压缩的目的。
+> **AOF为什么把命令追加到aof_buf中？**
+>
+> Redis使用单线程响应命令，如果每次写AOF文件命令都直接追加到硬盘，那么性能完全取决于当前硬盘负载。先写入缓冲区aof_buf中，还有另一个好处，Redis可以提供多种缓冲区同步硬盘的策略，在性能和安全性方面做出平衡。
 
-（4）当Redis服务器重启时，可以加载AOF文件进行数据恢复。
+（3）AOF 文件大小超过重写策略或手动重写时，会对 AOF 文件 rewrite 重写，压缩 AOF 文件容量;
+
+（4）当Redis服务器重启时，可以加载AOF文件中的写操作，进行数据恢复。
+
+> **AOF 和 RDB 同时开启，系统默认取 AOF 的数据(数据不会存在丢失)**
 
 **AOF重写（rewrite）机制**
 
@@ -409,27 +708,41 @@ AOF重写可以分为手动触发和自动触发：
 * 手动触发：直接调用bgrewriteaof命令。
 * 自动触发：根据auto-aof-rewrite-min-size和auto-aof-rewrite-percentage参数确定自动触发时机。
 
-auto-aof-rewrite-min-size：表示运行AOF重写时文件最小体积，默认 为64MB。
+auto-aof-rewrite-min-size：表示运行AOF重写时文件最小体积，默认为64MB。
 
-auto-aof-rewrite-percentage：代表当前AOF文件空间 （aof_current_size）和上一次重写后AOF文件空间（aof_base_size）的比值。
+auto-aof-rewrite-percentage：设置重写的基准值，文件达到 100%时开始重写(文件是原来重写后文件的 2 倍时触发)
 
-自动触发时机
+例如：文件达到 70MB 开始重写，降到 50MB，下次什么时候开始重写？100MB
 
-当aof_current_size>auto-aof-rewrite-minsize 并且（aof_current_size-aof_base_size）/aof_base_size>=auto-aof-rewritepercentage。
+系统载入时或者上次重写完毕时，Redis 会记录此时 AOF 大小，设为 base_size,
 
-其中aof_current_size和aof_base_size可以在info Persistence统计信息中查看。
+如果 Redis 的 AOF 当前大小>= base_size +base_size*100% (默认)且当前大小>=64mb(默认)的情况下，Redis 会对 AOF 进行重写。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025211707.png" width="300"/> </div><br>
+**重写流程**
 
-AOF文件重写后为什么会变小？
+与RDB类似
 
-（1）旧的AOF文件含有无效的命令，如：del key1， hdel key2等。重写只保留最终数据的写入命令。
+(1) bgrewriteaof 触发重写，判断是否当前有 bgsave 或 bgrewriteaof 在运行，如果有，则等待该命令结束后再继续执行。
 
-（2）多条命令可以合并，如lpush list a，lpush list b，lpush list c可以直接转化为lpush list a b c。
+(2) 主进程 fork 出子进程执行重写操作，保证主进程不会阻塞。
+
+(3) 子进程遍历 redis 内存中数据到临时文件，客户端的写请求同时写入 aof_buf 缓冲区和 aof_rewrite_buf 重写缓冲区保证原 AOF 文件完整以及新 AOF 文件生成期间的新的数据修改动作不会丢失。
+
+(4)1).子进程写完新的 AOF 文件后，向主进程发信号，父进程更新统计信息。2).主进程把 aof_rewrite_buf 中的数据写入到新的 AOF 文件。
+
+(5)使用新的 AOF 文件覆盖旧的 AOF 文件，完成 AOF 重写。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242115894.png" alt="image-20220424211515059" style="zoom:50%;" />
+
+> AOF文件重写后为什么会变小？
+>
+> （1）**旧的AOF文件含有无效的命令**，如：del key1， hdel key2等。重写只保留最终数据的写入命令。
+>
+> （2）**多条命令可以合并**，如lpush list a，lpush list b，lpush list c可以直接转化为lpush list a b c。
 
 **AOF文件数据恢复**
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025211835.png" width="300"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204232123653.png" width="300"/>
 
 数据恢复流程说明：
 
@@ -440,6 +753,18 @@ AOF文件重写后为什么会变小？
 （3）加载AOF/RDB文件成功后，Redis启动成功。
 
 （4）AOF/RDB文件存在错误时，Redis启动失败并打印错误信息。
+
+**优点**
+
+- 备份机制更稳健，丢失数据概率更低
+- 刻度的日志文本，通过操作 AOF 文件，可以处理误操作
+
+**缺点**
+
+- 比 RDB 占用更多的磁盘空间
+- 备份恢复速度慢
+- 每次读写都同步的话，会有一定的压力
+- 存在个别 bug，造成恢复不能
 
 ## RDB和AOF的优缺点
 
@@ -627,7 +952,7 @@ Cache aside最常用的缓存策略，数据请求的过程如下：
 
 详细流程可以结合以下流程图：
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025212628.png" width="300"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025212628.png" width="300"/>
 
 仔细看上面的流程可以发现，读请求常用的套路是先更新缓存再删缓存，有些同学可能要问为什么要删缓存，先更新数据库再更新缓存行不行？先更新缓存再更新数据库行不行？这里就涉及到几个坑，下面一一解读。
 
@@ -639,7 +964,7 @@ Cache aside策略如果用错就会遇到深坑，下面我们来逐个踩。
 
 如果一个写请求来了我们先更新数据库再更新缓存，在两个并发写请求下可能会导致脏数据。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213324.png" width="400"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213324.png" width="400"/>
 
 请求1先更新数据库，请求2后更新数据库，预期结果是数据库中age为20，缓存中age为20，但是由于请求1比请求2后更新缓存，结果导致缓存中age为18，造成了数据库与缓存不一致，缓存中age为脏数据。
 
@@ -647,7 +972,7 @@ Cache aside策略如果用错就会遇到深坑，下面我们来逐个踩。
 
 如果写请求的处理流程是先删缓存再更新数据库，在一个读请求和一个写请求并发场景下可能会出现脏数据。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213349.png" width="400"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213349.png" width="400"/>
 
 流程如下：
 
@@ -663,7 +988,7 @@ Cache aside策略如果用错就会遇到深坑，下面我们来逐个踩。
 
 在实际的系统中针对写请求推荐这种操作，但是在理论上还是存在问题。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213441.png" width="400"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213441.png" width="400"/> 
 
 流程如下：
 
@@ -681,7 +1006,7 @@ Cache aside策略如果用错就会遇到深坑，下面我们来逐个踩。
 
 在 Cache Aside 更新模式中，应用代码需要维护两个数据存储，一个是缓存，一个是数据库。而在 Read-Through 策略下，应用程序无需管理缓存和数据库，只需要将数据库的同步委托给缓存提供程序 Cache Provider 即可。所有数据交互都是通过抽象缓存层完成的。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213501.png" width="400"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213501.png" width="400"/>
 
 在进行大量读取时，Read-Through 可以减少数据源上的负载，也对缓存服务的故障具备一定的弹性。如果缓存服务挂了，则缓存提供程序仍然可以通过直接转到数据源来进行操作。
 
@@ -693,13 +1018,13 @@ Read-Through 适用于多次请求相同数据的场景。这与 Cache-Aside 策
 
 Write-Through 策略下，当发生数据更新(Write)时，缓存提供程序 Cache Provider 负责更新底层数据源和缓存。缓存与数据源保持一致，并且写入时始终通过抽象缓存层到达数据源。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213525.png" width="500"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213525.png" width="500"/>
 
 ## Write behind
 
 数据更新时只更新缓存，每隔一段时间将数据刷新到数据库中。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213709.png" width="500"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213709.png" width="500"/> 
 
 优点是数据写入速度非常快，适用于频繁写的场景。
 
@@ -745,7 +1070,7 @@ Write-Through 策略下，当发生数据更新(Write)时，缓存提供程序 C
 
 举个例子：下图是一个布隆过滤器，共有18个比特位，3个哈希函数。集合中三个元素x，y，z通过三个哈希函数散列到不同的比特位，并将比特位置为1。当查询元素w时，通过三个哈希函数计算，发现有一个比特位的值为0，可以肯定认为该元素不在集合中。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213820.png" width="500"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213820.png" width="500"/> 
 
 **布隆过滤器优缺点**
 
@@ -788,7 +1113,7 @@ Write-Through 策略下，当发生数据更新(Write)时，缓存提供程序 C
 
 这种思路比较简单，就是让一个线程回写缓存，其他线程等待回写缓存线程执行完，重新读缓存即可。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213939.png" width="500"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213939.png" width="500"/> 
 
 同一时间只有一个线程读数据库然后回写缓存，其他线程都处于阻塞状态。如果是高并发场景，大量线程阻塞势必会降低吞吐量。这种情况如何解决？大家可以在留言区讨论。
 
@@ -801,7 +1126,7 @@ Write-Through 策略下，当发生数据更新(Write)时，缓存提供程序 C
 * 物理不过期，针对热点key不设置过期时间
 * 逻辑过期，把过期时间存在key对应的value里，如果发现要过期了，通过一个后台的异步线程进行缓存的构建
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213959.png" width="500"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025213959.png" width="500"/> 
 
 从实战看这种方法对于性能非常友好，唯一不足的就是构建缓存时候，其余线程(非构建缓存的线程)可能访问的是老数据，对于不追求严格强一致性的系统是可以接受的。
 
@@ -869,12 +1194,27 @@ Write-Through 策略下，当发生数据更新(Write)时，缓存提供程序 C
 
 主从复制，是指将一台Redis服务器的数据，复制到其他的Redis服务器。前者称为主节点(master)，后者称为从节点(slave)；数据的复制是单向的，只能由主节点到从节点。
 
+master 以写为主，slave 以读为主
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242123054.png" alt="image-20220424212334512" style="zoom:50%;" />
+
 ### 主从复制的作用
 
-1. 数据冗余：主从复制实现了数据的热备份，是持久化之外的一种数据冗余方式。
-2. 故障恢复：当主节点出现问题时，可以由从节点提供服务，实现快速的故障恢复；实际上是一种服务的冗余。
-3. 负载均衡：在主从复制的基础上，配合读写分离，可以由主节点提供写服务，由从节点提供读服务，分担服务器负载；尤其是在写少读多的场景下，通过多个从节点分担读负载，可以大大提高Redis服务器的并发量。
-4. 高可用基石：主从复制还是哨兵和集群能够实施的基础，因此说主从复制是Redis高可用的基础。
+1. **数据冗余**：主从复制实现了数据的热备份，是持久化之外的一种数据冗余方式。
+2. **故障恢复**：当主节点出现问题时，可以由从节点提供服务，实现快速的故障恢复；实际上是一种服务的冗余。
+3. **负载均衡**：在主从复制的基础上，配合**读写分离**，可以由主节点提供写服务，由从节点提供读服务，分担服务器负载；尤其是在写少读多的场景下，通过多个从节点分担读负载，可以大大提高Redis服务器的并发量。
+4. **高可用基石**：主从复制还是哨兵和集群能够实施的基础，因此说主从复制是Redis高可用的基础。
+
+
+
+### 使用方法
+
+见pdf
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242138042.png"/>
+
+
+
 ### 主从复制实现原理
 
 主从复制过程主要可以分为3个阶段：连接建立阶段、数据同步阶段、命令传播阶段。
@@ -943,7 +1283,7 @@ Redis Sentinel 是 Redis 高可用的实现方案。Sentinel 是一个管理多�
 
 Redis Sentinel架构图如下：
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025214046.png" width="500"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242127151.png" width="500"/>
 
 ### 哨兵模式的原理
 
@@ -1004,7 +1344,7 @@ Redis Sentinel 是一个特殊的 Redis 节点。在哨兵模式创建时，需�
 
 Redis-Cluster采用无中心结构，每个节点都保存数据，节点之间互相连接从而知道整个集群状态。
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201025214115.png" width="500"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204242127462.png" width="500"/>
 
 如图所示Cluster模式其实就是多个主从复制的结构组合起来的，每一个主从复制结构可以看成一个节点，那么上面的Cluster集群中就有三个节点。
 
@@ -1133,7 +1473,7 @@ docker exec -it redis-server-02 redis-cli # 连接实例2
 --- 至此redis主从复制实例搭建和测试完毕，小伙伴们学会了吗。
 ## 使用docker搭建redis主从复制+哨兵模式
 
-<div align="center">  <img src="https://cdn.jsdelivr.net/gh/SmileLionCoder/assets@main/202010/20201018221921.png" width="500"/> </div><br>
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204241607990.png" width="500"/>
 
 搭建三个Sentinel实例+Redis实例
 
