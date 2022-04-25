@@ -21,9 +21,7 @@ git 入门网站
 
 ![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191529166.png)
 
-进入 Github网站注册一个账号并登录，进入 我的博客，点击 `Clone or download`，再点击 `Use HTTPS` ，复制项目地址 `https://github.com/gafish/gafish.github.com.git` 备用。
-
-`https://github.com/YiENx1205/notes.git`
+进入 Github网站注册一个账号并登录，进入仓库，点击 `Clone or download`，再点击 `Use HTTPS` ，复制项目地址`https://github.com/YiENx1205/notes.git`备用。
 
 再回到命令行工具，一切就绪，接下来进入本文的重点。
 
@@ -44,6 +42,14 @@ git 入门网站
 - `git tag`
 
 接下来，将通过对 我的博客 仓库进行实例操作，讲解如何使用 `Git` 拉取代码到提交代码的整个流程。
+
+### ssh
+
+```
+ssh-keygen -t rsa -C yienx1205@gamil.com
+```
+
+针对该github账号形成密钥，进入 ~/.ssh 打开 id_rsa.pub 复制后添加至 github 
 
 ### git clone
 
@@ -831,7 +837,9 @@ git diff --stat
 
 ### git reflog
 
-`reflog` 可以查看所有分支的所有操作记录（包括commit和reset的操作、已经被删除的commit记录，跟 `git log` 的区别在于它不能查看已经删除了的commit记录![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191532241.jpeg)
+`reflog` 可以查看所有分支的所有操作记录（包括commit和reset的操作、已经被删除的commit记录，跟 `git log` 的区别在于它不能查看已经删除了的commit记录
+
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191532241.jpeg)
 
 ## 远程版本库连接
 
@@ -839,8 +847,7 @@ git diff --stat
 
 ### git init
 
-> 在本地目录内部会生成.git文件夹
->
+在本地目录内部会生成.git文件夹
 
 ### git remote
 
