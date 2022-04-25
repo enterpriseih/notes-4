@@ -85,7 +85,7 @@ git 入门网站
 
 ![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191529166.png)
 
-进入 Github网站 注册一个账号并登录，进入 我的博客，点击 `Clone or download`，再点击 `Use HTTPS` ，复制项目地址 `https://github.com/gafish/gafish.github.com.git` 备用。
+进入 Github网站注册一个账号并登录，进入 我的博客，点击 `Clone or download`，再点击 `Use HTTPS` ，复制项目地址 `https://github.com/gafish/gafish.github.com.git` 备用。
 
 `https://github.com/YiENx1205/notes.git`
 
