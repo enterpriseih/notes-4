@@ -68,6 +68,22 @@ git config user.email gafish@qqqq.com
 
 每次代码提交的时候都会生成一条提交记录，其中会包含当前配置的用户名和邮箱。
 
+```
+git config --global init.defaultBranch <defaultBranch>
+#例
+git config --global init.defaultBranch main
+```
+
+修改默认创建的分支名
+
+```
+git init -b <branch-name> .
+#例
+git init -b main .
+```
+
+或创建的时候指定
+
 ### git branch
 
 > 创建、重命名、查看、删除项目分支，通过 `Git` 做项目开发时，一般都是在开发分支中进行，开发完成后合并分支到主干。
@@ -485,6 +501,14 @@ git branch -vv
 查看带有最后提交id、最近提交原因等信息的本地版本库分支列表
 
 ![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191531116.png)
+
+```
+git branch -m <oldbranch> <newbranch>
+#例
+git branch -m master main
+```
+
+修改分支名
 
 ### git merge
 
