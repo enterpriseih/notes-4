@@ -2,69 +2,6 @@ git 入门网站
 
 [https://learngitbranching.js.org/?locale=zh_CN](https://learngitbranching.js.org/?locale=zh_CN)
 
-<!-- TOC -->
-
-- [Git简介](#git简介)
-- [实用主义](#实用主义)
-    - [准备阶段](#准备阶段)
-    - [常用操作](#常用操作)
-        - [git clone](#git-clone)
-        - [git config](#git-config)
-        - [git branch](#git-branch)
-        - [git checkout](#git-checkout)
-        - [git status](#git-status)
-        - [git add](#git-add)
-        - [git commit](#git-commit)
-        - [git push](#git-push)
-        - [git pull](#git-pull)
-        - [git log](#git-log)
-        - [git tag](#git-tag)
-        - [.gitignore](#gitignore)
-        - [小结](#小结)
-- [深入探索](#深入探索)
-    - [基本概念](#基本概念)
-        - [工作区（*Working Directory*）](#工作区working-directory)
-        - [本地版本库（*Local Repository*）](#本地版本库local-repository)
-        - [暂存区（*stage*）](#暂存区stage)
-        - [远程版本库（*Remote Repository*）](#远程版本库remote-repository)
-        - [以上概念之间的关系](#以上概念之间的关系)
-        - [分支（*Branch*）](#分支branch)
-        - [主分支（*Master*）](#主分支master)
-        - [标签（*Tag*）](#标签tag)
-        - [HEAD](#head)
-    - [操作文件](#操作文件)
-        - [git add](#git-add-1)
-        - [git commit](#git-commit-1)
-        - [git mv](#git-mv)
-        - [git rm](#git-rm)
-        - [git status](#git-status-1)
-    - [操作分支](#操作分支)
-        - [git branch](#git-branch-1)
-        - [git merge](#git-merge)
-        - [git checkout](#git-checkout-1)
-        - [git stash](#git-stash)
-    - [操作历史](#操作历史)
-        - [git log](#git-log-1)
-        - [git cherry-pick](#git-cherry-pick)
-        - [git reset](#git-reset)
-        - [git rebase](#git-rebase)
-        - [git revert](#git-revert)
-        - [git diff](#git-diff)
-        - [git reflog](#git-reflog)
-    - [远程版本库连接](#远程版本库连接)
-        - [git init](#git-init)
-        - [git remote](#git-remote)
-        - [git fetch](#git-fetch)
-    - [问题排查](#问题排查)
-        - [git blame](#git-blame)
-        - [git bisect](#git-bisect)
-    - [更多操作](#更多操作)
-        - [git submodule](#git-submodule)
-        - [git gc](#git-gc)
-        - [git archive](#git-archive)
-
-<!-- /TOC -->
-
 
 # Git简介
 
@@ -74,8 +11,7 @@ git 入门网站
 
 `Git` 的api很多，但其实平时项目中90%的需求都只需要用到几个基本的功能即可，所以本文将从 `实用主义` 和 `深入探索` 2个方面去谈谈如何在项目中使用 `Git`，一般来说，看完 `实用主义` 这一节就可以开始在项目中动手用。
 
-> 说明：本文的操作都是基于 Mac 系统
->
+
 
 # 实用主义
 
@@ -347,7 +283,9 @@ build/
 
 ### 远程版本库（*Remote Repository*）
 
-一般指的是 `Git` 服务器上所对应的仓库，本文的示例所在的`github`仓库就是一个远程版本库![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191530358.jpeg)
+一般指的是 `Git` 服务器上所对应的仓库，本文的示例所在的`github`仓库就是一个远程版本库
+
+![img](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204191530358.jpeg)
 
 ### 以上概念之间的关系
 
