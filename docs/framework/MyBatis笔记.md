@@ -1297,7 +1297,7 @@ public void insertMoreByList() {
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../config/ehcache.xsd">
     <!-- 磁盘保存路径 -->
-    <diskStore path="D:\atguigu\ehcache"/>
+    <diskStore path="/Users/milk/Documents/Java/Encache"/>
     <defaultCache
             maxElementsInMemory="1000"
             maxElementsOnDisk="10000000"

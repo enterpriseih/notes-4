@@ -1007,6 +1007,13 @@ public String testRequestBody(@RequestBody String requestBody){
 
 requestBody:username=admin&password=123456
 
+```java
+@RequestBody(required = false)
+// 表示可以为空
+```
+
+
+
 ### 2、RequestEntity
 
 RequestEntity封装请求报文的一种类型，需要在控制器方法的形参中设置该类型的形参，当前请求的请求报文就会赋值给该形参，可以通过getHeaders()获取请求头信息，通过getBody()获取请求体信息

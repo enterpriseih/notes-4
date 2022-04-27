@@ -32,6 +32,22 @@ Ps：serverTimezone 是时区
 
 
 
+## ServiceImpl
+
+```java
+@Service
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+}
+```
+
+## MP自带的SQL语句输出日志
+
+```properties
+mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
+```
+
+
+
 # 常用注解
 
 ## @TableName
