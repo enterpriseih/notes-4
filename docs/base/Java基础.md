@@ -241,3 +241,15 @@ for(Map.Entry<Integer,String> node : set){
 ### 3、ConcurrentHashMap
 线程安全
 多线程并发中详细
+
+
+
+
+
+# 泛型
+
+## 一、泛型中entends和super的区别
+
+1. <? extends T>表示包括T在内的任何T的⼦类 
+
+2. <? super T>表示包括T在内的任何T的⽗类 

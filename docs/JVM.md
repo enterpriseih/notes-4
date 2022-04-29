@@ -802,8 +802,6 @@ Serial Old 作为 CMS 出现“Concurrent Mode Failure”失败后的后备预�
 
 > G1：整堆收集器
 
-![iShot2022-04-05_15.03.46](/Users/milk/Desktop/iShot2022-04-05_15.03.46.png)
-
 ### 1、Serial回收器：串行、响应速度优先
 
 Serial：复制算法、串行回收、STW机制（收集时必须暂停其他工作线程）

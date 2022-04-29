@@ -29,9 +29,9 @@
 
 - [Spring](./docs/framework/Spring.md)
 - [MyBatis](./docs/framework/MyBatis.md)
-- [MyBatis-plus](./docs/framework/MyBatis-plus.md)
 - [SpringMVC笔记](./docs/framework/SpringMVC笔记.md)
 - [MyBatis笔记](./docs/framework/MyBatis笔记.md)
+- [MyBatis-plus笔记](./docs/framework/MyBatis-plus笔记.md)
 - [SpringBoot笔记](./docs/framework/SpringBoot笔记.md)
 
 ### 数据库
