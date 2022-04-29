@@ -46,8 +46,8 @@
 ### 前端
 
 - [前端大致](./docs/前端大致.md)
-
 - [Vue](./docs/Vue.md)
+- [前端debug](./docs/前端debug.md)
 
 ### Redis
 

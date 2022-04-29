@@ -227,3 +227,18 @@ request.getRequestDispatcher("...").forward(request,response);
 - 地址栏有变化
 - 不同的request和response
 
+
+
+# Kaptcha验证码
+
+1、kaptcha如何使用:
+
+   - 添加jar
+   - 在web.xml文件中注册KaptchaServlet，并设置验证码图片的相关属性
+   - 在html页面上编写一个img标签，然后设置src等于KaptchaServlet对应的url-pattern
+
+2、kaptcha验证码图片的各个属性在常量接口：Constants中
+
+3、KaptchaServlet在生成验证码图片时，会同时将验证码信息保存到session中
+
+因此，在注册请求时，首先将用户文本框中输入的验证码值和session中保存的值进行比较，相等，则进行注册
