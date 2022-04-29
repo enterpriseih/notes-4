@@ -103,50 +103,53 @@ public ListNode removeNthFromEnd(ListNode head, int n) {
 ## 面试题22：链表中环的入口结点
 
 ### 题目
-一个链表中包含环，如何找出环的入口结点？从链表的头结点开始沿着next指针进入环的第一个结点为环的入口结点。例如，在图4.3的链表中，环的入口结点是结点3。
+一个链表中包含环，如何找出环的入口结点？从链表的头结点开始沿着next指针进入环的第一个结点为环的入口结点。
+
+例如，在图4.3的链表中，环的入口结点是结点3。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0403.png" alt="图4.3">
 
-图4.3：结点3是链表中环的入口结点
+
 
 > - 快慢双指针找到环中的某个节点
 > - 入口节点：指针P1在初始化时指向头节点，先移动环中节点数的步数，然后P2指向头节点，两指针开始以同样的速度移动，直至相遇，相遇的时候就是环的入口节点
-> - 下列代码不需要环中节点步数
+> - 该代码见书，下方代码不需要求环中节点数，但思路相同
 
 ### 参考代码
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202204292233402.png" alt="image-20220429223351605" style="zoom:67%;" />
+
+```
+快指针2步，慢指针1步
+假设快慢指针相遇时，
+慢指针走了 s 步，则快指针走了f = 2s步
+且 f = s + nb
+=> f = 2nb, s = nb
+```
+
+- 如果让指针从链表头部一直向前走并统计步数 k，那么所有**走到链表入口节点时的步数**是：k=a+nb（先走 a 步到入口节点，之后每绕 1 圈环（ b 步）都会再次到入口节点）。
+- 而目前，slow 指针走过的步数为 nb 步。因此，只要让 slow 再走 a 步停下来，就可以到环的入口。
+- 但是不知道 a 的值，该怎么办？依然是使用双指针法。我们构建一个指针，此指针需要有以下性质：此指针和slow 一起向前走 a 步后，两者在入口节点重合。那么从哪里走到入口节点需要 a 步？答案是链表头部head。
+
+让指针1指向inLoop
+
+指针2指向头指针，同时同速移动，相遇即为入口
+
 ``` java
 public ListNode detectCycle(ListNode head) {
-    ListNode inLoop = getNodeInLoop(head);
-    if (inLoop == null) {
-        return null;
-    }
-
-    ListNode node = head;
-    while (node != inLoop) {
-        node = node.next;
-        inLoop = inLoop.next;
-    }
-
-    return node;
-}
-
-private ListNode getNodeInLoop(ListNode head) {
-    if (head == null || head.next == null) {
-        return null;
-    }
-
-    ListNode slow = head.next;
-    ListNode fast = slow.next;
-    while (slow != null && fast != null) {
-        if (slow == fast) return slow;
-        // 一步
+    ListNode fast = head, slow = head;
+    while (true) {
+        if (fast == null || fast.next == null) return null;
         slow = slow.next;
-        // 两步
-        fast = fast.next;
-        if (fast != null) fast = fast.next;
+        fast = fast.next.next;
+        if (slow == fast) break;
     }
-
-    return null;
+    fast = head;
+    while (slow != fast) {
+        slow = slow.next;
+        fast = fast.next;
+    }
+    return fast;
 }
 ```
 
@@ -165,6 +168,9 @@ private ListNode getNodeInLoop(ListNode head) {
 > - 法二：先分别遍历，得到长度，想让长链表的指针先前进到和短链表相同长度的地方
 
 ### 参考代码
+
+法二
+
 ``` java
 public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
     int count1 = countList(headA);

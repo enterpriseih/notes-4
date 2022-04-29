@@ -41,7 +41,7 @@
 ### 算法
 
 - [代码随想录](https://programmercarl.com/)
-- [数据结构与算法（剑指Offer）](./docs/code/TOC.md)
+- [数据结构与算法](./docs/code/TOC.md)
 
 ### 前端
 

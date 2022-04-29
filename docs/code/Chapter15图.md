@@ -1,20 +1,88 @@
 # 第十五章：图
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202204291928832.png" alt="image-20220429192823973" style="zoom:50%;" />
+
+## 表示方式
+
+### 邻接表
+
+```
+有向图
+0 -> 1 -> 3
+1 -> 2
+2 -> 0
+3 -> 2
+
+无向图
+0 -> 1 -> 2 -> 3
+1 -> 0 -> 2
+2 -> 0 -> 1 -> 3
+3 -> 0 -> 2
+
+给出[[1,2,3],[0,2],[0,1,3],[0,2]]
+下标表示数 
+0 可以到 1，2，3
+1 可以到 0，2
+2 可以到 0，1，3
+3 可以到 0，2
+```
+
+
+
+### 矩阵
+
+```
+有向图
+    0  1  2  3
+   ------------
+0 | 0  1  0  1
+1 | 0  0  1  0
+2 | 1  0  0  0
+3 | 0  0  1  0
+
+无向图
+    0  1  2  3
+   ------------
+0 | 0  1  1  1
+1 | 1  0  1  0
+2 | 1  1  0  1
+3 | 1  0  1  0
+```
+
+
+
+## 15.1 图的搜索
+
+广度优先搜索bfs：可以保证在无权图中从某个节点出发用最短距离到达目标节点
+
+深度优先搜索dfs：能知道从起点到目标节点的所有路径
+
+## 无向图
+
 ## 面试题105：最大的岛屿
 
 ### 题目
 
-海洋岛屿地图可以用由0、1组成的二维数组表示，水平或者竖直方向相连的一组1表示一个岛屿。请计算最大的岛屿的面积（即岛屿中1的数目）。例如，在图15.5中有4个岛屿，其中最大的岛屿的面积为5。
+海洋岛屿地图可以用由0、1组成的二维数组表示，水平或者竖直方向相连的一组1表示一个岛屿。
+
+请计算最大的岛屿的面积（即岛屿中1的数目）。
+
+例如，在图中有4个岛屿，其中最大的岛屿的面积为5。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1505.png" alt="图2.1">
 
-图15.5：用0、1矩阵表示的海洋岛屿地图。地图中有4个岛屿，最大的岛屿的面积为5。
+> 该题还可以改为统计图中岛屿数目
 
 ### 参考代码
 
-#### 解法一
+找到矩阵中的图（不是使用矩阵表示的图），若干个不连通的子图
 
-``` java
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202204291951774.png" alt="image-20220429195145482" style="zoom:50%;" />
+
+岛屿面积为子图中节点数目
+
+```java
+// 搜索比较的过程
 public int maxAreaOfIsland(int[][] grid) {
     int rows = grid.length;
     int cols = grid[0].length;
@@ -31,7 +99,15 @@ public int maxAreaOfIsland(int[][] grid) {
 
     return maxArea;
 }
+```
 
+#### 解法一：bfs
+
+bfs 通常都需要一个队列，其中存放节点坐标
+
+dirs 是四个方向
+
+``` java
 private int getArea(int[][]grid, boolean[][] visited, int i, int j) {
     Queue<int[]> queue = new LinkedList<>();
     queue.add(new int[]{i, j});
@@ -46,6 +122,7 @@ private int getArea(int[][]grid, boolean[][] visited, int i, int j) {
         for (int[] dir : dirs) {
             int r = pos[0] + dir[0];
             int c = pos[1] + dir[1];
+            // 判断是否在边界内，并且是岛，并且也没有访问过
             if (r >= 0 && r < grid.length
                 && c >= 0 && c < grid[0].length
                 && grid[r][c] == 1 && !visited[r][c]) {
@@ -59,26 +136,11 @@ private int getArea(int[][]grid, boolean[][] visited, int i, int j) {
 }
 ```
 
-#### 解法二
+#### 解法二：基于栈的dfs
+
+就是把队列换成了栈，就变成了dfs
 
 ``` java
-public int maxAreaOfIsland(int[][] grid) {
-    int rows = grid.length;
-    int cols = grid[0].length;
-    boolean[][] visited = new boolean[rows][cols];
-    int maxArea = 0;
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (grid[i][j] == 1 && !visited[i][j]) {
-                int area = getArea(grid, visited, i, j);
-                maxArea = Math.max(maxArea, area);
-            }
-        }
-    }
-
-    return maxArea;
-}
-
 private int getArea(int[][]grid, boolean[][] visited, int i, int j) {
     Stack<int[]> stack = new Stack<>();
     stack.push(new int[]{i, j});
@@ -106,91 +168,100 @@ private int getArea(int[][]grid, boolean[][] visited, int i, int j) {
 }
 ```
 
-#### 解法三
+#### 解法三：基于递归的dfs
 
 ``` java
-public int maxAreaOfIsland(int[][] grid) {
-    int rows = grid.length;
-    int cols = grid[0].length;
-    boolean[][] visited = new boolean[rows][cols];
-    int maxArea = 0;
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (grid[i][j] == 1 && !visited[i][j]) {
-                int area = getArea(grid, visited, i, j);
-                maxArea = Math.max(maxArea, area);
-            }
+private int getArea(int[][]grid, boolean[][] visited, int i, int j) {
+    int area = 1;
+    visited[i][j] = true;
+    int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    for (int[] dir : dirs) {
+        int r = i + dir[0];
+        int c = j + dir[1];
+        if (r >= 0 && r < grid.length
+            && c >= 0 && c < grid[0].length
+            && grid[r][c] == 1 && !visited[r][c]) {
+            area += getArea(grid, visited, r, c);
         }
     }
 
-    return maxArea;
+    return area;
 }
-
-    private int getArea(int[][]grid, boolean[][] visited, int i, int j) {
-        int area = 1;
-        visited[i][j] = true;
-        int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        for (int[] dir : dirs) {
-            int r = i + dir[0];
-            int c = j + dir[1];
-            if (r >= 0 && r < grid.length
-                && c >= 0 && c < grid[0].length
-                && grid[r][c] == 1 && !visited[r][c]) {
-                area += getArea(grid, visited, r, c);
-            }
-        }
-        
-        return area;
-    }
 ```
 
 
-
-## 15.1 无向图
 
 ## 面试题106：二分图
 
 ### 题目
 
-如果能将一个图的结点分成A、B两部分，使得任意一条边的一个结点属于A另一个结点属于B，那么该图就是一个二分图。输入一个由数组graph表示的图，graph[i]里包含所有和结点i相邻的结点，请判断该图是否为二分图。例如，如果输入graph为[[1, 3], [0, 2], [1, 3], [0, 2]]，那么我们可以将结点分为{0, 2}、{1, 3}两部分，因此该图是一个二分图，如图15.7（a）所示。如果输入graph为[[1,2,3],[0,2],[0,1,3],[0,2]]，则不是一个二分图，如图15.7（b）所示。
+如果能将一个图的结点分成A、B两部分，使得任意一条边的一个结点属于A另一个结点属于B，那么该图就是一个二分图。输入一个由数组graph表示的图，graph[i]里包含所有和结点i相邻的结点，请判断该图是否为二分图。
+
+例如，如果输入graph为[[1, 3], [0, 2], [1, 3], [0, 2]]，那么我们可以将结点分为{0, 2}、{1, 3}两部分，因此该图是一个二分图，如图15.7（a）所示。如果输入graph为[[1,2,3],[0,2],[0,1,3],[0,2]]，则不是一个二分图，如图15.7（b）所示。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1507.png" alt="图2.1">
 
 图15.7：二分图与非二分图。（a）二分图。（b）不是二分图。
 
+二分图如下：在同一边的节点互不连通
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202204292017428.jpeg" alt="IMG_B84C9A49C548-1" style="zoom: 33%;" />
+
+
+
 ### 参考代码
 
-#### 解法一
+二分图的节点可以分成两种不同的类型，任意一条边的两个节点分别属于两种不同的类型
 
-``` java
+为所有节点着色，两种不同类型的节点分别涂上不同的颜色
+
+**如果任意一条边的两个节点都能被涂上不同的颜色，则整个图就是哥二分图**
+
+```java
+// 一个图可能包含多个连通子图，逐一对每个子图的节点着色
 public boolean isBipartite(int[][] graph) {
+    // 邻接表的长度即为节点数目
     int size = graph.length;
+    // 保存节点i的颜色，未上色为-1，上色了则为0、1
     int[] colors = new int[size];
     Arrays.fill(colors, -1);
     for (int i = 0; i < size; ++i) {
         if (colors[i] == -1) {
+            // 未上色就上0
             if (!setColor(graph, colors, i, 0)) {
                 return false;
             }
         }
     }
-
+    
     return true;
 }
 
-private boolean setColor(int[][] graph, int[] colors, int i, int color) {
+```
+
+若图中有n个节点和e条边，bfs和dfs的事件复杂度都是`O(v+e)`
+
+#### 解法一：bfs着色
+
+``` java
+private boolean setColor(int[][] graph, int[] colors, 
+                         int i, int color) {
     Queue<Integer> queue = new LinkedList<>();
     queue.add(i);
     colors[i] = color;
     while (!queue.isEmpty()) {
         int v = queue.remove();
+        // 与v相邻的节点保存在graph[v]中
         for (int neighbor : graph[v]) {
+            // 如果neighbour上过色
             if (colors[neighbor] >= 0) {
                 if (colors[neighbor] == colors[v]) {
                     return false;
                 }
             } else {
+                // 放进队列，并上色
                 queue.add(neighbor);
+                // 上色，上的色是与节点v不同的色
                 colors[neighbor] = 1 - colors[v];
             }
         }
@@ -198,32 +269,24 @@ private boolean setColor(int[][] graph, int[] colors, int i, int color) {
 
     return true;
 }
+
 ```
 
-#### 解法二
+#### 解法二：dfs着色
+
+将节点 i 上色为 color
 
 ``` java
-public boolean isBipartite(int[][] graph) {
-    int size = graph.length;
-    int[] colors = new int[size];
-    Arrays.fill(colors, -1);
-    for (int i = 0; i < size; ++i) {
-        if (colors[i] == -1) {
-            if (!setColor(graph, colors, i, 0)) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-private boolean setColor(int[][] graph, int[] colors, int i, int color) {
+private boolean setColor(int[][] graph, int[] colors, 
+                         int i, int color) {
+    // 若已经上过色了，且不是color，返回false
+    // 若是color，则true
     if (colors[i] >= 0) {
         return colors[i] == color;
     }
 
     colors[i] = color;
+    // 给邻节点上色
     for (int neighbor : graph[i]) {
         if (!setColor(graph, colors, neighbor, 1 - color)) {
             return false;
@@ -232,13 +295,18 @@ private boolean setColor(int[][] graph, int[] colors, int i, int color) {
 
     return true;
 }
+
 ```
+
+
 
 ## 面试题107：矩阵中的距离
 
 ### 题目
 
-输入一个有0、1组成的矩阵M，请输出一个大小相同的矩阵D，矩阵D中的每个格子是M中对应格子离最近的0的距离。水平或者竖直方向相邻两个格子的距离为1。假设矩阵M中至少要有一个0。例如，图15.8（a）是一个只包含0、1的矩阵M，它每个格子离最近的0的距离如15.8（b）的矩阵D所示。矩阵M\[0][0]等于0，因此它离最近的0的距离是0，所以D\[0][0]等于0。M\[2][1]等于1，离它最近的0的坐标是(0, 1)、(1, 0)、(1, 2)，它们离坐标(2, 1)的距离都是2，所以D\[2][1]等于2。
+输入一个有0、1组成的矩阵M，请输出一个大小相同的矩阵D，矩阵D中的每个格子是M中对应格子离最近的0的距离。水平或者竖直方向相邻两个格子的距离为1。假设矩阵M中至少要有一个0。
+
+例如，图15.8（a）是一个只包含0、1的矩阵M，它每个格子离最近的0的距离如15.8（b）的矩阵D所示。矩阵M\[0][0]等于0，因此它离最近的0的距离是0，所以D\[0][0]等于0。M\[2][1]等于1，离它最近的0的坐标是(0, 1)、(1, 0)、(1, 2)，它们离坐标(2, 1)的距离都是2，所以D\[2][1]等于2。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1508.png" alt="图2.1">
 
@@ -287,7 +355,9 @@ public int[][] updateMatrix(int[][] matrix) {
 
 ### 题目
 
-输入两个长度相同但内容不同的单词（beginWord和endWord）和一个单词列表，请问从beginWord到endWord的演变序列的最短长度，要求每一步只能改变单词中的一个字母，并且演变过程中每一步得到的单词都必须在给定的单词列表中。如果不能从beginWord演变到endWord，则返回0。假设所有单词只包含英文的小写字母。例如，如果beginWord为"hit"，endWord为"cog"，单词列表为["hot", "dot", "dog", "lot", "log", "cog"]，则演变序列的最短长度为5，一个可行的演变序列为"hit"→"hot"→"dot"→"dog"→"cog"。
+输入两个长度相同但内容不同的单词（beginWord和endWord）和一个单词列表，请问从beginWord到endWord的演变序列的最短长度，要求每一步只能改变单词中的一个字母，并且演变过程中每一步得到的单词都必须在给定的单词列表中。如果不能从beginWord演变到endWord，则返回0。假设所有单词只包含英文的小写字母。
+
+例如，如果beginWord为"hit"，endWord为"cog"，单词列表为["hot", "dot", "dog", "lot", "log", "cog"]，则演变序列的最短长度为5，一个可行的演变序列为"hit"→"hot"→"dot"→"dog"→"cog"。
 
 ### 参考代码
 
@@ -457,7 +527,7 @@ public int openLock(String[] deadends, String target) {
 
 
 
-## 15.2 有向图
+## 有向图
 
 ## 面试题110：所有路径
 
@@ -615,7 +685,7 @@ private int dfs(int[][] matrix, int[][] lengths, int i, int j) {
 
 
 
-## 15.3 拓扑排序
+## 15.2 拓扑排序
 
 ## 面试题113：课程顺序
 
@@ -787,7 +857,7 @@ public boolean sequenceReconstruction(int[] org, List<List<Integer>> seqs) {
 
 
 
-## 15.4 并查集
+## 15.3 并查集
 
 ## 面试题116：朋友圈
 
@@ -984,7 +1054,41 @@ private boolean union(int[] fathers, int i, int j) {
 
 ### 参考代码
 
-#### 解法一
+#### 解法一：哈希集合
+
+set 中存放每个元素，遍历 set，
+
+每次遍历到一个元素都循环判断时候存在+1的数，
+
+剪枝：如果存在-1的数，表示前面遍历到它的时候会去计算长度，避免了重复计算
+
+时间复杂度`O(n)`
+
+```java
+public int longestConsecutive(int[] nums) {
+    Set<Integer> all = new HashSet<>();
+    int maxLen = 0;
+    for (int num : nums) {
+        all.add(num);
+    } 
+
+    for (int num : all) {
+        if (!all.contains(num - 1)) {
+            int len = 1;
+            while(all.contains(num + 1)) {
+                len++;
+                num++;
+            }    
+            maxLen = Math.max(maxLen, len);
+        }  
+    }
+    return maxLen;
+}
+```
+
+
+
+#### 解法二：图的搜索
 
 ``` java
 public int longestConsecutive(int[] nums) {
@@ -1023,7 +1127,7 @@ private int bfs(Set<Integer> set, int num) {
 }
 ```
 
-#### 解法二
+#### 解法三：并查集
 
 ``` java
 public int longestConsecutive(int[] nums) {
@@ -1074,3 +1178,4 @@ private void union(Map<Integer, Integer> fathers, Map<Integer, Integer> counts, 
     }
 }
 ```
+
