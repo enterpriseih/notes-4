@@ -2,8 +2,6 @@
 
 好好学习，天天向上！！！
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/eight-legged_essay.png" alt="Java八股文" width=300px>
-
 ### 基础
 
 - [Java基础](./docs/base/Java基础.md)
