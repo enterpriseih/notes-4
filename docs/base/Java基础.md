@@ -226,10 +226,42 @@ map.put(key1,value1):
 		如果equals()返回true:使用value1替换value2。
 ```
 
-### 2、Entry
+### 2、Map的方法
+
+```java
+boolean containsKey(Object key);
+// 判断Map中是否包含某个key
+
+boolean containsValue(Object value); 
+// 判断Map中是否包含某个value
+
+boolean isEmpty();   
+// 判断Map集合中元素个数是否为0
+
+V remove(Object key); 
+// 通过key删除键值对
+
+int size(); 
+// 获取Map集合中键值对的个数。
+
+Collection<V> values(); 
+// 获取Map集合中所有的value，返回一个Collection
+
+Set<K> keySet(); 
+// 获取Map集合所有的key（所有的键是一个set集合）
+
+Set<Map.Entry<K,V>> entrySet(); 
+// 将Map集合转换成Set集合
+```
+
+
+
+### 3、Entry
 
 ```java
 Set<Map.Entry<Integer,String>> set = map.entrySet();
+// set里的对象是key=value的形式
+
 // foreach
 // 这种方式效率比较高，因为获取key和value都是直接从node对象中获取的属性值。
 // 这种方式比较适合于大数据量。
@@ -238,7 +270,7 @@ for(Map.Entry<Integer,String> node : set){
 }
 ```
 
-### 3、ConcurrentHashMap
+### 4、ConcurrentHashMap
 线程安全
 多线程并发中详细
 

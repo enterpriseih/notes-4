@@ -70,91 +70,157 @@ class RandomizedSet {
 + get(key)：如果缓存中存在键值key，则返回它对应的值；否则返回-1。
 + put(key, value)：如果缓存中之前包含键值key，将它的值设为value；否则添加键值key及对应的值value。在添加一个键值时如果缓存容量已经满了，则在添加新键值之前删除最近最少使用的键值（缓存里最长时间没有被使用过的元素）。
 
-> - 书上详细
+> - map查找元素时间`O(1)`，双向链表增删元素时间`O(1)`
 > - 哈希表和双向链表的结合
 > - 键就是缓存的键，值是双向链表的节点：每个节点都是一对键值
+> - 链表尾部的元素是最近使用的（包括查询和添加），头部元素是最近最少使用的
 
 ### 参考代码
 
-``` java
-class ListNode{
-    public int key;
-    public int value;
-    public ListNode next;
-    public ListNode prev;
+#### 方法一：哈希表和双向链表结合
 
-    public ListNode(int k, int v) {
-        key = k;
-        value = v;
+``` java
+class ListNode {
+    public int key;
+    public int val;
+    public ListNode prev;
+    public ListNode next;
+
+    public ListNode(int key, int val) {
+        this.key = key;
+        this.val = val;
     }
+
 }
-    
+
 class LRUCache {
     private ListNode head;
     private ListNode tail;
+    private int capacity;
     private Map<Integer, ListNode> map;
-    int capacity;
-    
-    public LRUCache(int cap) {
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
         map = new HashMap<>();
-        
-        // 两个哨兵节点，分别位于双向链表的头部和尾部
+        // 哨兵节点，位于头尾
         head = new ListNode(-1, -1);
         tail = new ListNode(-1, -1);
         head.next = tail;
         tail.prev = head;
-        
-        capacity = cap;
     }
     
     public int get(int key) {
-        ListNode node = map.get(key);
-        if (node == null) {
+        if (map.containsKey(key)) {
+            moveToTail(map.get(key));
+            return map.get(key).val;
+        } else {
             return -1;
         }
-        
-        moveToTail(node, node.value);
-        
-        return node.value;
     }
     
     public void put(int key, int value) {
         if (map.containsKey(key)) {
-            moveToTail(map.get(key), value);
+            map.get(key).val = value;
+            moveToTail(map.get(key));
         } else {
             if (map.size() == capacity) {
-                ListNode toBeDeleted = head.next;
-                deleteNode(toBeDeleted);
-                
-                map.remove(toBeDeleted.key);
+                ListNode toBeDel = head.next;
+                delNode(toBeDel);
+                map.remove(toBeDel.key);
             }
-            
-            ListNode node = new ListNode(key, value);
-            insertToTail(node);
-            
-            map.put(key, node);
+            ListNode newNode = new ListNode(key, value); 
+            addToTail(newNode);
+            map.put(key, newNode);
         }
     }
-    
-    private void moveToTail(ListNode node, int newValue) {
-        deleteNode(node);
 
-        node.value = newValue;
-        insertToTail(node);
-    }
-    
-    private void deleteNode(ListNode node) {
+    public void delNode(ListNode node) {
         node.prev.next = node.next;
         node.next.prev = node.prev;
     }
-    
-    private void insertToTail(ListNode node) {
+
+    public void moveToTail(ListNode node) {
+        delNode(node);
+        addToTail(node);
+    }
+
+    public void addToTail(ListNode node) {
         tail.prev.next = node;
         node.prev = tail.prev;
         node.next = tail;
         tail.prev = node;
     }
+    
 }
+```
+
+#### 方法二：直接使用LinkedHashMap
+
+```
+super(实参)的作用是：初始化当前对象的父类型特征。
+并不是创建新对象。实际上对象只创建了1个。
+```
+
+```java
+class LRUCache extends LinkedHashMap<Integer, Integer>{
+    private int capacity;
+    
+    public LRUCache(int capacity) {
+        // loadFactor默认0.75
+        // accessOrder: 
+        // - false表示链表按照插入顺序排列，
+        // - true表示按照读取顺序排列
+        super(capacity, 0.75F, true);
+        this.capacity = capacity;
+    }
+
+    public int get(int key) {
+        return super.getOrDefault(key, -1);
+    }
+
+    // 这个可不写，和父类相同
+    public void put(int key, int value) {
+        super.put(key, value);
+    }
+    
+	// 该方法的返回值是删除最近最少使用的条件 
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
+        return size() > capacity; 
+    }
+}
+
+```
+
+```java
+// 在插入一个新元素之后，如果是按插入顺序排序，即调用newNode()中的linkNodeLast()完成
+// 如果是按照读取顺序排序，即调用afterNodeAccess()完成
+// 这个就是著名的 LRU 算法啦
+// 在插入完成之后，需要回调函数判断是否需要移除某些元素！
+// LinkedHashMap 函数部分源码
+
+/**
+ * 插入新节点才会触发该方法，因为只有插入新节点才需要内存
+ * 根据 HashMap 的 putVal 方法, evict 一直是 true
+ * removeEldestEntry 方法表示移除规则, 在 LinkedHashMap 里一直返回 false
+ * 所以在 LinkedHashMap 里这个方法相当于什么都不做
+ */
+void afterNodeInsertion(boolean evict) { // possibly remove eldest
+    LinkedHashMap.Entry<K,V> first;
+    // 根据条件判断是否移除最近最少被访问的节点
+    if (evict && (first = head) != null && removeEldestEntry(first)) {
+        K key = first.key;
+        removeNode(hash(key), key, null, false, true);
+    }
+}
+
+// 移除最近最少被访问条件之一，通过覆盖此方法可实现不同策略的缓存
+// LinkedHashMap是默认返回false的，我们可以继承LinkedHashMap然后复写该方法即可
+// 例如 LeetCode 第 146 题就是采用该种方法，直接 return size() > capacity;
+protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+    return false;
+}
+
 ```
 
 
