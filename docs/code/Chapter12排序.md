@@ -1,5 +1,7 @@
 # 第十二章：排序
 
+排序[leetcode](https://leetcode-cn.com/problems/sort-an-array/)
+
 ## 面试题74：合并区间
 
 ### 题目
@@ -31,7 +33,7 @@ public int[][] merge(int[][] intervals) {
 }
 ```
 
-## 12.1 计数排序
+## 12.1 计数排序O(nlogn)
 
 数组长度n，数字范围k（最大值和最小值的差值），时间复杂度`O(n+k)`
 
@@ -106,7 +108,7 @@ public int[] relativeSortArray(int[] arr1, int[] arr2) {
 }
 ```
 
-## 12.2 快速排序
+## 12.2 快速排序O(nlogn)
 
 时间复杂度`O(nlogn)`
 
@@ -123,7 +125,29 @@ public int[] relativeSortArray(int[] arr1, int[] arr2) {
 3. 向右移动p2，当p2指向一个小于中间值的数时，移动p1，并交换p1和p2指向的数字，继续；
 4. 最后将中间值与p1++互换，此时p1指向的是本次的中间值 
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202204122146644.png" alt="iShot2022-04-12_21.44.25" style="zoom: 33%;" />                                                                                                                                                                                                                                                            
+```
+  4 1 5 3 6 2 7 8
+随机选中了3,移到末尾
+
+  4 1 5 6 2 7 8｜3
+↑ ↑
+p1p2
+
+  1 4 5 6 2 7 8｜3
+  ↑ ↑
+  p1p2
+
+  1 2 5 6 4 7 8｜3
+    ↑     ↑
+    p1    p2
+
+  1 2 3 6 4 7 8 5
+      ↑         ↑
+      p1        p2
+
+```
+
+​                                                                                                                                                                                                                                                            
 
 ```java
 public int[] sortArray(int[] nums) {
@@ -222,7 +246,17 @@ private void swap(int[] nums, int index1, int index2) {
 
 
 
-## 12.3 归并排序
+## 12.3 归并排序O(nlogn)
+
+为了排序 n 组，先分成两个 n/2 组，然后合并这两个排序的子数组，依次排序。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205011550841.png" alt="image-20220501155016561" style="zoom:50%;" />
+
+归并排序需要创建一个和输入数组大小相同的数组，用来保存合并两个排序子数组的结果
+
+数组 src 存放合并之前的数字
+
+数组 dst 存放合并之后的数字
 
 ```java
 // 迭代
@@ -231,12 +265,15 @@ public int[] mergeSort(int[] nums) {
     int[] dst = new int[nums.length];
 	int numsLen = nums.length;
     for (int seg = 1; seg < numsLen; seg += seg) {
-        // seg每组大小 1,2,4...
+        // seg每次每组的大小 1,2,4...
+        // 两个一组，四个一组
         for(int start = 0; start < numsLen; start += seg * 2) {
-            // seg * 2 下一个两两比较的第一组
             // start是两两比较的第一组的头
+            // start += seg * 2 下一个两两比较的头
             // 和numsLen比较，是因为可能后面不够分成seg一组
+            // nextStart下一组的头，第一组的下标要小于它
             int nextStart = Math.min(start + seg, numsLen);
+            // nnextStart下下一组的头，第二组的下标j要小于它
             int nnextStart = Math.min(start + seg * 2, numsLen);
             int i = start, j = nextStart, k = start;
             while(i < nextStart || j < nnextStart) {
@@ -249,15 +286,22 @@ public int[] mergeSort(int[] nums) {
                 }
             }
         }
+        
         // 每次的组大小的比较结束后，将分组排序后的dst作为下一次的src
+        int[] temp = src;
         src = dst;
-        dst = new int[numsLen];
+        dst = temp;
     }
+    // 最后一次的代排src就是排序完成的数组
     return src;
 }
 ```
+
+- 
+
 ```java
 // 递归
+// 排序长度为n的数组，只需分别排序n/2的数组，然后合并即可
 public int[] sortArray(int[] nums) {
     int[] dst = new int[nums.length];
     dst = Arrays.copyOf(nums, nums.length);
@@ -267,7 +311,9 @@ public int[] sortArray(int[] nums) {
 private void mergeSort(int[] src, int[] dst, int start, int nnextStart) {
     // 说明每组都只有一个了，不用排序
     if(start >= nnextStart - 1) return;
+    
     int nextStart = (start + nnextStart) / 2;
+    // 将每次排序后的dst是下一次的src
     mergeSort(dst, src, start, nextStart);
     mergeSort(dst, src, nextStart, nnextStart);
     int i = start, j = nextStart, k = start;
@@ -281,6 +327,7 @@ private void mergeSort(int[] src, int[] dst, int start, int nnextStart) {
         }
     }
 }
+
 ```
 
 
@@ -297,6 +344,10 @@ private void mergeSort(int[] src, int[] dst, int start, int nnextStart) {
 
 ### 参考代码
 
+#### 方法一：递归
+
+空间复杂度`O(logn)`，递归调用栈的开销
+
 ``` java
 public ListNode sortList(ListNode head) {
     if (head == null || head.next == null) {
@@ -311,7 +362,7 @@ public ListNode sortList(ListNode head) {
 
     return merge(head1, head2);
 }
-
+// 快慢双指针，分割链表成两份
 private ListNode split(ListNode head) {
     ListNode slow = head;
     ListNode fast = head.next;
@@ -337,15 +388,89 @@ private ListNode merge(ListNode head1, ListNode head2) {
             cur.next = head2;
             head2 = head2.next; 
         }
-
         cur = cur.next;
     }
-
     cur.next = head1 == null ? head2 : head1;
-
     return dummy.next;
 }
 ```
+
+#### 方法二：迭代
+
+空间复杂度`O(1)`
+
+```java
+public ListNode sortList(ListNode head) {
+    int len = 0;
+    ListNode node = head;
+    while (node != null) {
+        node = node.next;
+        len++;
+    }
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+
+    for (int seg = 1; seg < len; seg += seg) {
+        ListNode cur = dummy.next;
+        ListNode prev = dummy;
+
+        while (cur != null) {
+            ListNode head1 = cur;
+            for (int i = 1; i < seg && cur.next != null; i++) {
+                cur = cur.next;
+            }
+            ListNode head2 = cur.next;
+            // 将head1所在链表和head2所在链表断开
+            cur.next = null;
+            cur = head2;
+            // 有可能这组只有一条链表
+            for (int i = 1; i < seg && cur != null && cur.next != null; i++) {
+                cur = cur.next;
+            }
+            // 再次断开,next相当于第三个链表头
+            ListNode next = null;
+            if (cur != null) {
+                next = cur.next;
+                cur.next = null;
+            }
+
+            ListNode merged = merge(head1, head2);
+            // 然后把链表连起来
+            prev.next = merged;
+            // 将prev移动到合并好的第一组的尾部
+            // 下一次的prev.next = merged后
+            // 就会将合并好的链表连起来
+            while (prev.next != null) {
+                prev = prev.next;
+            }
+
+            cur = next;
+        }
+    }
+    return dummy.next;
+}
+
+// 合并两个有序链表
+private ListNode merge(ListNode head1, ListNode head2) {
+    ListNode dummy = new ListNode(0);
+    ListNode cur = dummy;
+    while (head1 != null && head2 != null) {
+        if (head1.val < head2.val) {
+            cur.next = head1;
+            head1 = head1.next;
+        } else {
+            cur.next = head2;
+            head2 = head2.next; 
+        }
+        cur = cur.next;
+    }
+    cur.next = head1 == null ? head2 : head1;
+    return dummy.next;
+}
+
+```
+
+
 
 ## 面试题78：合并排序链表
 
@@ -359,7 +484,7 @@ private ListNode merge(ListNode head1, ListNode head2) {
 
 ### 参考代码
 
-#### 解法一
+#### 解法一：最小堆
 
 ``` java
 // 将节点放入minHeap，每次都从中选取最小的那个，然后挨个拼接
@@ -389,7 +514,7 @@ public ListNode mergeKLists(ListNode[] lists) {
 }
 ```
 
-#### 解法二
+#### 解法二：归并排序
 
 ``` java
 /*
@@ -491,6 +616,68 @@ void select_sort(int a[], int n)
         //交换后，保证了a[0]..a[i]之间元素有序。
         if(min != i)
             swap(a[i], a[min]);
+    }
+}
+```
+
+## 12.6 插入排序
+
+时间复杂度`O(n^2)`
+
+每次迭代中，插入排序只从输入数据中移除一个待排序的元素，找到它在序列中适当的位置，并将其插入。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205011937522.gif" alt="Insertion-sort-example-300px"  />
+
+```java
+public void insertSort(int arr[]){
+    for(int i = 1; i < arr.length; i++){
+        int rt = arr[i];
+        for(int j = i - 1; j >= 0; j--){
+            if(rt < arr[j]){
+                arr[j + 1] = arr[j];
+                arr[j] = rt;
+            }else{
+                break;
+            }
+        }
+    }
+}
+```
+
+
+
+## 12.7 希尔排序
+
+插入排序的改进版。
+
+为了减少数据的移动次数，在初始序列较大时取较大的步长，通常取序列长度的一半，此时只有两个元素比较，交换一次；之后步长依次减半直至步长为1，即为插入排序，由于此时序列已接近有序，故插入元素时数据移动的次数会相对较少，效率得到了提高。
+
+第一趟：gap = len / 2 = 4
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205011948122.png" alt="image-20220501194841078" style="zoom: 33%;" />
+
+第二趟：gap = gap >> 1 = 2
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205011950396.png" alt="image-20220501195041892" style="zoom: 33%;" />
+
+第三趟：gap = 1
+
+就是普通插入排序
+
+```java
+void shellSort(int arr[]){
+    int gap = arr.length >> 1;
+    while(gap >= 1){
+        for(int i = gap; i < arr.length; i++){
+            int rt = arr[i];
+            for(int j = i - gap; j >= 0; j -= d){
+                if(rt < arr[j]){
+                    arr[j + gap] = arr[j];
+                    arr[j] = rt;
+                }else break;
+            }
+        }
+        gap >>= 1;
     }
 }
 ```
