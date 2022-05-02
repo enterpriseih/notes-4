@@ -2,8 +2,6 @@
 
 noted by YiENx
 
-一些符号：↑
-
 ### 前言：[ACM模式](./ACM模式.md)
 ### 第1章：[整数](./Chapter01整数.md)
 ### 第2章：[数组](./Chapter02数组.md)

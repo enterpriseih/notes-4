@@ -250,7 +250,7 @@ private void swap(int[] nums, int index1, int index2) {
 
 为了排序 n 组，先分成两个 n/2 组，然后合并这两个排序的子数组，依次排序。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205011550841.png" alt="image-20220501155016561" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205020938540.png" alt="iShot_2022-05-02_09.36.44" style="zoom: 33%;" />
 
 归并排序需要创建一个和输入数组大小相同的数组，用来保存合并两个排序子数组的结果
 
