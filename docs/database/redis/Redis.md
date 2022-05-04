@@ -2,7 +2,7 @@
 
 SQL 是持久化到硬盘，IO 读取慢
 
-NoSQL (Not Only SQL) 是内存级别，读取速度快，减少 IO 操作
+NoSQL (Not Only SQL) 是**内存级别**，读取速度快，减少 IO 操作
 
 - 不遵循 SQL 标准
 - 不支持 ACID

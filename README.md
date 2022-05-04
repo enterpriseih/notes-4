@@ -9,7 +9,7 @@
 - [Java基础入门80问](./docs/base/Java基础入门80问.md)
 - [深浅拷贝](./docs/base/深浅拷贝.md)
 - [JavaIO&NIO](./docs/base/JavaIO&NIO.md)
-- [设计模式](./docs/design-pattern/设计模式-目录.md)
+- [设计模式](./docs/design-pattern/设计模式目录.md)
 - [Lambda&StreamAPI](./docs/base/Lambda&StreamAPI.md)
 
 ### J.U.C
@@ -36,8 +36,9 @@
 ### :floppy_disk: 数据库
 
 - [MySQL](./docs/database/MySQL.md)
-- [Redis](./docs/redis/Redis.md)
-- [Redis面试](./docs/redis/Redis面试.md)
+- [MongoDB](./docs/database/MongoDB.md)
+- [Redis](./docs/database/redis/Redis.md)
+- [Redis面试](./docs/database/redis/Redis面试.md)
 - [数据字典](./docs/database/数据字典.md)
 
 ### :pencil2: 算法
