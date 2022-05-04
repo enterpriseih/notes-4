@@ -1,6 +1,6 @@
 # 第十四章：动态规划
 
-## 补充：最大字数组之和
+## 补充：最大连续子数组之和
 
 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
 
@@ -55,6 +55,39 @@ public int maxSubArray(int[] nums) {
     return res;
 }
 ```
+
+## 补充：最大连续子数组乘积
+
+```
+输入: nums = [2,3,-2,4]
+输出: 6
+解释: 子数组 [2,3] 有最大乘积 6。
+```
+要维护两个值，一个最大值，一个最小值，
+
+这个最小值是可能为负数的，负负得正
+
+```java
+public int maxProduct(int[] nums) {
+    int len = nums.length;
+    int[] fmin = new int[len];
+    int[] fmax = new int[len];
+    int res = nums[0];
+    fmin[0] = nums[0];
+    fmax[0] = nums[0];
+    for (int i = 1; i < len; i++) {
+        int t1 = fmax[i-1] * nums[i], t2 = fmin[i-1] * nums[i];
+        fmax[i] = Math.max(t1, Math.max(t2, nums[i]));
+        fmin[i] = Math.min(t1, Math.min(t2, nums[i]));
+        res = Math.max(fmax[i], res);
+    }
+    return res;
+}
+```
+
+
+
+
 
 ## 不同的二叉搜索树
 

@@ -221,6 +221,7 @@ private int countList(ListNode head) {
 
 ``` java
 // i --> j --> k
+// 一次断开一个，然后再拼上
 public ListNode reverseList(ListNode head) {
     ListNode pre = null;
     ListNode cur = head;    
@@ -230,7 +231,6 @@ public ListNode reverseList(ListNode head) {
         pre = cur;// 下一个prev即k的j
         cur = next;// 下一个cur即当前的k
     }
-
     return pre;
 }
 ```
