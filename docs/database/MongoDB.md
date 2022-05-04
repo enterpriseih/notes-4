@@ -6,6 +6,8 @@ MongoDB 是由C++语言编写的，是一个**基于分布式文件存储的开�
 
 **在高负载的情况下，添加更多的节点，可以保证服务器性能。**
 
+**是nosql数据库中功能最丰富，最像关系数据库的**
+
 MongoDB 旨在为WEB应用提供可扩展的高性能数据存储解决方案。
 
 MongoDB 将数据存储为一个文档，数据结构由键值(key=>value)对组成。MongoDB 文档类似于 JSON 对象。字段值可以包含其他文档，数组及文档数组。
@@ -79,7 +81,6 @@ db.auth("useradmin", "adminpassword")
 然后使用库，给库创建用户
 use yourdatabase
 db.createUser({ user: "youruser", pwd: "yourpassword", roles: [{ role: "dbOwner", db: "yourdatabase" }] })
-
 
 ```
 
@@ -165,10 +166,9 @@ db.getCollection("user");
 - 插入多条数据
 	- db.collectionName.insertMany( [ {name:'liu5'} , {name:'liu6'} ] ) 
 		- 需要用数组包起来
-- 万能API：db.collectionName.insert()
+- 万能API：`db.collectionName.insert()`
 
 ```shell
-
 
 #添加两万条数据
 for(var i=0;i<20000;i++){
@@ -279,6 +279,19 @@ db.emp.find({},{ename:1,_id:0}) #在匹配到的文档中只显示ename字段
 ### 修改数据
 
 ```shell
+Update()有几个参数需要注意。
+# db.collection.update(criteria, objNew, upsert, mult)
+criteria:需要更新的条件表达式
+objNew:更新表达式
+upsert:如FI标记录不存在，是否插入新文档。 
+multi:是否更新多个文档。
+```
+
+
+
+```shell
+
+
 # 1.替换整个文档
 # db.collectionName.update(condiction,newDocument)
 
@@ -328,6 +341,8 @@ db.users.update({username:'liu'},{$addToSet:{"hobby.movies":'movie4'}})
 {$inc:{num:-100}} #让num自减100
 db.emp.updateMany({sal:{$lt:1000}},{$inc:{sal:400}}) #给工资低于1000的员工增加400的工资
 
+
+
 ```
 
 
@@ -358,6 +373,58 @@ db.dropDatabase()
 # 8.当删除的条件为内嵌的属性时：
 db.users.remove({"hobby.movies":'movie3'})
 ```
+
+
+
+# SpringBoot+MongoDB
+
+## MongoTemplate
+
+常用方法
+
+mongoTemplate.findAll(User.class): 查询User文档的全部数据
+
+mongoTemplate.findById(\<id>, User.class): 查询User文档id为id的数据
+
+mongoTemplate.find(query, User.class);: 根据query内的查询条件查询
+
+mongoTemplate.upsert(query, update, User.class): 修改
+
+mongoTemplate.remove(query, User.class): 删除
+
+mongoTemplate.insert(User): 新增
+
+
+
+Query对象
+
+1、创建一个query对象（用来封装所有条件对象)，再创建一个criteria对象（用来构建条件）
+
+2、 
+
+精准条件：criteria.and(“key”).is(“条件”)
+
+模糊条件：criteria.and(“key”).regex(“条件”)
+
+3、封装条件：query.addCriteria(criteria)
+
+4、
+
+大于（创建新的criteria）：Criteria gt = Criteria.where(“key”).gt（“条件”）
+
+小于（创建新的criteria）：Criteria lt = Criteria.where(“key”).lt（“条件”）
+
+5、Query.addCriteria(new Criteria().andOperator(gt,lt));
+
+6、一个query中只能有一个andOperator()。其参数也可以是Criteria数组。
+
+7、排序 ：
+
+query.with（new Sort(Sort.Direction.ASC, "age"). and(new Sort(Sort.Direction.DESC, "date")))
+
+## MongoRepository
+
+
 
 
 
@@ -418,9 +485,17 @@ db.students.insert([
 ])
 ```
 
+# 聚合操作
 
 
 
+# 索引
+
+```shel
+> db.User.createIndex({"name":1})
+```
+
+语法中 name值为你要创建的索引字段，1 为指定按升序创建索引，如果你想按降序来创建索引指定为 -1 即可
 
 # mongoose:
 
