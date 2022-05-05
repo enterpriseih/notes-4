@@ -20,13 +20,18 @@ MongoDB 将数据存储为一个文档，数据结构由键值(key=>value)对组
 
 ## 安装
 
-```
+```shell
 #拉取镜像 
 docker pull mongo:latest
 
 #创建和启动容器 
 docker run -d --restart=always -p 27017:27017 --name mymongo -v /data/db:/data/db -d mongo
-
+#或
+docker run -d --name mymongo -p 27017:27017 
+--restart=always 
+-v /usr/local/mydocker/mongodb/data:/data/db 
+-v /usr/local/mydocker/mongodb/etc/mongodb.conf:/etc/mongodb.conf 
+-d mongo
 #进入容器 
 docker exec -it mymongo /bin/bash 
 
@@ -83,6 +88,8 @@ use yourdatabase
 db.createUser({ user: "youruser", pwd: "yourpassword", roles: [{ role: "dbOwner", db: "yourdatabase" }] })
 
 ```
+
+db.createUser({ user: "testOwner", pwd: "testOwner1205", roles: [{ role: "dbOwner", db: "yourdatabase" }] })
 
 role：dbOwner 代表数据库所有者角色，拥有最高该数据库最高权限。比如新建索引等
 
@@ -424,9 +431,20 @@ query.with（new Sort(Sort.Direction.ASC, "age"). and(new Sort(Sort.Direction.DE
 
 ## MongoRepository
 
+Spring Data 提供了对 mongodb 数据访问的支持，我们只需要继承 MongoRepository 类，按照 Spring Data 规范就可以了
+
+需要创建一个Repository类
+
+```java
+@Repository
+public interface HospitalRepository extends MongoRepository<Hospital, String> {
+
+}
+```
 
 
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205051723038.png" alt="20190811094647887" style="zoom:80%;" />
 
 # 文档之间的关系：
 
