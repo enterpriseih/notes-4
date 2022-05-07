@@ -20,12 +20,6 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 
 
-### P76签名问题
-
-医院模拟端发送的sign大家记得改写一下,ApiServiceImpl的103行HttpRequestHelper.getSign(paramMap, this.getSignKey())改成MD5.encrypt(this.getSignKey())，不然和后端比对的时候会一直报错
-
-
-
 ### 模板状态码的标准问题
 
 utils/request.js 中
@@ -36,7 +30,7 @@ response 拦截器的状态码20000，改成200，这是说明，不是20000不�
 
 ### Springboot2.2之后不自动给mongodb创建索引
 
-
+但是2.6.7又不会报错了，可能是底层自行加入了
 
 ```yaml
 // 第一步
@@ -103,4 +97,12 @@ public void initIndicesAfterStartup() {
 }
 
 ```
+
+
+
+
+
+### SpringCloudAlibaba和SpringBoot版本配对问题
+
+见[版本配对设置](https://github.com/alibaba/spring-cloud-alibaba/wiki/%E7%89%88%E6%9C%AC%E8%AF%B4%E6%98%8E)
 
