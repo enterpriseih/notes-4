@@ -1080,13 +1080,18 @@ private boolean union(int[] fathers, int i, int j) {
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/1522.png" alt="图2.1">
 
-图15.22：由边列表[[1, 2], [1, 3], [2, 4], [3, 4], [2, 5]]构成的图。
+> 按顺序添加边，如果再添加某边后，图中出现了环，那么该边是多余的
+>
+> 也就是说，本来那两个节点就在一个子图中了，添加该边之后还是在同一个子图中，所以多余
+>
+> 在添加 [3,4] 之前，3124已经是同一个子图了，添加后就成了环
 
 ### 参考代码
 
 ``` java
 public int[] findRedundantConnection(int[][] edges) {
     int maxVertex = 0;
+    // 找到最大的节点编号，即n的值
     for (int[] edge : edges) {
         maxVertex = Math.max(maxVertex, edge[0]);
         maxVertex = Math.max(maxVertex, edge[1]);
