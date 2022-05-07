@@ -1,5 +1,11 @@
 # 第十五章：图
 
+## 概念
+
+图时用来研究物体与物体之间的关系的。
+
+物体就是图中的节点。
+
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202204291928832.png" alt="image-20220429192823973" style="zoom:50%;" />
 
 ## 表示方式
@@ -687,11 +693,17 @@ private int dfs(int[][] matrix, int[][] lengths, int i, int j) {
 
 ## 15.2 拓扑排序
 
+可以解决与任务顺序相关的问题。
+
+如果某些任务必须在其他任务之前（或之后）完成，则可以用一个有向图描述任务之间的依赖关系，然后通过拓扑排序得到所有任务的执行顺序。
+
 ## 面试题113：课程顺序
 
 ### 题目
 
-n门课程的编号从0到n-1。输入一个数组prerequisites，它的每个元素prerequisites[i]表示两门课程的先修顺序。如果prerequisites[i]=[ai, bi]，那么我们必须先修完可以bi才能修ai。请根据总课程数n和表示先修顺序的prerequisites得出一个可行的修课序列。如果有多个可行的修课序列，则输出任意序列。如果没有可行的修课序列，则输出空序列。例如，总共有4门课程，先修顺序prerequisites为[[1, 0], [2, 0], [3, 1], [3, 2]]，一个可行的修课序列是0→2→1→3。
+n门课程的编号从0到n-1。输入一个数组prerequisites，它的每个元素prerequisites[i]表示两门课程的先修顺序。如果prerequisites[i]=[ai, bi]，那么我们必须先修完可以bi才能修ai。请根据总课程数n和表示先修顺序的prerequisites得出一个可行的修课序列。如果有多个可行的修课序列，则输出任意序列。如果没有可行的修课序列，则输出空序列。
+
+例如，总共有4门课程，先修顺序prerequisites为[[1, 0], [2, 0], [3, 1], [3, 2]]，一个可行的修课序列是0→2→1→3。
 
 ### 参考代码
 
@@ -859,16 +871,54 @@ public boolean sequenceReconstruction(int[] org, List<List<Integer>> seqs) {
 
 ## 15.3 并查集
 
+### 定义
+
+并查集是一种树型的数据结构，用于处理一些不相交集合（disjoint sets）的合并及查询问题。
+
+每个节点都有一个指向父节点的指针，根节点的指针指向自己
+
+并查集通常包含两种操作
+
+- 查找(Find)：查询两个元素是否在同一个集合中
+- 合并(Union)：把两个不相交的集合合并为一个集合
+
+> 注意：双亲结点就是父结点
+
+常用来解决图的动态连接问题
+
+如果一个问题对应的图可以分成若干子图，并且需要判断两个节点是否在同一个子图中且在某些时候合并两个子图
+
+<div>
+<div align="center">
+    <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205061317190.png" alt="image-20220506131657786" style="zoom:50%;" />
+</div>
+<div align="center">(a) 由两个子集组成的并查集</div>
+<br/>    
+<div align="center">
+    <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205061323002.png" alt="image-20220506132347322" style="zoom:50%;" />
+</div>
+<div align="center">(b) 将两个子集合并之后的并查集</div>
+</div>
+
+
+
+
+
 ## 面试题116：朋友圈
 
 ### 题目
 
-假设一个班上有n个同学。同学之间有些是朋友，有些不是。朋友关系是可以传递的。比如A是B的直接朋友，B是C的直接朋友，那么A是C的间接朋友。我们定义朋友圈就是一组直接或间接朋友的同学。输入一个n×n的矩阵M表示班上的朋友关系，如果M[i][j]=1,那么同学i和同学j是直接朋友。请计算该班朋友圈的数目？
+假设一个班上有n个同学。同学之间有些是朋友，有些不是。朋友关系是可以传递的。比如A是B的直接朋友，B是C的直接朋友，那么A是C的间接朋友。
+
+我们定义朋友圈就是一组直接或间接朋友的同学。输入一个n×n的矩阵M表示班上的朋友关系，如果`M[i][j]=1`,那么同学i和同学j是直接朋友。请计算该班朋友圈的数目？
+
 例如输入数组[[1, 1, 0], [1, 1, 0], [0, 0, 1]]，则表明同学0和同学1是朋友，他们组成一个朋友圈。同学2一个人组成一个朋友圈。因此朋友圈的数目是2。
 
 ### 参考代码
 
-#### 解法一
+#### 解法一：图搜索
+
+求子图数
 
 ``` java
 public int findCircleNum(int[][] M) {
@@ -900,7 +950,21 @@ private void findCircle(int[][] M, boolean[]visited, int i) {
 }
 ```
 
-#### 解法二
+#### 解法二：并查集
+
+当`M[i][j]==1`时，说明两人是朋友，此时需要解决两个问题
+
+一、如何判断两人是否已经在同一个圈内
+
+- 判断两人的根节点是否相同
+- 使用`fathers[i]`，存放 i 的父节点，这样就不需要每次都去遍历了（路径压缩）
+
+二、如果不在同一个圈内，如何合并两人
+
+- 第一个子图的根节点是 i，第二个子图的根节点是 j
+- 令`father[i]=j`，即完成合并
+
+
 
 ``` java
 public int findCircleNum(int[][] M) {
@@ -908,9 +972,10 @@ public int findCircleNum(int[][] M) {
     for (int i = 0; i < fathers.length; ++i) {
         fathers[i] = i;
     }
-
+    
     int count = M.length;
     for (int i = 0; i < M.length; ++i) {
+        // 该矩阵是对称的，只需要搜索一半就可以了
         for (int j = i + 1; j < M.length; ++j) {
             if (M[i][j] == 1 && union(fathers, i, j)) {
                 count--;
@@ -921,14 +986,8 @@ public int findCircleNum(int[][] M) {
     return count;
 }
 
-private int findFather(int[] fathers, int i) {
-    if (fathers[i] != i) {
-        fathers[i] = findFather(fathers, fathers[i]);
-    }
-
-    return fathers[i];
-}
-
+// true:第一次连接，成功
+// false:已经是在同一个子图中了
 private boolean union(int[] fathers, int i, int j) {
     int fatherOfI = findFather(fathers, i);
     int fatherOfJ = findFather(fathers, j);
@@ -939,6 +998,14 @@ private boolean union(int[] fathers, int i, int j) {
 
     return false;
 }
+
+private int findFather(int[] fathers, int i) {
+    // 递归查找该节点的父节点
+    if (fathers[i] != i) {
+        fathers[i] = findFather(fathers, fathers[i]);
+    }
+    return fathers[i];
+}
 ```
 
 ## 面试题117：相似的字符串
@@ -947,7 +1014,9 @@ private boolean union(int[] fathers, int i, int j) {
 
 如果交换字符串X中的两个字符能得到字符串Y，那么两个字符串X和Y相似。例如字符串"tars"和"rats"相似（交换下标0和2的两个字符）、字符串"rats"和"arts"相似（交换下标0和1的字符），但字符串"star"和"tars"不相似。
 
-输入一个字符串数组，根据字符串的相似性分组，请问能把输入数组分成几组？如果一个字符串至少和一组字符串中的一个相似，那么它就可以放到该组里去。假设输入数组中的所有字符串长度相同并且两两互为变位词。例如输入数组["tars","rats","arts","star"]，可以分成2组，一组为{"tars", "rats", "arts"}，另一组为{"star"}。
+输入一个字符串数组，根据字符串的相似性分组，请问能把输入数组分成几组？如果一个字符串至少和一组字符串中的一个相似，那么它就可以放到该组里去。假设输入数组中的所有字符串长度相同并且两两互为变位词。
+
+例如输入数组["tars","rats","arts","star"]，可以分成2组，一组为{"tars", "rats", "arts"}，另一组为{"star"}。
 
 ### 参考代码
 
@@ -968,6 +1037,17 @@ public int numSimilarGroups(String[] A) {
     }
 
     return groups;
+}
+
+// 两字符串对应位置不同字符的个数不超过两个，即相似
+private boolean similar(String str1, String str2) {
+    int diffCount = 0;
+    for (int i = 0; i < str1.length(); i++) {
+        if (str1.charAt(i) != str2.charAt(i)) {
+            diffCount++;
+        }
+    }
+    return diffCount <= 2;
 }
 
 private int findFather(int[] fathers, int i) {

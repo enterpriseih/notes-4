@@ -5,6 +5,7 @@
 ### :coffee: Java基础
 
 - [Java基础](./docs/base/Java基础.md)
+- [Java笔记](./docs/base/Java笔记.md)
 - [面向对象思想](./docs/base/面向对象思想.md)
 - [Java基础入门80问](./docs/base/Java基础入门80问.md)
 - [深浅拷贝](./docs/base/深浅拷贝.md)
@@ -36,6 +37,7 @@
 ### :floppy_disk: 数据库
 
 - [MySQL](./docs/database/MySQL.md)
+- [MySQL数据库笔记](./docs/database/MySQL数据库笔记.md)
 - [MongoDB](./docs/database/MongoDB.md)
 - [Redis](./docs/database/redis/Redis.md)
 - [Redis面试](./docs/database/redis/Redis面试.md)
@@ -46,7 +48,7 @@
 - [代码随想录](https://programmercarl.com/)
 - [数据结构与算法](./docs/code/TOC.md)
 
-### 前端
+### 前端 
 
 - [前端大致](./docs/front-end/前端大致.md)
 - [Vue](./docs/front-end/Vue.md)
@@ -71,6 +73,7 @@
 ### 项目
 
 - [尚医通](./docs/尚医通.md)
+- [尚医通难点](./docs/尚医通难点.md)
 
 ### 排版
 

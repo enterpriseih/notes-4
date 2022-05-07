@@ -166,10 +166,15 @@ public ListNode detectCycle(ListNode head) {
 
 > - 法一：将链表1的尾节点指向链表2的头节点，形成一个带有环的链表3，3的环入口节点就是12的第一个重合点
 > - 法二：先分别遍历，得到长度，想让长链表的指针先前进到和短链表相同长度的地方
+> - 法三：贼妙～～～～～
 
 ### 参考代码
 
-法二
+#### 方法二
+
+时间`O(m+n)`
+
+空间`O(1)`
 
 ``` java
 public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
@@ -201,6 +206,38 @@ private int countList(ListNode head) {
     }
 
     return count;
+}
+```
+
+#### 方法三***
+
+时间`O(m+n)`
+
+空间`O(1)`
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205061206757.png" alt="image-20220506120605704" style="zoom: 45%;" />
+
+设 headA 长 a，headB 长 b，公共部分长 c
+
+headA 和 headB 到公共节点的长度分别为 `a - c` 和 `b - c`
+
+headA 走完后继续走 B 的，headB 走完后继续走 A 的
+
+两者相遇时，A 走了 `a + (b - c)`，B 走了 `b + (a - c)`，相同的步数
+
+相遇时有两种情况
+
+- 节点是公共节点
+- 没有公共节点的话，`A == B` 只会是 `null == null`
+
+```java
+public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+    ListNode A = headA, B = headB;
+    while (A != B) {
+        A = A != null ? A.next : headB;
+        B = B != null ? B.next : headA;
+    }
+    return A;
 }
 ```
 

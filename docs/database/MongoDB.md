@@ -385,6 +385,8 @@ db.users.remove({"hobby.movies":'movie3'})
 
 # SpringBoot+MongoDB
 
+都是SpringData提供的
+
 ## MongoTemplate
 
 常用方法
@@ -431,7 +433,7 @@ query.with（new Sort(Sort.Direction.ASC, "age"). and(new Sort(Sort.Direction.DE
 
 ## MongoRepository
 
-Spring Data 提供了对 mongodb 数据访问的支持，我们只需要继承 MongoRepository 类，按照 Spring Data 规范就可以了
+**Spring Data** 提供了对 mongodb 数据访问的支持，我们只需要继承 MongoRepository 类，按照 Spring Data 规范就可以了
 
 需要创建一个Repository类
 
