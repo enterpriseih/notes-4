@@ -1,5 +1,135 @@
 # 第二章：数组
 
+## 补充：较多的数字
+
+给定一个大小为 n 的数组 nums ，返回其中的多数元素。多数元素是指在数组中出现次数 大于 ⌊ n/2 ⌋ 的元素。
+
+可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+```
+输入：nums = [2,2,1,1,1,2,2]
+输出：2
+```
+
+### 方法一：排序
+
+```java
+// O(nlogn)
+// O(nlogn)
+public int majorityElement(int[] nums) {
+    Arrays.sort(nums);
+    return nums[nums.length / 2];
+}
+```
+
+
+
+### 方法二：计数
+
+hashmap 记录个数
+
+```java
+public int majorityElement(int[] nums) {
+    Map<Integer, Long> map = new HashMap<>();
+    int n = nums.length;
+    for (int i = 0; i < n; i++) {
+        map.put(nums[i], map.getOrDefault(nums[i], 0L) + 1L);
+        if (map.get(nums[i]) > n / 2) {
+            return nums[i];
+        }
+    }
+    return 0;
+}
+```
+
+
+
+### 方法三：摩尔投票法
+
+摩尔投票法，遇到相同的数，就投一票，遇到不同的数，就减一票，最后还存在票的数就是众数
+
+候选人`(candidate)`初始化为`nums[0]`，票数`count`初始化为 0。
+当遇到与`candidate`相同的数，则票数`count++`，否则票数`count--`。
+当票数`count==0`时，更换候选人，并将票数`count`重置为1。
+遍历完数组后，`candidate`即为最终答案。
+
+为何这行得通呢？
+投票法是遇到相同的则票数 + 1，遇到不同的则票数 - 1。
+且“多数元素”的个数> ⌊ n/2 ⌋，其余元素的个数总和<= ⌊ n/2 ⌋。
+因此`“多数元素”的个数 - 其余元素的个数总和 肯定 >= 1`。
+这就相当于每个“多数元素”和其他元素 两两相互抵消，抵消到最后肯定还剩余至少1个“多数元素”。
+
+
+```java
+// O(n)
+// O(1)
+public int majorityElement(int[] nums) {
+    int count = 0;
+    int candidate = nums[0];
+    for (int i = 0; i < nums.length; i++) {
+        if (nums[i] == candidate) {
+            count++;
+        } else if (--count == 0){
+            candidate = nums[i];
+            count = 1;
+        }
+    }
+    return candidate;
+}
+```
+
+## 补充：摩尔投票法扩展
+
+使用有限变量来代表这` k - 1` 个候选数及其出现次数。
+
+然后使用「摩尔投票」的标准做法，在遍历数组时同时 check 这 `k - 1` 个数，假设当前遍历到的元素为 xx：
+
+- 如果 xx 本身是候选者的话，则对其出现次数加一；
+- 如果 xx 本身不是候选者，检查是否有候选者的出现次数为 0：
+	- 若有，则让 xx 代替其成为候选者，并记录出现次数为 1；
+	- 若无，则让所有候选者的出现次数减一。
+
+当处理完整个数组后，这 `k - 1` 个数可能会被填满，但不一定都是符合出现次数超过 `n / k` 要求的。
+
+需要进行二次遍历，来确定候选者是否符合要求，将符合要求的数加到答案。
+
+**上述做法正确性的关键是：若存在出现次数超过 n / k 的数，最后必然会成为这 k - 1 个候选者之一。**
+
+```java
+// n/3为例
+public List<Integer> majorityElement(int[] nums) {
+        
+    int candidate1 = nums[0], count1 = 0;
+    int candidate2 = nums[0], count2 = 0;
+
+    for (int num : nums) {
+        if (candidate1 == num && count1 > 0) count1++;
+        else if (candidate2 == num && count2 > 0) count2++;
+        else if (count1 == 0 && ++count1 > 0) candidate1 = num;
+        else if (count2 == 0 && ++count2 > 0) candidate2 = num;
+        else {
+            count1--;
+            count2--;
+        }
+    }
+
+    count1 = 0;
+    count2 = 0;
+    for (int num : nums) {
+        if (num == candidate1) count1++;
+        else if (num == candidate2) count2++;
+    }
+
+    List<Integer> res = new ArrayList<>();
+    if (count1 > nums.length / 3) res.add(candidate1);
+    if (count2 > nums.length / 3) res.add(candidate2);
+
+    return res;
+}
+```
+
+
+
 ## 2.1 双指针
 
 ## 面试题6：排序数组中两个数字之和

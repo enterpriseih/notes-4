@@ -541,6 +541,8 @@ public int dfs(TreeNode node) {
 
 ## 8.2 二叉搜索树
 
+`left <= root <= right`
+
 ## 补：验证二叉搜索树
 
 #### 方法一：中序遍历
@@ -986,6 +988,63 @@ public boolean findTarget(TreeNode root, int k) {
 
 
 ## 8.3 TreeSet和TreeMap的应用
+
+利用红黑树这种平衡二叉搜索树实现 TreeSet 和 TreeMap
+
+红黑树：
+
+- 根节点黑色
+- NIL黑色
+- 一个节点红则其子节点必黑
+- 从一个节点到该节点子孙节点的所有路径上包含相同个数的黑节点
+
+```
+TreeSet常用函数
+
+ceiling
+返回键大于等于给定值的最小键；
+如果没有，返回null
+
+floor
+返回键小于等于给定值的最大键；
+如果没有，返回null
+
+higher
+返回键大于给定值的最小键；
+如果没有，返回null
+
+lower
+返回键小于给定值的最大键；
+如果没有，返回null
+```
+
+
+
+```
+TreeMap常用函数
+
+ceilingEntry/ceilingKey
+返回键大于等于给定值的最小映射/键；
+如果没有，返回null
+
+floorEntry/floorKey
+返回键小于等于给定值的最大映射/键；
+如果没有，返回null
+
+higherEntry/higherKey
+返回键大于给定值的最小映射/键；
+如果没有，返回null
+
+lowerEntry/lowerKey
+返回键小于给定值的最大映射/键；
+如果没有，返回null
+```
+
+
+
+> 如果数据集合是动态的，即题目要求逐步在数据集合中添加更多的数据，并且需要根据数据大小实现快速查找，则可能需要用到
+
+
 
 ## 面试题57：值和下标之差都在给定的范围内
 

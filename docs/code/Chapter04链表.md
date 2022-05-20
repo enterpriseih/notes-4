@@ -405,24 +405,29 @@ private ListNode reverseList(ListNode head) {
 ## 面试题27：回文链表
 
 ### 题目
-如何判断一个链表是不是回文？要求解法的时间复杂度是O(n)，另外不得使用超过O(1)的辅助空间。如果一个链表是回文，那么链表中结点序列从前往后看和从后往前看是相同的。例如，图4.13中的链表的结点序列从前往后看和从后往前看都是1、2、3、3、2、1，因此这是一个回文链表。
+如何判断一个链表是不是回文？要求解法的时间复杂度是O(n)，另外不得使用超过O(1)的辅助空间。如果一个链表是回文，那么链表中结点序列从前往后看和从后往前看是相同的。
+
+例如，图4.13中的链表的结点序列从前往后看和从后往前看都是1、2、3、3、2、1，因此这是一个回文链表。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0413.png" alt="图4.13">
 
-图4.13：一个回文链表。
+
 
 > - slow从head开始，fast从head.next开始的话，奇数总节点：slow到达的是中间；偶数总节点：slow到达的是前半部分最后一个节点
 
 ### 参考代码
+
+#### 法一
+
 ``` java
+// 先分割，再反转
 public boolean isPalindrome(ListNode head) {
     if (head == null && head.next == null) return true;
     ListNode slow = head;
     ListNode fast = head.next;
     while (fast != null && fast.next != null) {
         slow = slow.next;
-        fast = fast.next;
-        if (fast.next != null) fast = fast.next;
+        fast = fast.next.next;
     }
     ListNode secondHalf = slow.next;
     slow.next = null;
@@ -452,6 +457,30 @@ private ListNode reverseList(ListNode head) {
         cur = next;
     }
     return reversedHead;
+}
+```
+
+#### 法二
+
+```java
+// 一边快慢双指针一边反转
+public boolean isPalindrome(ListNode head) {
+    ListNode fast = head;
+    ListNode slow = head;
+    ListNode pre = null;
+    ListNode prepre = null;
+    while (fast != null && fast.next != null) {
+        pre = slow;
+        slow = slow.next;
+        fast = fast.next.next;
+        pre.next = prepre;
+        prepre = pre;
+    }
+	// 若是奇数
+    if (fast != null) {
+        slow = slow.next;
+    }
+    return equals(pre, slow);
 }
 ```
 

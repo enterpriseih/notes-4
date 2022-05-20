@@ -196,6 +196,13 @@ public int minCostClimbingStairs(int[] cost) {
 
 ### 参考代码
 
+```java
+dp[i]:前i个房子能偷到的最大钱财
+dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i]);
+```
+
+
+
 #### 解法一
 
 ``` java
@@ -313,8 +320,9 @@ public int rob(int[] nums) {
     if (nums.length == 1) {
         return nums[0];
     }
-
+	// 0~n-2
     int result1 = helper(nums, 0, nums.length - 2);
+    // 1~n-1
     int result2 = helper(nums, 1, nums.length - 1);
     return Math.max(result1, result2);        
 }
@@ -340,9 +348,20 @@ private int helper(int[] nums, int start, int end) {
 
 ### 题目
 
-一排n幢房子要粉刷成红、绿、蓝三种颜色，不同房子粉刷成不同颜色的成本不同。用一个n×3的数组表示n幢房子分别用三种颜色粉刷的成本。要求任意相邻的两幢房子的颜色都不一样，请计算粉刷这n幢的最少成本。例如，粉刷3幢房子的成本分别为[[17, 2, 16], [15, 14, 5], [13, 3, 1]]，如果分别将这3幢房子粉刷成绿色、蓝色和绿色，那么粉刷的成本是10，是最小的成本。
+一排n幢房子要粉刷成红、绿、蓝三种颜色，不同房子粉刷成不同颜色的成本不同。用一个n×3的数组表示n幢房子分别用三种颜色粉刷的成本。要求任意相邻的两幢房子的颜色都不一样，请计算粉刷这n幢的最少成本。
+
+例如，粉刷3幢房子的成本分别为[[17, 2, 16], [15, 14, 5], [13, 3, 1]]，如果分别将这3幢房子粉刷成绿色、蓝色和绿色，那么粉刷的成本是10，是最小的成本。
 
 ### 参考代码
+
+```java
+r(i)是将i号房粉刷成r的成本;
+r(i) = min(g(i-1),b(i-1)) + costs[i][0];
+g(i) = min(r(i-1),b(i-1)) + costs[i][1];
+b(i) = min(g(i-1),r(i-1)) + costs[i][2];
+```
+
+
 
 ``` java
 public int minCost(int[][] costs) {
@@ -355,8 +374,10 @@ public int minCost(int[][] costs) {
         dp[j][0] = costs[0][j];
     }
 
+    // i是房号
     for (int i = 1; i < costs.length; i++) {
         for (int j = 0; j < 3; j++) {
+            // j+1和j+2是与j不同的房子
             int prev1 = dp[(j + 2) % 3][(i - 1) % 2];
             int prev2 = dp[(j + 1) % 3][(i - 1) % 2];
             dp[j][i % 2] = Math.min(prev1, prev2) + costs[i][j];

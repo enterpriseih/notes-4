@@ -30,6 +30,29 @@ jdbc:mysql://localhost:3306/mybatis_plus?serverTimezone=GMT%2B8&characterEncodin
 
 Ps：serverTimezone 是时区
 
+## 启动类
+
+> 在Spring Boot启动类中添加@MapperScan注解，扫描mapper包
+
+```java
+@SpringBootApplication
+@MapperScan("com.atguigu.mybatisplus.mapper")
+public class MybatisplusApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MybatisplusApplication.class, args);
+	} 
+}
+```
+
+## 添加Mapper
+
+> BaseMapper是MyBatis-Plus提供的模板mapper，其中包含了基本的CRUD方法，泛型为操作的实体类型
+
+```java
+public interface UserMapper extends BaseMapper<User> {
+}
+```
+
 
 
 ## ServiceImpl

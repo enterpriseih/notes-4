@@ -147,7 +147,7 @@ p1p2
 
 ```
 
-​                                                                                                                                                                                                                                                            
+
 
 ```java
 public int[] sortArray(int[] nums) {
@@ -198,6 +198,8 @@ private void swap(int[] nums, int index1, int index2){
 
 ### 参考代码
 
+> 第k大就是快排时p1指针指向第nums.length - k的那个数
+
 ``` java
 public int findKthLargest(int[] nums, int k) {
     int target = nums.length - k;
@@ -218,25 +220,23 @@ public int findKthLargest(int[] nums, int k) {
 }
 
 private int partition(int[] nums, int start, int end) {
-    int random = new Random().nextInt(end - start + 1) + start;
-    swap(nums, random, end);
-
-    int small = start - 1;
-    for (int i = start; i < end; ++i) {
-        if (nums[i] < nums[end]) {
-            small++;
-            swap(nums, i, small);
+    int pivot = new Random().nextInt(end - start + 1) + start;
+    swap(nums, pivot, end);
+    
+    int p1 = start - 1;
+    for(int p2 = start; p2 < end; p2++) {
+        if(nums[p2] < nums[end]) {
+            p1++;
+            swap(nums, p1, p2);
         }
     }
-
-    small++;
-    swap(nums, small, end);
-
-    return small;
+    p1++;
+    swap(nums, p1, end);
+    return p1;
 }
 
-private void swap(int[] nums, int index1, int index2) {
-    if (index1 != index2) {
+private void swap(int[] nums, int index1, int index2){
+    if(index1 != index2) {
         int temp = nums[index1];
         nums[index1] = nums[index2];
         nums[index2] = temp;

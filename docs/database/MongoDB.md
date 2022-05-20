@@ -391,45 +391,170 @@ db.users.remove({"hobby.movies":'movie3'})
 
 常用方法
 
-mongoTemplate.findAll(User.class): 查询User文档的全部数据
+```java
+// 查询User文档的全部数据
+mongoTemplate.findAll(User.class);
 
-mongoTemplate.findById(\<id>, User.class): 查询User文档id为id的数据
+// 查询User文档id为id的数据
+mongoTemplate.findById(<id>, User.class);
 
-mongoTemplate.find(query, User.class);: 根据query内的查询条件查询
+// 根据query内的查询条件查询
+mongoTemplate.find(query, User.class);
 
-mongoTemplate.upsert(query, update, User.class): 修改
+// 修改
+mongoTemplate.upsert(query, update, User.class); 
 
-mongoTemplate.remove(query, User.class): 删除
+// 删除
+mongoTemplate.remove(query, User.class); 
 
-mongoTemplate.insert(User): 新增
+// 新增
+mongoTemplate.insert(User); 
+```
 
 
 
+
+
+```
 Query对象
 
-1、创建一个query对象（用来封装所有条件对象)，再创建一个criteria对象（用来构建条件）
+1、创建一个query对象（用来封装所有条件对象)，
+再创建一个criteria对象（用来构建条件）
 
 2、 
-
 精准条件：criteria.and(“key”).is(“条件”)
-
 模糊条件：criteria.and(“key”).regex(“条件”)
 
 3、封装条件：query.addCriteria(criteria)
 
 4、
-
 大于（创建新的criteria）：Criteria gt = Criteria.where(“key”).gt（“条件”）
-
 小于（创建新的criteria）：Criteria lt = Criteria.where(“key”).lt（“条件”）
 
 5、Query.addCriteria(new Criteria().andOperator(gt,lt));
 
 6、一个query中只能有一个andOperator()。其参数也可以是Criteria数组。
 
-7、排序 ：
+7、排序 
+query.with（new Sort(Sort.Direction.ASC, "age")
+.and(new Sort(Sort.Direction.DESC, "date")))
 
-query.with（new Sort(Sort.Direction.ASC, "age"). and(new Sort(Sort.Direction.DESC, "date")))
+```
+
+
+
+```java
+
+@Autowired
+private MongoTemplate mongoTemplate;
+
+@Test
+public void create() {
+    User user = new User();
+    user.setAge(20);
+    user.setName("test2");
+    user.setEmail("456@qq.com");
+    User user1 = mongoTemplate.insert(user);
+    System.out.println(user1);
+}
+
+@Test
+public void findUser() {
+    List<User> userList = mongoTemplate.findAll(User.class);
+    System.out.println(userList);
+}
+
+//根据id查询
+@Test
+public void getById() {
+    User user =
+        mongoTemplate.findById("627282268d8267494fc646b5", User.class);
+    System.out.println(user);
+}
+
+//条件查询
+@Test
+public void findUserList() {
+    Query query = new Query(Criteria
+                            .where("name").is("test")
+                            .and("age").is(20));
+    List<User> userList = mongoTemplate.find(query, User.class);
+    System.out.println(userList);
+}
+
+//模糊查询
+@Test
+public void findUsersLikeName() {
+    String name = "est";
+    String regex = String.format("%s%s%s", "^.*", name, ".*$");
+    Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    Query query = new Query(Criteria.where("name").regex(pattern));
+    List<User> userList = mongoTemplate.find(query, User.class);
+    System.out.println(userList);
+}
+
+//分页查询
+@Test
+public void findUsersPage() {
+    String name = "est";
+    int pageNo = 1;
+    int pageSize = 10;
+
+    Query query = new Query();
+    String regex = String.format("%s%s%s", "^.*", name, ".*$");
+    Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    query.addCriteria(Criteria.where("name").regex(pattern));
+    int totalCount = (int) mongoTemplate.count(query, User.class);
+    List<User> userList = mongoTemplate.find(query.skip((pageNo - 1) * pageSize).limit(pageSize), User.class);
+
+    Map<String, Object> pageMap = new HashMap<>();
+    pageMap.put("list", userList);
+    pageMap.put("totalCount",totalCount);
+    System.out.println(pageMap);
+}
+
+//修改
+@Test
+public void updateUser() {
+    User user = mongoTemplate.findById("627282268d8267494fc646b5", User.class);
+    user.setName("test_1");
+    user.setAge(25);
+    user.setEmail("493220990@qq.com");
+    Query query = new Query(Criteria.where("_id").is(user.getId()));
+    Update update = new Update();
+    update.set("name", user.getName());
+    update.set("age", user.getAge());
+    update.set("email", user.getEmail());
+    UpdateResult result = mongoTemplate.upsert(query, update, User.class);
+    long count = result.getModifiedCount();
+    System.out.println(count);
+}
+
+//删除操作
+@Test
+public void delete() {
+    Query query =
+        new Query(Criteria.where("_id").is("627282268d8267494fc646b5"));
+    DeleteResult result = mongoTemplate.remove(query, User.class);
+    long count = result.getDeletedCount();
+    System.out.println(count);
+}
+
+
+```
+
+
+
+### 聚合操作
+
+```java
+// 聚合操作
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+
+
+```
+
+
 
 ## MongoRepository
 
@@ -438,15 +563,125 @@ query.with（new Sort(Sort.Direction.ASC, "age"). and(new Sort(Sort.Direction.DE
 需要创建一个Repository类
 
 ```java
+// 第二个参数String是主键查询时主键的类型
 @Repository
 public interface HospitalRepository extends MongoRepository<Hospital, String> {
 
 }
+
+@Autowired
+private UserRepository userRepository;
+
+//添加
+@Test
+public void createUser() {
+    User user = new User();
+    user.setAge(20);
+    user.setName("张三");
+    user.setEmail("3332200@qq.com");
+    User user1 = userRepository.save(user);
+    System.out.println(user1);
+}
+
+//查询所有
+@Test
+public void findUser() {
+    List<User> userList = userRepository.findAll();
+    System.out.println(userList);
+}
+
+//id查询
+@Test
+public void getById() {
+    User user = userRepository
+        .findById("627282268d8267494fc646b5").get();
+    System.out.println(user);
+}
+
+//条件查询
+@Test
+public void findUserList() {
+    User user = new User();
+    user.setName("张三");
+    user.setAge(20);
+    Example<User> userExample = Example.of(user);
+    List<User> userList = userRepository.findAll(userExample);
+    System.out.println(userList);
+}
+
+//模糊查询
+@Test
+public void findUsersLikeName() {
+    //创建匹配器，即如何使用查询条件
+    ExampleMatcher matcher = ExampleMatcher.matching() //构建对象
+        //改变默认字符串匹配方式：模糊查询
+        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING) 
+        .withIgnoreCase(true); //改变默认大小写忽略方式：忽略大小写
+    User user = new User();
+    user.setName("三");
+    Example<User> userExample = Example.of(user, matcher);
+    List<User> userList = userRepository.findAll(userExample);
+    System.out.println(userList);
+}
+
+//分页查询
+@Test
+public void findUsersPage() {
+    Sort sort = Sort.by(Sort.Direction.DESC, "age");
+    //0为第一页
+    Pageable pageable = PageRequest.of(0, 10, sort);
+    //创建匹配器，即如何使用查询条件
+    ExampleMatcher matcher = ExampleMatcher.matching() //构建对象
+        //改变默认字符串匹配方式：模糊查询
+        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING) 
+        .withIgnoreCase(true); //改变默认大小写忽略方式：忽略大小写
+    User user = new User();
+    user.setName("三");
+    //创建实例
+    Example<User> example = Example.of(user, matcher);
+    Page<User> pages = userRepository.findAll(example, pageable);
+    System.out.println(pages);
+}
+
+//修改
+@Test
+public void updateUser() {
+    User user = userRepository
+        .findById("627282268d8267494fc646b5").get();
+    user.setName("张三_1");
+    user.setAge(25);
+    user.setEmail("883220990@qq.com");
+    User save = userRepository.save(user);
+    System.out.println(save);
+}
+
+//删除
+@Test
+public void delete() {
+    userRepository.deleteById("627282268d8267494fc646b5");
+}
+
+
+
 ```
 
 
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205051723038.png" alt="20190811094647887" style="zoom:80%;" />
+
+
+
+```java
+// Repository规范：查询语句用find、read、get都可以
+@Repository
+public interface ScheduleRepository extends MongoRepository<Schedule, String> {
+    Schedule getScheduleByHoscodeAndHosScheduleId(String hoscode, String hosScheduleId);
+}
+```
+
+
+
+
 
 # 文档之间的关系：
 

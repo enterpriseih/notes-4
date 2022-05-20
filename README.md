@@ -51,8 +51,8 @@
 ### 前端 
 
 - [前端大致](./docs/front-end/前端大致.md)
-- [Vue](./docs/front-end/Vue.md)
-- [前端debug](./docs/front-end/前端debug.md)
+- [Vue空](./docs/front-end/Vue.md)
+- [前端debug空](./docs/front-end/前端debug.md)
 
 ### else
 
@@ -74,6 +74,7 @@
 
 - [尚医通](./docs/尚医通.md)
 - [尚医通难点](./docs/尚医通难点.md)
+- [尚医通Debug](./docs/尚医通Debug.md)
 
 ### 排版
 

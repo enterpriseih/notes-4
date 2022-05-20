@@ -120,7 +120,7 @@ public interface UserMapper {
 	- MyBatis映射文件存放的位置是src/main/resources/mappers目录下
 - MyBatis中可以面向接口操作数据，要保证两个一致
 	- **mapper接口的全类名和映射文件的命名空间（namespace）保持一致**
-	- mapper接口中方法的方法名和映射文件中编写SQL的标签的id属性保持一致
+	- mapper接口中方法的**方法名**和映射文件中编写SQL的标签的**id属性**保持一致
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>  
 <!DOCTYPE mapper  
@@ -1131,7 +1131,6 @@ public void getEmpByChoose() {
 	System.out.println(emps);
 }
 ```
-![](Resources/choose测试结果.png)
 - 相当于`if a else if b else if c else d`，只会执行其中一个
 
 ## foreach

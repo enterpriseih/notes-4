@@ -1,3 +1,5 @@
+# 基础入门
+
 ## 01、基础入门-SpringBoot2课程介绍
 
 
@@ -332,6 +334,7 @@ public static void main(String[] args) {
 	- 
 - ......
 
+# 底层注解
 
 ## 08、底层注解-@Configuration详解
 
@@ -812,6 +815,8 @@ SpringBoot默认会在底层配好所有的组件，但是**如果用户自己�
 
 
 
+# 最佳实践
+
 ## 16、最佳实践-SpringBoot应用如何编写
 
 - 引入场景依赖
@@ -899,7 +904,11 @@ public class HelloController {
 
 在IDEA中，菜单栏New -> Project -> Spring Initailizr。
 
-## 20、配置文件-yaml的用法
+
+
+# 配置文件
+
+## 20、配置文件-yaml的用法***
 
 **同以前的properties用法**
 
@@ -1059,6 +1068,10 @@ note：2.5之后移除了配置器打包机制，自动取消了
     </plugins>
 </build>
 ```
+
+
+
+# Web场景
 
 ## 22、web场景-web开发简介
 
@@ -1358,6 +1371,10 @@ WelcomePageHandlerMapping(TemplateAvailabilityProviders templateAvailabilityProv
 ```
 
 这构造方法内的代码也解释了[web场景-welcome与favicon功能](#)中配置`static-path-pattern`了，welcome页面和小图标失效的问题。
+
+
+
+# 请求处理
 
 ## 26、请求处理-【源码分析】-Rest映射及源码解析
 
@@ -2860,6 +2877,8 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
 
 
 
+# 相应处理
+
 ## 37、响应处理-【源码分析】-ReturnValueHandler原理
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211001631.jpg" alt="在这里插入图片描述" style="zoom:67%;" />
 
@@ -3919,7 +3938,7 @@ public class WebConfig {
 
 
 
-
+# 视图解析
 
 ## 43、视图解析-Thymeleaf初体验
 
@@ -4146,7 +4165,7 @@ server:
 
 
 
-
+# 拦截器
 
 ## 48、拦截器-登录检查与静态资源放行
 
@@ -4367,6 +4386,8 @@ public class HandlerExecutionChain {
 ```
 
 
+
+# 文件上传
 
 ## 50、文件上传-单文件与多文件上传的使用
 
@@ -4855,6 +4876,10 @@ public final class MultipartResolutionDelegate {
 ```
 
 
+
+
+
+# 错误处理
 
 ## 52、错误处理-SpringBoot默认错误处理机制
 
@@ -5375,6 +5400,8 @@ public interface ErrorViewResolver {
 
 
 
+# 原生组件和定制化组件
+
 ## 56、原生组件注入-原生注解与Spring方式注入
 
 [官方文档 - Servlets, Filters, and listeners](https://docs.spring.io/spring-boot/docs/2.4.2/reference/htmlsingle/#howto-add-a-servlet-filter-or-listener)
@@ -5693,6 +5720,10 @@ public class AdminWebConfig implements WebMvcConfigurer{
 场景starter - `xxxxAutoConfiguration` - 导入xxx组件 - 绑定`xxxProperties` - 绑定配置文件项。
 
 
+
+
+
+# 数据库访问
 
 ## 60、数据访问-数据库场景的自动配置分析与整合测试
 
@@ -6518,6 +6549,8 @@ public class IndexController {
 
 
 
+# 指标监控
+
 ## 77、指标监控-SpringBoot Actuator与Endpoint
 
 未来每一个微服务在云上部署以后，我们都需要对其进行监控、追踪、审计、控制等。SpringBoot就抽取了Actuator场景，使得我们每个微服务快速引用即可获得生产级别的应用监控、审计等功能。
@@ -6901,6 +6934,10 @@ public class DockerEndpoint {
 [开始使用方法](https://codecentric.github.io/spring-boot-admin/2.3.1/#getting-started)
 
 
+
+
+
+# 高级特性
 
 ## 81、高级特性-Profile环境切换
 
@@ -7354,6 +7391,10 @@ class HelloSpringBootStarterTestApplicationTests {
 ```
 
 
+
+
+
+# 流程解析
 
 ## 84、原理解析-SpringApplication创建初始化流程
 
@@ -8047,5 +8088,4 @@ org.springframework.context.ApplicationListener=\
 org.springframework.boot.SpringApplicationRunListener=\
   com.lun.boot.listener.MySpringApplicationRunListener
 ```
-
 
