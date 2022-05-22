@@ -41,7 +41,7 @@
 - [MongoDB](./docs/database/MongoDB.md)
 - [Redis](./docs/database/redis/Redis.md)
 - [Redis面试](./docs/database/redis/Redis面试.md)
-- [数据字典](./docs/database/数据字典.md)
+- [数据字典&EasyExcel](./docs/database/数据字典.md)
 
 ### :pencil2: 算法
 

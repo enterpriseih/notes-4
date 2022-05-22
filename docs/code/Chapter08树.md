@@ -79,6 +79,80 @@ private TreeNode helper(int inleft, int inright) {
 
 
 
+## 补充：最近的公共祖先
+
+### 题目
+
+```
+     1
+   /   \
+  2     3
+ / \   / \
+4   5 6   7
+```
+
+p：6，q：2，最近公共祖先：1
+
+
+
+### 解法
+
+根据以上定义，若 root 是 p, q 的 最近公共祖先 ，则只可能为以下情况之一：
+
+1、p 和 q 在 root 的子树中，且分列 root 的 异侧（即分别在左、右子树中）；
+
+2、p = root，且 q 在 root 的左或右子树中；
+
+3、q = root，且 p 在 root 的左或右子树中；
+
+**返回值**
+
+1. 当 left 和 right 同时为空 ：说明 root 的左 / 右子树中都不包含 p,q，返回 null；
+
+2. 当 left和 right 同时不为空 ：说明 p, q 分列在 root 的 异侧 （分别在 左 / 右子树），因此 root为最近公共祖先，返回 root ；
+
+3. 当 left 为空 ，right 不为空 ：p,q 都不在 root 的左子树中，直接返回 right 。具体可分为两种情况：
+	- p,q 其中一个在 root 的 右子树 中，此时 right 指向 p（假设为 p ）；
+	- p,q 两节点都在 root 的 右子树 中，此时的 right 指向 最近公共祖先节点 ；
+
+4. 当 left不为空 ， right 为空 ：与情况 3. 同理；
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205222144064.png" alt="image-20220522214443897" style="zoom:50%;" />
+
+```java
+public TreeNode lowestCommonAncestor(TreeNode root, 
+                                     TreeNode p, 
+                                     TreeNode q) {
+    if (root == null || root == p || root == q) { 
+        // 递归结束条件
+        // 只要当前根节点是p和q中的任意一个，
+        // 就返回（因为不能比这个更深了，再深p和q中的一个就没了）
+        return root;
+    }
+
+    // 根节点不是p和q中的任意一个，那么就继续分别往左子树和右子树找p和q
+    // 后序遍历
+    TreeNode left = lowestCommonAncestor(root.left, p, q);
+    TreeNode right = lowestCommonAncestor(root.right, p, q);
+
+    if(left == null && right == null) { 
+        // p和q都没找到，那就没有
+        return null;
+    }else if(left == null && right != null) { 
+        // 左子树没有p也没有q，就返回右子树的结果
+        return right;
+    }else if(left != null && right == null) { 
+        // 右子树没有p也没有q就返回左子树的结果
+        return left;
+    }else { 
+        // 左右子树都找到p和q了，
+        // 那就说明p和q分别在左右两个子树上，
+        // 所以此时的最近公共祖先就是root
+        return root;
+    }
+}
+```
+
 
 
 ## 8.1 二叉树的深度优先搜索
@@ -867,6 +941,9 @@ public TreeNode convertBST(TreeNode root) {
 图8.11：一个有3个结点的二叉搜索树。
 
 ### 参考代码
+
+迭代法本身就是迭代器
+
 ``` java
 public class BSTIterator {
     TreeNode cur;
@@ -898,13 +975,47 @@ public class BSTIterator {
 
 ## 面试题56：二叉搜索树中两个结点之和
 ### 题目
-给你一个二叉搜索树和一个值k，请判断该二叉搜索树中是否存在两个结点它们的值之和等于k。假设二叉搜索树中结点的值均唯一。例如在图8.12中的二叉搜索树里，存在两个两个结点它们的和等于12（结点5和结点7），但不存在两个结点值之和为22的结点。 
+给你一个二叉搜索树和一个值k，请判断该二叉搜索树中是否存在两个结点它们的值之和等于k。假设二叉搜索树中结点的值均唯一。
+
+例如在图8.12中的二叉搜索树里，存在两个两个结点它们的和等于12（结点5和结点7），但不存在两个结点值之和为22的结点。 
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/0812.png" alt="图2.1">
 
-图8.12：在二叉搜索树中，存在两个结点它们的和等于12（结点5和结点7），但不存在两个结点值之和为22的结点。
+
 
 ### 参考代码
+
+### 法一：哈希表
+
+```java
+public boolean findTarget(TreeNode root, int k) {
+    Set<Integer> set = new HashSet<>();
+    Stack<TreeNode> stack = new Stack<>();
+    TreeNode cur = root;
+    while (cur != null || !stack.isEmpty()) {
+        while(cur != null) {
+            stack.push(cur);
+            cur = cur.left;
+        }
+        cur = stack.pop();
+        
+        if (set.contains(k - cur.val)) {
+            return true;
+        }
+        set.add(cur.val);
+        
+        cur = cur.right;
+    }
+    return false;
+}
+```
+
+
+
+### 法二：迭代器、双指针
+
+`O(h)`
+
 ``` java
 public class BSTIterator {
     TreeNode cur;
@@ -1049,20 +1160,33 @@ lowerEntry/lowerKey
 ## 面试题57：值和下标之差都在给定的范围内
 
 ### 题目
-给你一个整数数组nums，请判断是否存在两个不同的下标i和j（i和j之差的绝对值不大于给定的k）使得两个数值nums[i]和nums[j]的差的绝对值不大于给定的t。例如，如果输入数组{1, 2, 3, 1}，k为3，t为0，由于下标0和下标3，它们对应的数字之差的绝对值为0，因此返回true。如果输入数组{1, 5, 9, 1, 5, 9}，k为2，t为3，由于不存在两个下标之差小于等于2的数字它们差的绝对值小于等于3，此时应该返回false。
+给你一个整数数组`nums`，请判断是否存在两个不同的下标`i`和`j`（i和j之差的绝对值不大于给定的k）使得两个数值`nums[i]`和`nums[j]`的差的绝对值不大于给定的t。
+
+例如，如果输入数组{1, 2, 3, 1}，k为3，t为0，由于下标0和下标3，它们对应的数字之差的绝对值为0，因此返回true。如果输入数组{1, 5, 9, 1, 5, 9}，k为2，t为3，由于不存在两个下标之差小于等于2的数字它们差的绝对值小于等于3，此时应该返回false。
 
 ### 参考代码
 #### 解法一：TreeSet
+
+`o(nlogk)`
+
 ``` java
 public boolean containsNearbyAlmostDuplicate(int[] nums,
     int k, int t) {
+    // long是怕溢出
     TreeSet<Long> set = new TreeSet<>();
+    // set里只存k个数
+    // 那么只需要判断里面有没有数值差满足条件的就可以了
     for (int i = 0; i < nums.length; ++i) {
+        // |[i]-[?]| <= t
+        // floor是小于x的max
+        // lower是小于等于[i]的最大数字
+        // [i]-[?] <= t
         Long lower = set.floor((long)nums[i]);
         if (lower != null && lower >= (long)nums[i] - t) {
             return true;
         }
-
+		// upper是大于等于[i]的最小数字
+        // [?]-[i] <= t
         Long upper = set.ceiling((long)nums[i]);
         if (upper != null && upper <= (long)nums[i] + t) {
             return true;
@@ -1078,15 +1202,27 @@ public boolean containsNearbyAlmostDuplicate(int[] nums,
 }
 ```
 
+
+
 #### 解法二：TreeMap
+
+`O(n)`
+
 ``` java
+// 还是k个k个的找
+// 将数放入若干大小为t+1的桶中，0~t放入0号桶
+// 如果两个数在同一个桶内，则差值小于等于t
+// 遍历数字num，放入id桶
+// 1、如果桶中有数字，则找到
+// 2、桶中无数字，则判断id-1桶和id+1桶中是否存在差值小于等于t的
 public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+   // 桶：key-id,val-num
     Map<Integer, Integer> buckets = new HashMap<>();
     int bucketSize = t + 1;
     for (int i = 0; i < nums.length; i++) {
         int num = nums[i];
         int id = getBucketID(num, bucketSize);
-
+		
         if (buckets.containsKey(id)
             || (buckets.containsKey(id-1) && buckets.get(id-1) + t >= num)
             || (buckets.containsKey(id+1) && buckets.get(id+1) - t <= num)) {
@@ -1102,11 +1238,13 @@ public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
     return false;
 }
 
+// 用来确定数字该放入的桶的编号
 private int getBucketID(int num, int bucketSize) {
     return num >= 0
         ? num / bucketSize
         : (num + 1) / bucketSize - 1; 
 }
+
 ```
 
 ## 面试题58：日程表

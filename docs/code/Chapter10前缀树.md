@@ -1,6 +1,28 @@
 # 第十章：前缀树/字典树
 
-用一个树状的数据结构存储一个字典中的所有单词
+用一个树状的数据结构存储一个字典中的所有单词，灰色代表单词结尾
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205202011322.png" alt="image-20220520201136360" style="zoom:50%;" />
+
+```java
+// 前缀树
+class Trie {
+    private TrieNode root;
+
+    static class TrieNode {
+        TrieNode children[];
+        boolean isWord;
+        // 每个节点都可能会有26个子节点
+        public TrieNode() {
+            children = new TrieNode[26];
+        }
+    }
+    
+    public Trie() {
+        root = new TrieNode();
+    }
+}
+```
 
 
 
@@ -18,26 +40,6 @@
 
 ### 参考代码
 
-```java
-// 前缀树
-class Trie {
-    private TrieNode root;
-
-    static class TrieNode {
-        TrieNode children[];
-        boolean isWord;
-        
-        public TrieNode() {
-            children = new TrieNode[26];
-        }
-    }
-    
-    public Trie() {
-        root = new TrieNode();
-    }
-}
-```
-
 
 
 ``` java
@@ -45,9 +47,8 @@ class Trie {
     private TrieNode root;
 
     static class TrieNode {
-        TrieNode children[];
+        TrieNode[] children;
         boolean isWord;
-        
         public TrieNode() {
             children = new TrieNode[26];
         }
@@ -63,10 +64,8 @@ class Trie {
             if (node.children[ch - 'a'] == null) {
                 node.children[ch - 'a'] = new TrieNode();
             }
-            
             node = node.children[ch - 'a'];
         }
-        
         node.isWord = true;
     }
     
@@ -76,10 +75,8 @@ class Trie {
             if (node.children[ch - 'a'] == null) {
                 return false;
             }
-            
             node = node.children[ch - 'a'];
         }
-        
         return node.isWord;
     }
     
@@ -89,20 +86,24 @@ class Trie {
             if (node.children[ch - 'a'] == null) {
                 return false;
             }
-            
             node = node.children[ch - 'a'];
         }
-        
         return true;
     }
 }
 ```
 
+
+
 ## 面试题63：替换单词
 
 ### 题目
 
-英语里有一个概念叫词根。我们在词根后面加上若干字符就能拼出更长的单词。例如"an"是一个词根，在它后面加上"other"就能得到另一个单词"another"。现在给你一个由词根组成的字典和一个英语句子，如果句子中的单词在字典里有它的词根，则用它的词根替换该单词；如果单词没有词根，则保留该单词。请输出替换后的句子。例如，如果词根字典包含字符串["cat", "bat", "rat"]，英语句子为"the cattle was rattled by the battery"，则替换之后的句子是"the cat was rat by the bat"。
+英语里有一个概念叫词根。我们在词根后面加上若干字符就能拼出更长的单词。
+
+例如"an"是一个词根，在它后面加上"other"就能得到另一个单词"another"。
+
+现在给你一个由词根组成的字典和一个英语句子，如果句子中的单词在字典里有它的词根，则用它的词根替换该单词；如果单词没有词根，则保留该单词。请输出替换后的句子。例如，如果词根字典包含字符串["cat", "bat", "rat"]，英语句子为"the cattle was rattled by the battery"，则替换之后的句子是"the cat was rat by the bat"。
 
 ### 参考代码
 
@@ -423,6 +424,7 @@ class MapSum {
 ### 参考代码
 
 ``` java
+// 每个数都是32位
 static class TrieNode {
     public TrieNode[] children;
 
@@ -432,17 +434,21 @@ static class TrieNode {
 }
 
 public int findMaximumXOR(int[] nums) {
+    // 将数都存入前缀树中
     TrieNode root = buildTrie(nums);
     int max = 0;
     for (int num : nums) {
         TrieNode node = root;
+        // 与num异或的最大值
         int xor = 0;
         for (int i = 31; i >= 0; i--) {
             int bit = (num >> i) & 1;
+            // 有不一样的进入不一样的那个分支，这样的异或结果最大
             if (node.children[1 - bit] != null) {
                 xor = (xor << 1) + 1;
                 node = node.children[1 - bit];
             } else {
+                // 如果一样，该位的异或值为0
                 xor = xor << 1;
                 node = node.children[bit];
             }
@@ -459,6 +465,7 @@ private TrieNode buildTrie(int[] nums) {
     for (int num : nums) {
         TrieNode node = root;
         for (int i = 31; i >= 0; i--) {
+            // 当前高位数
             int bit = (num >> i) & 1;
             if (node.children[bit] == null) {
                 node.children[bit] = new TrieNode();

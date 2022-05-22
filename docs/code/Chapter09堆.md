@@ -1,7 +1,52 @@
 # 第九章：堆
 
-> - 最小堆 --> k个值最大的元素
-> - 最大堆 --> k个值最小的元素
+堆是一种完全二叉树：除了最底层，每层都填满
+
+最大堆：每个节点的值总是大于等于其任意子节点
+
+最小堆：每个节点的值总是小于等于其任意子节点
+
+> - 最小堆 --> 找k个最大的元素
+> - 最大堆 --> 找k个最小的元素
+
+用数组表示堆，堆中一节点下标设为i，则
+
+```
+   (i-1)/2
+     / 
+    i   
+  /   \ 
+2i+1  2i+2 
+```
+
+**最大堆添加**：
+
+1、从上到下，从左到右，找到空位，添加
+
+2、判断新节点是否比其父节点大，是则交换，直到小于其父节点或到顶
+
+**最大堆删除**：通常指删除堆顶元素
+
+1、删除堆顶元素，然后将最底层最右侧的节点移动到堆顶
+
+2、如果小于其左或右节点，则将该节点与其左右子节点中**较大**的节点交换
+
+3、重复，直至大于或等于子节点，或到底
+
+`堆中有n个节点，则插入或删除的时间复杂度都是O(logn)`
+
+```java
+// 默认最小堆
+PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+// 传入Comparator可以改变比较规则
+PriorityQueue<Integer> maxHeap = new PriorityQueue<>(
+    (e1, e2) -> e2 - e1
+);
+
+// 使用函数和Queue一样，offer、poll、peek
+```
+
+
 
 ## 面试题59：数据流的第k大数值
 
@@ -9,7 +54,17 @@
 
 请设计一个类型KthLarges，它每次从一个数据流中读取一个数字，并得出数据流已经读取的数字中第k（k≥1）大的数值。该类型的构造函数有两个参数，一个是整数k，另一个是包含数据流中最开始数值的整数数组nums（假设数组nums的长度大于k）。该类型还有一个函数add用来添加数据流中的新数值并返回数据流中已经读取的数字的第k大数值。
 
-例如，当k=3、nums为数组[4, 5, 8, 2]时，调用构造函数创建除类型KthLargest的实例之后，第一次调用add函数添加数字3，此时已经从数据流里读取了数值4、5、8、2和3，第3大的数值是4；第二次调用add函数添加数字5时，则返回第3大的数值5。
+例如，
+
+```
+当k=3、nums为数组[4, 5, 8, 2]时，
+调用构造函数创建除类型KthLargest的实例之后，
+第一次调用add函数添加数字3，
+此时已经从数据流里读取了数值4、5、8、2和3，第3大的数值是4；
+第二次调用add函数添加数字5时，则返回第3大的数值5。
+```
+
+
 
 ### 参考代码
 
@@ -19,6 +74,7 @@ class KthLargest {
     private int size;
 
     public KthLargest(int k, int[] nums) {
+        // 让堆中只存k个，则最小堆堆顶就是第k大元素
         size = k;
         minHeap = new PriorityQueue<>();
         for (int num : nums) {
@@ -43,12 +99,17 @@ class KthLargest {
 
 ### 题目
 
-请找出数组中出现频率最高的k个数字。例如当k等于2时输入数组[1, 2, 2, 1, 3, 1]，由于数字1出现3次，数字2出现2次，数字3出现1，那么出现频率最高的2个数字时1和2。
+请找出数组中出现频率最高的k个数字。
+
+例如
+
+当`k=2`时输入数组`[1, 2, 2, 1, 3, 1]`，由于数字1出现3次，数字2出现2次，数字3出现1，那么出现频率最高的2个数字是1和2。
 
 ### 参考代码
 
 ``` java
 public int[] topKFrequent(int[] nums, int k) {
+    // 存数字及其次数
     Map<Integer, Integer> numToCount = new HashMap<>();
     for (int num : nums) {
         numToCount.put(num, numToCount.getOrDefault(num, 0) + 1);
@@ -84,16 +145,23 @@ public int[] topKFrequent(int[] nums, int k) {
 
 ### 参考代码
 
-#### 解法一
+#### 解法一：最大堆
+
+> 数组是递增排序，则第一个数组中取第k+1个数和第二个数组中取任意数字组成和p
+>
+> 其一定不是和最小的k个之一
 
 ``` java
 public List<List<Integer>> kSmallestPairs(int[] nums1,
     int[] nums2, int k) {
     Queue<int[]> maxHeap = new PriorityQueue<>((p1, p2)
         -> p2[0] + p2[1] - p1[0] - p1[1]);
+    
     for (int i = 0; i < Math.min(k, nums1.length); ++i) {
         for (int j = 0; j < Math.min(k, nums2.length); ++j) {
+            // 装满了
             if (maxHeap.size() >= k) {
+                // 堆中和最大的数对
                 int[] root = maxHeap.peek();
                 if (root[0] + root[1] > nums1[i] + nums2[j]) {
                     maxHeap.poll();
@@ -115,13 +183,24 @@ public List<List<Integer>> kSmallestPairs(int[] nums1,
 }
 ```
 
-#### 解法二
+#### 解法二：最小堆
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205201616274.png" alt="image-20220520161600269" style="zoom:50%;" />
+
+先放进去三个候选，A0，A1，A2与B0的组合
+
+第一对最小组合肯定是A0B0
+
+第二对不是A0B1，就是A1B0，但A1B0已经在堆中，所以需要放入A0B1，然后堆顶就是第二个需要的数对
+
+下一对的第二个坐标是堆顶弹出的数对的B的下标+1
 
 ``` java
-public List<List<Integer>> kSmallestPairs(int[] nums1,
-    int[] nums2, int k) {
+public List<List<Integer>> kSmallestPairs(
+    int[] nums1,int[] nums2, int k) {
     Queue<int[]> minHeap = new PriorityQueue<>((p1, p2)
         -> nums1[p1[0]] + nums2[p1[1]] - nums1[p2[0]] - nums2[p2[1]]);
+    // 先把第一个
     if (nums2.length > 0) {
         for (int i = 0; i < Math.min(k, nums1.length); ++i) {
             minHeap.offer(new int[] {i, 0});
