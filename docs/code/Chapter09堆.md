@@ -46,6 +46,96 @@ PriorityQueue<Integer> maxHeap = new PriorityQueue<>(
 // 使用函数和Queue一样，offer、poll、peek
 ```
 
+## 补充：滑动窗口的最大值
+
+### 题
+
+```
+输入：nums = [1,3,-1,-3,5,3,6,7], k = 3
+输出：[3,3,5,5,6,7]
+解释：
+滑动窗口的位置                最大值
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+
+```
+
+
+
+### 解一：最大堆
+
+时间复杂度`O(nlongn)`
+
+```java
+public int[] maxSlidingWindow(int[] nums, int k) {
+    int len = nums.length;
+    int[] res = new int[len - k + 1];
+    // 堆中存放的是 值和下标
+    PriorityQueue<int[]> maxHeap = new PriorityQueue<int[]>(
+        (e1, e2) -> e1[0] != e2[0] ? e2[0] - e1[0] : e2[1] - e1[1]
+    );
+    /*
+    PriorityQueue<int[]> maxHeap = new PriorityQueue<int[]>(new Comparator<int[]>() {
+        public int compare(int[] e1, int[] e2) {
+            return e1[0] != e2[0] ? e2[0] - e1[0] : e2[1] - e1[1];
+        }
+    });
+	*/
+    for (int i = 0; i < k; i++) {
+        maxHeap.offer(new int[]{nums[i], i});
+    }
+
+    res[0] = maxHeap.peek()[0];
+    for (int i = k; i < len; i++) {
+        maxHeap.offer(new int[]{nums[i], i});
+        // 添完新数，就要删除旧数
+        // 如果max在窗口的最左侧或者已经不在窗口中了，则去掉
+        while (maxHeap.peek()[1] <= i - k) {
+            maxHeap.poll();
+        }
+        res[i - k + 1] = maxHeap.peek()[0];
+    }
+
+    return res;
+
+}
+```
+
+### 解二：双向队列
+
+时间复杂度`O(n)`
+
+```java
+// 队列中存放坐标
+public int[] maxSlidingWindow(int[] nums, int k) {
+    if(nums == null || nums.length == 1) return nums;
+    // 双向队列 保存当前窗口最大值的坐标 保证队列中数组位置的数值按从大到小排序
+    LinkedList<Integer> queue = new LinkedList();
+    int[] result = new int[nums.length-k+1];
+
+    for(int i = 0;i < nums.length;i++){
+        // 从大到小排，要求队首对应的数是最大的
+        while (!queue.isEmpty() && nums[queue.peekLast()] < nums[i]) {
+            queue.pollLast();
+        }
+        queue.addLast(i);
+        while (queue.peekFirst() <= i - k) {
+            queue.pollFirst();
+        }
+        // 当窗口长度为k时 保存当前窗口中最大值
+        if(i+1 >= k){
+            result[i+1-k] = nums[queue.peek()];
+        }
+    }
+    return result;
+}
+```
+
 
 
 ## 面试题59：数据流的第k大数值
