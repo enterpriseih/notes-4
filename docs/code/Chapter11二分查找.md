@@ -242,7 +242,7 @@ private int getKthElement(int[] nums1, int[] nums2, int k) {
 - 每行中的整数从左到右按升序排列。
 - 每行的第一个整数大于前一行的最后一个整数。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205251552931.jpg" alt="img" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205251552931.jpg" alt="img" style="zoom:67%;" />
 
 ### 解
 
@@ -290,7 +290,7 @@ public static boolean searchMatrix(int[][] matrix, int target) {
 - 每行的元素从左到右升序排列。
 - 每列的元素从上到下升序排列。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205251608933.jpg" alt="img" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205251608933.jpg" alt="img" style="zoom:50%;" />
 
 ### 解
 
@@ -302,7 +302,7 @@ public static boolean searchMatrix(int[][] matrix, int target) {
 
 该方法前题也能使用
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205251646634.png" alt="image-20220525164605256" style="zoom: 33%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205251646634.png" alt="image-20220525164605256" style="zoom: 33%;" />
 
 ```java
 public boolean searchMatrix(int[][] matrix, int target) {

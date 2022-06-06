@@ -71,6 +71,42 @@ mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
 
 
 
+## maven 加载 xml 问题
+
+maven 构建加载项目的时候，默认不会加载 src-java 文件夹里的 xml 
+
+**解决方案**
+
+application.properties 中加载路径
+
+```properties
+mybatis-plus.mapper-locations=classpath:com/yienx/yygh/order/xml/*.xml
+```
+
+> 如果多个jar，需要用 classpath*:
+
+并在 pom 中配置
+
+```xml
+<build>
+	<resources>
+        <resource>
+        	<directory>src/main/java</directory>
+            <includes>
+            	<include>**/*.xml</include>
+            </includes>
+            <filtering>false</filtering>
+        </resource>
+    </resources>
+</build>
+```
+
+
+
+> 或者 xml 就直接放到 resources 里面
+
+
+
 # 常用注解
 
 ## @TableName

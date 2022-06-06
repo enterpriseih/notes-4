@@ -12,6 +12,7 @@
 - [JavaIO&NIO](./docs/base/JavaIO&NIO.md)
 - [设计模式](./docs/design-pattern/设计模式目录.md)
 - [Lambda&StreamAPI](./docs/base/Lambda&StreamAPI.md)
+- [序列化与反序列化](./docs/base/序列化和反序列化.md)
 
 ### J.U.C
 
@@ -54,6 +55,10 @@
 - [Vue空](./docs/front-end/Vue.md)
 - [前端debug空](./docs/front-end/前端debug.md)
 
+### 消息队列
+
+- [MQ消息队列](./docs/MQ消息队列.md)
+
 ### else
 
 
@@ -75,6 +80,7 @@
 - [尚医通](./docs/尚医通.md)
 - [尚医通难点](./docs/尚医通难点.md)
 - [尚医通Debug](./docs/尚医通Debug.md)
+- [项目技术点总结](./docs/项目技术点总结.md)
 
 ### 排版
 

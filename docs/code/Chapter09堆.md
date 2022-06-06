@@ -275,7 +275,7 @@ public List<List<Integer>> kSmallestPairs(int[] nums1,
 
 #### 解法二：最小堆
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205201616274.png" alt="image-20220520161600269" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205201616274.png" alt="image-20220520161600269" style="zoom:50%;" />
 
 先放进去三个候选，A0，A1，A2与B0的组合
 

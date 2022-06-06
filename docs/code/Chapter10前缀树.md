@@ -2,7 +2,7 @@
 
 用一个树状的数据结构存储一个字典中的所有单词，灰色代表单词结尾
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205202011322.png" alt="image-20220520201136360" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205202011322.png" alt="image-20220520201136360" style="zoom:50%;" />
 
 ```java
 // 前缀树

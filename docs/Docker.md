@@ -73,3 +73,31 @@ docker exec –it 容器名(或id) /bin/bash
 
 ```
 
+
+
+# 挂载数据或配置文件
+
+```shell
+1 在docker hub搜索redis镜像
+docker search redis
+
+2 拉取redis镜像到本地
+docker pull redis:6.0.10
+
+3 修改需要自定义的配置(docker-redis默认没有配置文件，
+自己在宿主机建立后挂载映射)
+创建并修改/usr/local/redis/redis.conf
+bind 0.0.0.0 开启远程权限
+appendonly yes 开启aof持久化
+
+4 启动redis服务运行容器
+docker run --name redis  -v /usr/local/redis/data:/data  -v /usr/local/redis/redis.conf:/usr/local/etc/redis/redis.conf -p 6379:6379 -d redis:6.0.10  redis-server /usr/local/etc/redis/redis.conf 
+
+解释： -v /usr/local/redis/data:/data  # 将数据目录挂在到本地保证数据安全
+ -v /root/redis/redis.conf:/usr/local/etc/redis/redis.conf   # 将配置文件挂在到本地修改方便
+ 
+5  直接进去redis客户端。
+docker exec -it redis redis-cli
+
+```
+

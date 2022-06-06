@@ -117,7 +117,7 @@ p：6，q：2，最近公共祖先：1
 
 4. 当 left不为空 ， right 为空 ：与情况 3. 同理；
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205222144064.png" alt="image-20220522214443897" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205222144064.png" alt="image-20220522214443897" style="zoom:50%;" />
 
 ```java
 public TreeNode lowestCommonAncestor(TreeNode root, 
