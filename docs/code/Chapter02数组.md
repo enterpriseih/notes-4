@@ -468,6 +468,43 @@ public int[] productExceptSelf(int[] nums) {
 }
 ```
 
+## 补充：移动零
+
+### 题目
+
+给定一个数组 `nums`，编写一个函数将所有 `0` 移动到数组的末尾，同时保持非零元素的相对顺序。
+
+**请注意** ，必须在不复制数组的情况下原地对数组进行操作。
+
+### 解法
+
+```java
+public void moveZeroes(int[] nums) {
+    // 双指针
+    // p2非0与p1的0交换
+    int p1 = 0, p2 = 0;
+    while (p2 < nums.length) {
+        if (nums[p2] != 0) {
+            swap(p1, p2, nums);
+            p1++;
+        }
+        p2++;
+
+    }
+}
+
+private void swap(int p1, int p2, int[] nums) {
+    // int temp = nums[p1];
+    // nums[p1] = nums[p2];
+    // nums[p2] = temp;
+    if (nums[p1] != nums[p2]) {
+        nums[p1] = nums[p1] ^ nums[p2];
+        nums[p2] = nums[p1] ^ nums[p2]; // b = a ^ b ^ b;
+        nums[p1] = nums[p1] ^ nums[p2]; // a = a ^ a ^ b;
+    }
+}
+```
+
 
 
 

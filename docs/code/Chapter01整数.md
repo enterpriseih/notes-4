@@ -201,6 +201,7 @@ public double myPow(double x, int n) {
         b = - b;
     }
     while (b > 0) {
+        // b是奇数的话，乘入res
         if ((b & 1) == 1) res *= x;
         x *= x;
         b >>= 1;

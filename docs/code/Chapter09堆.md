@@ -124,6 +124,7 @@ public int[] maxSlidingWindow(int[] nums, int k) {
             queue.pollLast();
         }
         queue.addLast(i);
+        // 队首的下标超出了窗口的界，就要去除
         while (queue.peekFirst() <= i - k) {
             queue.pollFirst();
         }
