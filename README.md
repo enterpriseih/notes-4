@@ -28,12 +28,13 @@
 
 ### 框架
 
-- [Spring](./docs/framework/Spring.md)
-- [MyBatis](./docs/framework/MyBatis.md)
-- [SpringMVC笔记](./docs/framework/SpringMVC笔记.md)
-- [MyBatis笔记](./docs/framework/MyBatis笔记.md)
-- [MyBatis-plus笔记](./docs/framework/MyBatis-plus笔记.md)
-- [SpringBoot笔记](./docs/framework/SpringBoot笔记.md)
+- [Spring](./docs/framework/spring/Spring.md)
+- [MyBatis](./docs/framework/mybatis/MyBatis.md)
+- [SpringMVC笔记](./docs/framework/spring/SpringMVC笔记.md)
+- [MyBatis笔记](./docs/framework/mybatis/MyBatis笔记.md)
+- [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)
+- [SpringBoot笔记](./docs/framework/spring/SpringBoot笔记.md)
+- [SpringCloud笔记](./docs/framework/spring/springcloud/SpringCloud.md)
 
 ### :floppy_disk: 数据库
 
@@ -47,7 +48,7 @@
 ### :pencil2: 算法
 
 - [代码随想录](https://programmercarl.com/)
-- [数据结构与算法](./docs/code/TOC.md)
+- [数据结构与算法](./docs/data-structure/TOC.md)
 
 ### 前端 
 
@@ -57,7 +58,8 @@
 
 ### 后端
 
-- [MQ消息队列](./docs/MQ消息队列.md)
+- [消息队列](./docs/message-queue/消息队列.md)
+- [RabbitMQ](./docs/message-queue/rabbitmq/RabbitMQ.md)
 - [分布式与微服务](./docs/分布式与微服务.md)
 
 ### else
@@ -78,13 +80,8 @@
 
 ### 项目
 
-- [尚医通](./docs/尚医通.md)
-- [尚医通难点](./docs/尚医通难点.md)
-- [尚医通Debug](./docs/尚医通Debug.md)
-- [项目技术点总结](./docs/项目技术点总结.md)
+- [尚医通](./docs/project/尚医通.md)
+- [尚医通难点](./docs/project/尚医通难点.md)
+- [尚医通Debug](./docs/project/尚医通Debug.md)
+- [项目技术点总结](./docs/project/项目技术点总结.md)
 
-### 排版
-
-不使用 `![]()` 这种方式来引用图片，而是用 `<img>` 标签。一方面是为了能够控制图片以合适的大小显示，另一方面是因为 [GFM](https://github.github.com/gfm/) 不支持 `<center> ![]() </center>` 这种方法让图片居中显示，只能使用 `<div align="center"> <img src=""/> </div>` 达到居中的效果。
-
-在线排版工具：[Text-Typesetting](https://github.com/CyC2018/Text-Typesetting)。

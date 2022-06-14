@@ -340,3 +340,22 @@ mvn install:install-file -Dfile=D:\idea2019workspace\atguigu-maven-outer\out\art
 查看本地仓库是否存在，存在就可以使用了。
 
  
+
+# dependencyManagement和dependencies
+
+> 父pom中依赖若是无法导入，先注释掉dependencyManagement，导入完成后再解除
+
+Maven 使用dependencyManagement 元素来提供了一种管理依赖版本号的方式。 
+
+通常会在一个组织或者项目的最顶层的父POM 中看到dependencyManagement 元素。
+
+使用pom.xml 中的dependencyManagement 元素能让所有在子项目中引用一个依赖而不用显式的列出版本号。 
+
+Maven 会沿着父子层次向上走，直到找到一个拥有dependencyManagement 元素的项目，然后它就会使用这个 dependencyManagement 元素中指定的版本号。
+
+这样做的好处就是：
+
+- 如果有**多个子项目都引用同一样依赖**，则可以避免在每个使用的子项目里都声明一个版本号，这样当想升级或切换到另一个版本时，**只需要在顶层父容器里更新**，而不需要一个一个子项目的修改 ；
+- 另外如果某个子项目需要另外的一个版本，只需要声明version就可。  
+
+> dependencyManagement里只是声明依赖， **并不实现引入** ，因此子项目需要显示的声明需要用的依赖。 
