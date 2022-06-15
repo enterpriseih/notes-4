@@ -60,7 +60,7 @@
 
 - [消息队列](./docs/message-queue/消息队列.md)
 - [RabbitMQ](./docs/message-queue/rabbitmq/RabbitMQ.md)
-- [分布式与微服务](./docs/分布式与微服务.md)
+- [分布式与微服务](./docs/distributed/分布式与微服务.md)
 
 ### else
 
