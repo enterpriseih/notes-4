@@ -268,7 +268,9 @@ Java中的`volatile`关键字提供了一个功能，那就是被其修饰的变
 - **write**：写入。作用于**主内存**的变量，它把store操作从工作内存中一个变量的值传送到主内存的变量中。
 - **unlock**：解锁。作用于**主内存**变量，把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。
 
-<img src="/Users/milk/Library/Application Support/typora-user-images/image-20220407105226340.png" alt="image-20220407105226340" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204071052975.png" style="zoom:80%;" />
+
+
 
 使用规则：
 
