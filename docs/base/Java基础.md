@@ -36,7 +36,9 @@
 	- 字段（属性field）的名称和描述符 
 	- 方法的名称和描述符。
 
-## 三、final修饰
+## 三、关键字修饰
+
+### 1、final
 
 **final：属性不可变、方法不可覆盖、类不可继承**
 
@@ -45,6 +47,10 @@ final修饰的方法不能重写，但可以继承、重载
 重载：方法名字相同，而参数不同。返回类型可以相同也可以不同。
 
 每个重载的方法（或者构造函数）都必须有一个独一无二的参数类型列表。
+
+### 2、transient
+
+不可序列化
 
 <br>
 
@@ -202,6 +208,103 @@ threshold：扩容的阈值，=容量*加载因子，超过阈值就扩容
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061509495.png" alt="image-20220406150940121" style="zoom:67%;" />
 
+### 1、Arrays.sort()
+
+`Arrays类`
+
+使用的是经过调优的**快速排序**算法
+
+对基本数据类型`byte[] int[] double[] char[]`进行升序排序
+
+对引用数据类型进行降序，如`Integer[]，Double[]，Character[]`等
+
+```java
+// 1、对list排序的时候需要保证list中的元素实现了Comparable接口
+// 2、或者自定义一个比较器对象Comparator
+// [参数1] <、=、> [参数2]的时候，分别返回-1、0、1。
+// 表示将[参数1]和[参数2]按照-1、0、1的顺序排序
+class cmp implements Comparator<Integer>{
+	public int compare(Ingeger n1, Ingeger n2){
+		if (n1 < n2){
+			return -1;
+		}else{
+			return 1;
+		}
+	}
+}
+
+```
+
+### 2、集合的remove()
+
+```
+关于集合元素的remove
+    重点：当集合的结构发生改变时，迭代器必须重新获取，如果还用旧的迭代器，会出现
+    异常：java.util.ConcurrentModificationException
+
+    重点：在迭代集合元素的过程中，不能调用集合对象的remove方法，删除元素：
+        c.remove(o); 迭代过程中不能这样。
+    	会出现：java.util.ConcurrentModificationException
+
+```
+
+
+> **注**：在迭代元素的过程当中，一定要使用迭代器**Iterator的remove方法**，删除元素，不要使用集合自带的remove方法删除元素。
+>
+> 集合结构只要发生改变，迭代器必须重新获取。
+>
+> 通过迭代器删除时，会自动更新迭代器，并且更新集合
+
+```java
+public static void main(String[] args) {
+    // 创建集合
+    Collection c = new ArrayList();
+
+    // 注意：此时获取的迭代器，指向的是那是集合中没有元素状态下的迭代器。
+    // 一定要注意：集合结构只要发生改变，迭代器必须重新获取。
+    // 当集合结构发生了改变，迭代器没有重新获取时，
+    // 调用next()方法时：java.util.ConcurrentModificationException
+    Iterator it = c.iterator();
+
+    // 添加元素
+    c.add(1); // Integer类型
+    c.add(2);
+    c.add(3);
+
+    // 获取迭代器
+    //Iterator it = c.iterator();
+    /*while(it.hasNext()){
+            // 编写代码时next()方法返回值类型必须是Object。
+            // Integer i = it.next();
+            Object obj = it.next();
+            System.out.println(obj);
+        }*/
+
+    Collection c2 = new ArrayList();
+    c2.add("abc");
+    c2.add("def");
+    c2.add("xyz");
+
+    Iterator it2 = c2.iterator();
+    while(it2.hasNext()){
+        Object o = it2.next();
+        // 删除元素之后，集合的结构发生了变化，应该重新去获取迭代器
+        // 但是，循环下一次的时候并没有重新获取迭代器，
+        // 所以会出现异常：java.util.ConcurrentModificationException
+        // 出异常根本原因是：集合中元素删除了，但是没有更新迭代器（迭代器不知道集合变化了）
+        // c2.remove(o); // 直接通过集合去删除元素，没有通知迭代器。（导致迭代器的快照和原集合状态不同。）
+        // 使用迭代器来删除可以吗？
+        // 迭代器去删除时，会自动更新迭代器，并且更新集合（删除集合中的元素）。
+        // *****通过迭代器删除时，会自动更新迭代器，并且更新集合
+        it2.remove(); // 删除的一定是迭代器指向的当前元素。
+        System.out.println(o);
+        // System.out.println(it2.next());
+    }
+
+    System.out.println(c2.size()); //0
+}
+```
+
 
 
 ## 二、Map
@@ -272,9 +375,23 @@ for(Map.Entry<Integer,String> node : set){
 
 ### 4、ConcurrentHashMap
 线程安全
+
 多线程并发中详细
 
 
+
+### 5、hashCode()和equals()的关系
+
+**hashCode()**的作用是获取哈希码，也称散列码；实际上是一个int整数
+
+哈希码的作用是确定该对象在哈希表中的索引位置。
+
+- 先比较 hashcode，再看需求比较 equals
+- 两个对象相等，则 hashcode 一定也是相同的
+- 两个对象相等，equals 方法返回 true
+- 两个对象拥有相同的 hashcode，也不一定相等
+- equals() 重写，hashCode() 也一定要重写
+- hashCode() 的默认⾏为是对堆上的对象产⽣独特值。如果没有重写hashCode()，则该class的两个对象⽆论如何都不会相等（即使这两个对象指向相同的数据）
 
 
 
