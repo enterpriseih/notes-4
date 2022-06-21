@@ -329,6 +329,10 @@ map.put(key1,value1):
 		如果equals()返回true:使用value1替换value2。
 ```
 
+[深入浅出HashMap详解（JDK7）](https://blog.csdn.net/qq_29051413/article/details/107860264)
+
+[深入浅出ConcurrentHashMap详解](https://blog.csdn.net/qq_29051413/article/details/107869427)
+
 ### 2、Map的方法
 
 ```java
