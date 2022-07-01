@@ -354,7 +354,10 @@ System.out.println(Arrays.toString(countBits(num)));
 
 ### 参考代码
 
+**方法一**
+
 ``` java
+// 方法一
 public int singleNumber(int[] nums) {
     int[] bitSums = new int[32];
     for (int num : nums) {
@@ -370,6 +373,54 @@ public int singleNumber(int[] nums) {
     }
 
     return result;
+}
+```
+**方法二**
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202206292126573.png" alt="Picture3.png" style="zoom: 50%;" />
+
+> 针对1bit
+>
+> - 异或运算：`x ^ 0 = x` ， `x ^ 1 = ~x`
+> - 与运算：`x & 0 = 0` ， `x & 1 = x`
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202206292139687.png" alt="Picture4.png" style="zoom: 40%;" />
+
+```java
+// 计算one的方法
+// 设当前状态为two one，此时输入二进制位n。
+// 对上表拆分
+if two == 0:
+  if n == 0:
+    one = one
+  if n == 1:
+    one = ~one
+if two == 1:
+    one = 0
+
+// 引入异或，简化
+if two == 0:
+    one = one ^ n
+if two == 1:
+    one = 0
+// 引入与，简化
+one = one ^ n & ~two
+        
+// 同理two，用计算之后对one来计算
+two = two ^ n & ~one
+
+```
+> 遍历完所有数字后，各二进制位都处于状态 00 和状态 01 （取决于 “只出现一次的数字” 的各二进制位是 1 还是 0，即count[i]%3 == 0还是1 ），而此两状态是由 one 来记录的（此两状态下 twos 恒为 0 ），因此返回 ones 即可。
+
+```java
+// 方法二
+public int singleNumber(int[] nums) {
+    int a = 0, b = 0;
+    for (int num : nums) {
+        a = (a^num) & ~b;
+        b = (b^num) & ~a;
+    }
+    return a;
 }
 ```
 
@@ -388,6 +439,39 @@ a^0 = a;
 ```
 
 可以用来解决，只有一个数出现奇数次，其余出现偶数次的题目
+
+## 补充：只有两个出现一次，其余出现两次
+
+```java
+public int[] singleNumber(int[] nums) {
+    int xorsum = 0;
+    for (int num : nums) {
+        xorsum ^= num;
+    }
+    // xorsum是出现一次的两个数的异或
+    // 防止溢出
+    // 用xorsum & (-xorsum)取出xorsum二进制中最低位的那个1，记为第l位
+    // 假设num1的第l位是1则，num2的第l位就是0
+    // 分类，一类是l位为0，一类是l位为1
+    // 出现两次的数会被分到同一类中
+    // num1和num2会出现在不同类中
+    int lsb = 
+        xorsum == Integer.MIN_VALUE ? xorsum : xorsum & (-xorsum);
+    int num1 = 0, num2 = 0;
+    for (int num : nums) {
+        if ((num & lsb) != 0) {
+            num1 ^= num;
+        } else {
+            num2 ^= num;
+        }
+    }
+    return new int[]{num1, num2};
+}
+```
+
+
+
+
 
 
 

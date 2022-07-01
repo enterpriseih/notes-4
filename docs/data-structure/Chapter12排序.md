@@ -112,7 +112,7 @@ public int[] relativeSortArray(int[] arr1, int[] arr2) {
 
 时间复杂度`O(nlogn)`
 
-分治思想，过程如下
+**分治思想**，过程如下
 
 1. 在输入数组中随机选取一个元素作为中间值（pivot）
 2. 对数组进行分区（partition），使得，所有比中间值小的挪到数组左侧，比中间值大的挪到数组右侧
@@ -199,6 +199,8 @@ private void swap(int[] nums, int index1, int index2){
 ### 参考代码
 
 > 第k大就是快排时p1指针指向第nums.length - k的那个数
+>
+> 时间`O(n)`
 
 ``` java
 public int findKthLargest(int[] nums, int k) {
@@ -221,6 +223,7 @@ public int findKthLargest(int[] nums, int k) {
 
 private int partition(int[] nums, int start, int end) {
     int pivot = new Random().nextInt(end - start + 1) + start;
+    // 中间值挪到最后
     swap(nums, pivot, end);
     
     int p1 = start - 1;

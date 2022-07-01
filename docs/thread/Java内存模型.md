@@ -1,4 +1,4 @@
-Java Memory Model
+# Java Memory Model
 
 java内存模型(JMM)屏蔽掉各种硬件和操作系统的内存访问差异，以实现让java程序在各种平台下都能达到一致的并发效果。
 

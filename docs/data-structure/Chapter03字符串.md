@@ -126,66 +126,64 @@ private boolean areAllZero(int[] counts) {
 
 ### 参考代码
 
-#### 解法一
-
-``` java
+```java
 public int lengthOfLongestSubstring(String s) {
-    // 字符串不局限于字母
+    int maxLen = 0;
+    int l = 0, r = 0;
     int[] counts = new int[256];
-    int longest = s.length() > 0 ? 1 : 0;
-    for (int i = 0, j = -1; i < s.length(); ++i) {
-        counts[s.charAt(i)]++;
-        while (hasGreaterThan1(counts)) {
-            ++j;
-            counts[s.charAt(j)]--;
+    while (r < s.length()) {
+        counts[s.charAt(r)]++;
+        while (counts[s.charAt(r)] > 1) {
+            counts[s.charAt(l)]--;
+            l++;
         }
-
-        longest = Math.max(i - j, longest);
+        maxLen = Math.max(maxLen, r - l + 1);
+        r++;
     }
-
-    return longest;
+    return maxLen;
 }
-
-private boolean hasGreaterThan1(int[] counts) {
-    for (int count : counts) {
-        if (count > 1) {
-            return true;
-        }
-    }
-
-    return false;
-}    
 ```
 
-#### 解法二
 
-> - 时间效率有所提高，但是时间复杂度相同，可以避免多次遍历哈希表
-> - countDup记录哈希表中大于1的数字的个数
-> - 当出现重复字符的时候，countDup++；只要有重复的，P1右移，P1先删除再移动
 
-``` java
-public int lengthOfLongestSubstring(String s) {
-    int[] counts = new int[256];
-    int longest = s.length() > 0 ? 1 : 0;
-    int countDup = 0;
-    for (int i = 0, j = 0; i < s.length(); ++i) {
-        counts[s.charAt(i)]++;
-        if (counts[s.charAt(i)] == 2) {
-            countDup++;
+## 补充：替换后的最长重复字符串
+
+### 题目
+
+给你一个字符串 s 和一个整数 k 。你可以选择字符串中的任一字符，并将其更改为任何其他大写英文字符。该操作最多可执行 k 次。
+
+在执行上述操作后，返回包含相同字母的最长子字符串的长度。
+
+```
+输入：s = "ABAB", k = 2
+输出：4
+解释：用两个'A'替换为两个'B',反之亦然。
+```
+
+### 解法
+
+```java
+// len - 字母出现最大次数 <= 替换数目
+public int characterReplacement(String s, int k) {
+    int[] counts = new int[26];
+    // int len = 0;
+    int res = 0;
+    int maxNum = 0;
+    int l = 0, r = 0;
+    while (r < s.length()) {
+        counts[s.charAt(r) - 'A']++;
+        // 维持最大的窗口，因为比它小的窗口对题目无意义
+        // 窗口大小只会递增，除非数字的个数更大，才会出现更符合要求的更大的窗口
+        maxNum = Math.max(maxNum, counts[s.charAt(r) - 'A']);
+        // len = r - l + 1;
+        if (r - l + 1 - maxNum > k) {
+            counts[s.charAt(l) - 'A']--;
+            l++;
         }
-
-        while (countDup > 0) {
-            counts[s.charAt(j)]--;
-            if (counts[s.charAt(j)] == 1) {
-                countDup--;
-            }
-            ++j;
-        }
-
-        longest = Math.max(i - j + 1, longest);
+        r++; 
     }
-
-    return longest;
+    // 因为r会多走一步
+    return r - l;
 }
 ```
 

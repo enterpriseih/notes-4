@@ -411,7 +411,7 @@ class Test {
 
 - 加载 **$JAVA_HOME/jre/lib** 下的 jar 包，如 rt.jar
 
-**扩展累加载器 Extension ClassLoader**
+**扩展类加载器 Extension ClassLoader**
 
 - 加载\$JAVA_HOME/jre/lib/*.jar 、-Djava.ext.dirs 参数指定目录下的 jar 包、**$JAVA_HOME/jre/lib/ext/classes** 目录下的 class
 

@@ -122,6 +122,16 @@ public int peakIndexInMountainArray(int[] nums) {
 
 ### 参考代码
 
+- 两两一组，单独的那个数会导致后面的组别里的数都不相同
+
+```
+(1,1)、(2,2)、(3,4)、(4,5)、(5)
+```
+
+- 所以只出现一次的数字正好是`第一个两两一组不相同`的分组的`第一个数字`
+- `n(奇数)`个数可以分成`n/2+1`组，最后一组只有一个数字
+- 从`0`开始编号，为`0～n/2`，`left`是查找范围内第一个分组的编号，`right`是查找范围内第二个分组的编号，查找编号为`mid`的分组，分组的第一个数字的编号为`i`
+
 ``` java
 public int singleNonDuplicate(int[] nums) {
     int left = 0;
@@ -133,13 +143,12 @@ public int singleNonDuplicate(int[] nums) {
             if (mid == 0 || nums[i - 2] == nums[i - 1]) {
                 return nums[i];
             }
-
             right = mid - 1;
         } else {
             left = mid + 1;
         }
     }
-
+	// 直到最后都没找到两个数字不同的分组，说明单独的数字在数组尾部
     return nums[nums.length - 1];
 }
 ```
