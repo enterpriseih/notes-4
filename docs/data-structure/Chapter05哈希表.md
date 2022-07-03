@@ -61,7 +61,7 @@ class RandomizedSet {
 
 
 
-## 面试题31：最近最少使用缓存
+## 面试题31：最近最少使用缓存LRU
 
 ### 题目
 
@@ -220,6 +220,138 @@ void afterNodeInsertion(boolean evict) { // possibly remove eldest
 protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
     return false;
 }
+
+```
+
+## 补充：最不常使用缓存LFU
+
+### 题目
+
+一个缓存结构需要实现如下功能。
+
+- set(key, value)：将记录(key, value)插入该结构
+- get(key)：返回key对应的value值
+
+但是缓存结构中最多放K条记录，如果新的第K+1条记录要加入，就需要根据策略删掉一条记录，然后才能把新记录加入。
+
+这个策略为：在缓存结构的K条记录中，哪一个key从进入缓存结构的时刻开始，被调用set或者get的**次数最少**，就删掉这个key的记录；
+
+如果调用次数最少的key有多个，上次调用发生最早的key被删除
+
+### 解法
+
+```java
+class Node {
+    int key;
+    int value;
+    int freq = 1;
+    Node pre;
+    Node next;
+    public Node() {}
+    public Node(int key, int value) {
+        this.key = key;
+        this.value = value;
+    }
+}
+
+class DoublyLinkedList {
+    Node head;
+    Node tail;
+
+    public DoublyLinkedList() {
+        head = new Node();
+        tail = new Node();
+        head.next = tail;
+        tail.pre = head;
+    }
+
+    void removeNode(Node node) {
+        node.pre.next = node.next;
+        node.next.pre = node.pre;
+    }
+
+    void addNode(Node node) {
+        node.next = head.next;
+        head.next.pre = node;
+        head.next = node;
+        node.pre = head;
+    }
+}
+class LFUCache {
+    // 存储缓存的内容
+    Map<Integer, Node> cache; 
+    // 存储每个频次对应的双向链表
+    Map<Integer, DoublyLinkedList> freqMap; 
+    int size;
+    int capacity;
+    int min; // 存储当前最小频次
+
+    public LFUCache(int capacity) {
+        cache = new HashMap<> (capacity);
+        freqMap = new HashMap<>();
+        this.capacity = capacity;
+    }
+    
+    public int get(int key) {
+        if (cache.containsKey(key)) {
+            Node node = cache.get(key);
+            freqInc(node);
+            return node.value;
+        } else {
+            return -1;
+        }
+    }
+    
+    public void put(int key, int value) {
+        // 不存储
+        if (capacity == 0) {
+            return;
+        }
+        if (cache.containsKey(key)) {
+            Node node = cache.get(key);
+            node.value = value;
+            freqInc(node);
+        } else {
+            if (size == capacity) {
+                DoublyLinkedList minFreqLinkedList = freqMap.get(min);
+                cache.remove(minFreqLinkedList.tail.pre.key);
+                // 这里不需要维护min, 因为下面add了newNode后min肯定是1.
+                minFreqLinkedList.removeNode(minFreqLinkedList.tail.pre); 
+                size--;
+            }
+            Node newNode = new Node(key, value);
+            cache.put(key, newNode);
+            DoublyLinkedList linkedList = freqMap.get(1);
+            if (linkedList == null) {
+                linkedList = new DoublyLinkedList();
+                freqMap.put(1, linkedList);
+            }
+            linkedList.addNode(newNode);
+            size++;  
+            min = 1;   
+        }
+    }
+    // freq增加
+    void freqInc(Node node) {
+        // 从原freq对应的链表里移除, 并更新min
+        int freq = node.freq;
+        DoublyLinkedList linkedList = freqMap.get(freq);
+        linkedList.removeNode(node);
+        // 如果是最低的频次，并且该频次的链表为空
+        if (freq == min && linkedList.head.next == linkedList.tail) { 
+            min = freq + 1;
+        }
+        // 加入新freq对应的链表
+        node.freq++;
+        linkedList = freqMap.get(freq + 1);
+        if (linkedList == null) {
+            linkedList = new DoublyLinkedList();
+            freqMap.put(freq + 1, linkedList);
+        }
+        linkedList.addNode(node);
+    }
+}
+
 
 ```
 

@@ -30,7 +30,9 @@ public int search(int[] nums, int target) {
 
 ### 题目
 
-输入一个排序的整数数组nums和一个目标值t，如果nums中包含t，返回t在数组中的下标；如果nums中不包含t，则返回如果将t添加到nums里时t在nums中的下标。假设数组中的没有相同的数字。例如，输入数组nums为[1, 3, 6, 8]，如果目标值t为3，则输出1；如果t为5，则返回2。
+输入一个排序的整数数组nums和一个目标值t，如果nums中包含t，返回t在数组中的下标；如果nums中不包含t，则返回如果将t添加到nums里时t在nums中的下标。假设数组中的没有相同的数字。
+
+例如，输入数组nums为[1, 3, 6, 8]，如果目标值t为3，则输出1；如果t为5，则返回2。
 
 ### 参考代码
 
@@ -56,6 +58,8 @@ public int searchInsert(int[] nums, int target) {
 
 ```java
 // 第二种写法：左开右闭
+// while (left < right)，
+// 这里使用 < ,因为left == right在区间[left, right)是没有意义的
 public int searchInsert(int[] nums, int target) {
     int len = nums.length;
     // 特殊判断
@@ -417,6 +421,110 @@ public int mySqrt(int n) {
     return 0;
 }
 ```
+
+## 补充：子序列最小值的最大值
+
+### 题目
+
+有m个节点，k个任务，每个任务都有执行时长，将这k个任务在m个节点上执行，每个节点执行的任务序列，必须是连续的，如1、2、3，不可以是1、3，求最短的执行时间。
+
+```
+输入：
+3 5
+1 5 3 4 2
+输出：
+6
+说明：3个节点，5个任务，每个任务的执行时长是1、5、3、4、2
+分成三个序列，{1、5} {3} {4、2}，最长时长是6
+
+分成的子序列的最大值中的最小时间
+```
+
+
+
+### 解法
+
+```
+二分法，初始化时，
+
+最短执行时间在[ Max(1、5、3、4、2) ，1+5+3+4+2 ]之间，
+
+使用二分法，mid=（left+end)/2，
+
+判断执行时间是mid时，可以分成多少个子序列，使每个子序列的执行时长都小于mid，
+
+如果计算结果是k个子序列，若k>mid，right=mid，
+
+否则，left=mid+1，继续下层循环，直至left==right，返回结果。
+
+```
+
+当m=3、dataArray=[1,5,3,4,2]，执行流程如下：
+
+- left=5，right=15，mid=10，当前执行时间是10，可以分成{1,5,3}、{4,2}两个序列，即k=2，k<(m=3)，所以下一步 ：right=mid=10
+- left=5，right=10，mid=7，当前执行时间是7，可以分成{1,5}、{3,4}、{2}三个序列，即k=3，k<=(m=3)，所以下一步 right=mid=7  
+- left=5，right=7，mid=6，当前执行时间是6，可以分成{1,5}、{3}、{4,2}三个序列，即k=3，k<=(m=3)，所以下一步 right=mid=6
+- left=5，right=6，mid=5，当前执行时间是5，可以分成{1}、{5}、{3}、{4}、{2}五个序列，即k=5，k>(m=3)，所以下一步： left=mid+1=6
+- left=6，right=6，循环结束，返回执行时间6
+
+
+
+```java
+import java.util.*;
+ 
+public class Main {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int m = in.nextInt();
+        int size = in.nextInt();
+        int[] dataArray = new int[size];
+        for (int i = 0; i < size; i++) {
+            dataArray[i] = in.nextInt();
+        }
+        System.out.println(schedule(m, dataArray));
+    }
+ 
+    static int schedule(int m, int[] dataArray) {
+        int left = 0, right = 0;
+        for (int i = 0; i < dataArray.length; i++) {
+            left = Math.max(left, dataArray[i]);
+            right += dataArray[i];
+        }
+        int mid;
+        while (left < right) {
+            mid = (left + right) >> 1;
+            // 判断当每个子序列最大执行时间是mid，
+            // 可以分成多少个子序列，子序列的数量是t
+            int t = 1, sum = dataArray[0];
+            for (int i = 1; i < dataArray.length; i++) {
+                if (sum + dataArray[i] <= mid) {
+                    sum += dataArray[i];
+                } else {
+                    ++t;
+                    if (t > m) {
+                        break;
+                    }
+                    sum = dataArray[i];
+                }
+            }
+            //已获得子序列的数量t
+            if (t > m) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return right;
+    }
+}
+```
+
+
+
+
+
+
+
 
 ## 面试题73：狒狒吃香蕉
 

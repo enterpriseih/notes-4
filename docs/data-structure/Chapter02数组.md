@@ -128,6 +128,66 @@ public List<Integer> majorityElement(int[] nums) {
 }
 ```
 
+## 补充：下一个排列
+
+### 题目
+
+“下一个排列”的定义是：给定数字序列的字典序中下一个更大的排列。如果不存在下一个更大的排列，则将数字重新排列成最小的排列（即升序排列）。
+
+```
+123456
+123465
+123546
+...
+654321
+```
+
+### 解法
+
+- 先找出最大的索引 k 满足 nums[k] < nums[k+1]，如果不存在(654321)，就翻转整个数组(123456)；
+- 再找出另一个最大索引 l 满足 nums[l] > nums[k]；
+- 交换 nums[l] 和 nums[k]；
+- 最后翻转 nums[k+1:]（主要是为了使k+1之后的数变成升序，因为到这一步之后的数肯定是降序的，所以反转就升序了）。
+
+```java
+class Solution {
+    public void nextPermutation(int[] nums) {
+        // 找最大索引满足nums[i - 1] < nums[i]
+        int firstIndex = -1;
+        for (int i = nums.length - 1; i > 0; i--) {
+            if (nums[i - 1] < nums[i]) {
+                firstIndex = i - 1;
+                break;
+            }
+        }
+        // 说明找到了
+        if (firstIndex > 0) {
+            // int secondIndex = -1;
+            // 找到最大的索引满足nums[i] > nums[firstIndex]
+            for (int i = nums.length - 1; i >= 0; i--) {
+                if (nums[i] > nums[firstIndex]) {
+                    swap(nums, i, firstIndex);
+                    break;
+                }
+            }
+        }
+        // 就算没找到，firstIndex = -1也要反转
+        reverse(nums, firstIndex + 1, nums.length - 1);
+        return;     
+    }
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+    private void reverse(int[] nums, int i, int j) {
+        while (i < j) {
+            swap(nums, i++, j--);
+        }
+    }
+}
+```
+
 
 
 ## 2.1 双指针

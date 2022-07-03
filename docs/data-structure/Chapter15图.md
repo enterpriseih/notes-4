@@ -689,6 +689,60 @@ private int dfs(int[][] matrix, int[][] lengths, int i, int j) {
 } 
 ```
 
+## 补充：单词搜索
+
+### 题目
+
+给定一个 `m x n` 二维字符网格 `board` 和一个字符串单词 `word` 。如果 `word` 存在于网格中，返回 `true` ；否则，返回 `false` 。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202207030928818.jpg" alt="img" style="zoom:67%;" />
+
+```
+输入：
+board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]]
+word = "ABCCED"
+输出：true
+```
+
+### 解法
+
+```java
+public boolean exist(char[][] board, String word) {
+    int m = board.length;
+    int n = board[0].length;
+    boolean[][] track = new boolean[m][n];
+    for (int x = 0; x < m; x ++) {
+        for (int y = 0; y < n; y ++) {
+            if (exist(board, m, n, track, word, word.length(), x, y, 0)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+public boolean exist(char[][] board, int m, int n, boolean[][] track, String word, int wordLen, int curX, int curY, int count) {
+    // 该路径能够被记录！
+    if (word.charAt(count) == board[curX][curY]) {
+        if (++ count == wordLen) return true;
+        track[curX][curY] = true;
+        // 上右下左顺序取数值
+        if ((curX - 1 >= 0 && !track[curX - 1][curY] &&
+             exist(board, m, n, track, word, wordLen, curX - 1, curY, count)) ||
+            (curY + 1 < n && !track[curX][curY + 1] &&
+             exist(board, m, n, track, word, wordLen, curX, curY + 1, count)) ||
+            (curX + 1 < m && !track[curX + 1][curY] &&
+             exist(board, m, n, track, word, wordLen, curX + 1, curY, count)) ||
+            (curY - 1 >= 0 && !track[curX][curY - 1] &&
+             exist(board, m, n, track, word, wordLen, curX, curY - 1, count))) 
+            return true;
+        track[curX][curY] = false;
+    }
+    return false;
+}
+
+```
+
 
 
 ## 15.2 拓扑排序
