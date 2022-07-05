@@ -9,7 +9,7 @@
 > - 最小堆 --> 找k个最大的元素
 > - 最大堆 --> 找k个最小的元素
 
-用数组表示堆，堆中一节点下标设为i，则
+用数组表示堆，堆中一节点下标设为i，则（从0开始）
 
 ```
    (i-1)/2
@@ -48,7 +48,7 @@ PriorityQueue<Integer> maxHeap = new PriorityQueue<>(
 
 ## 补充：滑动窗口的最大值
 
-### 题
+### 题目
 
 ```
 输入：nums = [1,3,-1,-3,5,3,6,7], k = 3
@@ -130,7 +130,7 @@ public int[] maxSlidingWindow(int[] nums, int k) {
         }
         // 当窗口长度为k时 保存当前窗口中最大值
         if(i+1 >= k){
-            result[i+1-k] = nums[queue.peek()];
+            result[i-k+1] = nums[queue.peek()];
         }
     }
     return result;
