@@ -119,30 +119,31 @@ private void backtrace(List<List<Integer>> res, LinkedList<Integer> combination,
 ### 模板
 
 ```java
-class Solution {
-    public List<List<Integer>> combinationSum(int[] candidates, int target) {
-        List<List<Integer>> res = new ArrayList<>();
-        // 排序之后才能剪枝
-        Arrays.sort(candidates);
-        backtrack(candidates, target, res, 0, new ArrayList<Integer>());
-        return res;
-    }
+public List<List<Integer>> combinationSum(int[] candidates, int target) {
+    List<List<Integer>> res = new ArrayList<>();
+    // 排序之后才能剪枝
+    Arrays.sort(candidates);
+    backtrack(candidates, target, res, 0, new ArrayList<Integer>());
+    return res;
+}
 
-    private void backtrack(int[] candidates, int target, List<List<Integer>> res, int i, ArrayList<Integer> tmp_list) {
-        if (target < 0) return;
-        if (target == 0) {
-            res.add(new ArrayList<>(tmp_list));
-            return;
-        }
-        // 用for来代替不选
-        for (int start = i; start < candidates.length; start++) {
-            if (target < 0) break;
-            tmp_list.add(candidates[start]);
-            backtrack(candidates, target - candidates[start], res, start, tmp_list);
-            tmp_list.remove(tmp_list.size() - 1);
-        }
+private void backtrack(int[] candidates, int target, 
+                       List<List<Integer>> res, int i, 
+                       ArrayList<Integer> tmp_list) {
+    if (target < 0) return;
+    if (target == 0) {
+        res.add(new ArrayList<>(tmp_list));
+        return;
+    }
+    // 用for来代替不选
+    for (int start = i; start < candidates.length; start++) {
+        if (target < 0) break;
+        tmp_list.add(candidates[start]);
+        backtrack(candidates, target - candidates[start], res, start, tmp_list);
+        tmp_list.remove(tmp_list.size() - 1);
     }
 }
+
 ```
 
 
@@ -233,6 +234,7 @@ public List<List<Integer>> permute(int[] nums) {
     return result;
 }
 
+// 为位置i选择数字
 public void helper(int[] nums, int i, List<List<Integer>> result) {
     if (i == nums.length) {
         List<Integer> permutation = new LinkedList<>();
@@ -244,7 +246,7 @@ public void helper(int[] nums, int i, List<List<Integer>> result) {
         for (int j = i; j < nums.length; ++j) {
             swap(nums, i, j);
             // 为排列数组中下标为i+1的数字选择数字
-            // 排列这里比较特殊
+            // 画图理解
             helper(nums, i + 1, result);
             swap(nums, i, j);
         }
