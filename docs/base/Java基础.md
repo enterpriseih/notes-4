@@ -113,6 +113,35 @@ Static Nested Class不依赖于外部类的实例对象，所以可以访问外�
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311610240.png" alt="第10章_对象的实例化" style="zoom:50%;" />
 
+# 异常体系
+
+## 一、error
+
+程序无法处理的错误，一旦出现，程序就会被迫停止。
+
+OutOfMemoryError（内存溢出）
+
+StackOverflowError（栈溢出）
+
+## 二、exception
+
+设计或实现上的问题，代码编写或逻辑上的，可以进行异常处理
+
+- 编译时异常(checked)
+	- IOException
+		- FileNotFoundException
+	- ClassNotFoundException
+- 运行时异常(unchecked)
+	- NullPointerException
+	- ArrayIndexOutOfBoundsException
+	- ClassCastException（数据类型转换异常）
+	- NumberFormatException
+	- InputMismatchException
+	- ArithmeticException（数学运算异常）
+	- IllegalArgumentException（方法的参数错误）
+
+
+
 # StringTable
 
 ## 一、字符串的拼接
@@ -497,14 +526,9 @@ for(Map.Entry<Integer,String> node : set){
 }
 ```
 
-### 4、ConcurrentHashMap
-线程安全
-
-多线程并发中详细
 
 
-
-### 5、hashCode()和equals()的关系
+### 4、hashCode()和equals()的关系
 
 **hashCode()**的作用是获取哈希码，也称散列码；实际上是一个int整数
 
@@ -516,6 +540,224 @@ for(Map.Entry<Integer,String> node : set){
 - 两个对象拥有相同的 hashcode，也不一定相等
 - equals() 重写，hashCode() 也一定要重写
 - hashCode() 的默认⾏为是对堆上的对象产⽣独特值。如果没有重写hashCode()，则该class的两个对象⽆论如何都不会相等（即使这两个对象指向相同的数据）
+
+
+
+# 集合线程安全问题
+
+## 一、List
+
+```java
+// 具体集合类型ArrayList：
+// 抛出java.util.ConcurrentModificationException异常
+
+// 具体集合类型Vector：
+// 不会抛异常，线程安全，但是这个类太古老
+
+Collections.synchronizedList(new ArrayList<>())：
+// 不会抛异常，但是锁定范围大，性能低
+public void add(int index, E element) { 
+    synchronized (mutex) {
+        list.add(index, element);
+    } 
+}
+public E get(int index) { 
+    synchronized (mutex) {
+        return list.get(index);
+    } 
+}
+
+// 具体集合类型CopyOnWriteArrayList：
+// 使用了写时复制技术，兼顾了线程安全和并发性能
+List<String> list = new CopyOnWriteArrayList<>();
+```
+
+### 1、写时复制技术
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204072009224.png" alt="image-20220407200925958" style="zoom:80%;" />
+
+使用写时复制技术要向集合对象中写入数据时：
+
+> - 先把整个集合数组复制一份，将新数据写入复制得到的新集合数组
+> - 写操作（加锁）在新数组上进行，读操作在旧数组上进行
+> - 再让指向集合数组的变量指向新复制的集合数组
+
+优缺点：
+
+- 优点：兼顾了性能和线程安全，允许同时进行读写操作；适合读多写少的情况
+- 缺点：
+	- 由于需要把集合对象整体复制一份，所以对内存的消耗很大
+	- 读到的数据可能不是最新的，不适合实时性很高的场景
+
+对应类中的源代码：
+
+- 所在类：java.util.concurrent.**CopyOnWriteArrayList**
+
+```java
+public boolean add(E e) {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+        Object[] elements = getArray();
+        int len = elements.length;
+        Object[] newElements = Arrays.copyOf(elements, len + 1);
+        newElements[len] = e;
+        setArray(newElements);
+        return true;
+    } finally {
+        lock.unlock();
+    }
+}
+```
+
+
+
+## 二、Set
+
+采用了写时复制技术的Set集合：java.util.concurrent.CopyOnWriteArraySet
+
+```java
+// 测试
+// 1、创建集合对象
+Set<String> set = new CopyOnWriteArraySet<>();
+// 2、创建多个线程，每个线程中读写 List 集合
+for (int i = 0; i < 5; i++) {
+    new Thread(()->{
+        for (int j = 0; j < 5; j++) {
+            // 写操作：随机生成字符串存入集合
+            set.add(UUID.randomUUID().toString().
+                    replace("-","").substring(0, 5));
+            // 读操作：打印集合整体
+            System.out.println("set = " + set);
+        }
+    }, "thread-"+i).start();
+}
+```
+
+源码
+
+- 所在类：java.util.concurrent.CopyOnWriteArraySet
+
+```java
+public boolean add(E e) {
+    return al.addIfAbsent(e);
+}
+```
+
+- 所在类：java.util.concurrent.CopyOnWriteArrayList
+
+```java
+private boolean addIfAbsent(E e, Object[] snapshot) {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+        Object[] current = getArray();
+        int len = current.length;
+        if (snapshot != current) {
+            // Optimize for lost race to another addXXX operation
+            int common = Math.min(snapshot.length, len);
+            for (int i = 0; i < common; i++)
+                if (current[i] != snapshot[i] && eq(e, current[i]))
+                    return false;
+            if (indexOf(e, current, common, len) >= 0)
+                return false;
+        }
+        Object[] newElements = Arrays.copyOf(current, len + 1);
+        newElements[len] = e;
+        setArray(newElements);
+        return true;
+    } finally {
+        lock.unlock();
+    }
+}
+```
+
+
+
+## 三、Map
+
+```java
+java.util.concurrent.ConcurrentHashMap
+```
+
+```java
+// 1、创建集合对象
+Map<String, String> map = new ConcurrentHashMap<>();
+// 2、创建多个线程执行读写操作
+for (int i = 0; i < 5; i++) {
+    new Thread(()->{
+        for (int j = 0; j < 5; j++) {
+            String key = UUID.randomUUID().toString().replace("-","").substring(0, 5);
+            String value = UUID.randomUUID().toString().replace("-","").substring(0, 5);
+            map.put(key, value);
+            System.out.println("map = " + map);
+        }
+    }, "thread" + i).start();
+}
+```
+
+### 1、jdk1.7之前Segment
+
+#### 1.1、Segment段
+
+ConcurrentHashMap，它内部细分了若干个小的 HashMap，称之为`段(Segment)`。默认情况下一个 ConcurrentHashMap 被进一步细分为 16 个段，既就是锁的并发度。
+
+如果需要在 ConcurrentHashMap 中添加一个新的表项，并不是将整个 HashMap 加锁，而是首先根据 hashcode 得到该表项应该存放在哪个段中，然后`对该段加锁`，并完成 put 操作。
+
+在多线程环境中，如果多个线程同时进行 put操作，只要被加入的表项不存放在同一个段中，则线程间可以做到真正的并行。
+
+#### 1.2、线程安全（Segment 继承 ReentrantLock 加锁）
+
+简单理解就是，ConcurrentHashMap 是一个 Segment 数组，Segment 通过继承ReentrantLock 来进行加锁，所以每次需要加锁的操作**锁住的是一个 segment**，这样只要保证每个 Segment 是线程安全的，也就实现了全局的线程安全。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061546572.png" alt="image-20220406154643937" style="zoom:50%;" />
+
+每个segment也具有红黑树结构
+
+ConcurrentHashMap 是由 Segment 数组结构和 HashEntry 数组结构组成。
+
+Segment 是一种可重入锁 ReentrantLock，在 ConcurrentHashMap 里扮演锁的角色，HashEntry 则用于存储键值对数据。
+
+每个 Segment 守护一个 HashEntry 数组里的元素,当对 HashEntry 数组的数据进行修改时，必须首先获得它对应的 Segment 锁。
+
+> HashTable只能由一个线程操作。 ConcurrentHashMap可以让一个线程操作第一个Segment，另一个线程操作另一个Segment。
+
+#### 1.3、并行度（默认16）
+
+concurrencyLevel：并行级别、并发数、Segment 数。
+
+也就是说 ConcurrentHashMap 有 16 个 Segments，所以理论上，这个时候，最多可以同时支持 16 个线程并发写，只要它们的操作分别分布在不同的 Segment 上。
+
+`可以初始化赋值，但是初始化后不可扩容`
+
+每个 Segment 很像之前介绍的 HashMap，不过它要保证线程安全，所以处理起来要麻烦些。
+
+### 2、jdk1.8之后Node数组
+
+抛弃了 Segment，改为数组+链表+红黑树的数据结构，乐观锁+synchronized
+
+> 1.7数组存的是HashEntry，1.8数组存的是Node，功能一样
+
+对头节点加锁，从而实现了对每一列数据进行加锁，降低锁粒度
+
+并发控制使用Synchronized和CAS来操作
+
+> 当多线程并发向同一个散列桶添加元素时。
+>
+> - 若散列桶为空，此时触发乐观锁机制，线程会获取到桶中的版本号，在添加节点之前，判断线程中获取的版本号与桶中实际存在的版本号是否一致，若一致,则添加成功，若不一致，则让线程自旋。
+> - 若散列桶不为空，此时使用Synchronized来保证线程安全，先访问到的线程会给桶中的**头节点**加锁，从而保证线程安全。
+
+#### 2.1、为什么是synchronized，而不是ReentrantLock
+
+- **减少内存开销** 
+
+假设使用可重入锁来获得同步支持，那么**每个节点都需要通过继承AQS来获得同步支持**。但并不是每个节点都需要获得同步支持的，**只有链表的头节点（红黑树的根节点）需要同步**，这无疑带来了巨大内存浪费。 
+
+- **获得JVM的支持** 
+
+可重入锁毕竟是API这个级别的，后续的性能优化空间很小。 
+
+synchronized则是JVM直接支持的，JVM能够在运行时作出相应的优化措施：锁粗化、锁消除、锁自旋等等。这就使得**synchronized能够随着JDK版本的升级而不改动代码的前提下获得性能上的提升**。
 
 
 

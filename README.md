@@ -38,8 +38,8 @@
 
 ### :floppy_disk: 数据库
 
-- [MySQL](./docs/database/MySQL.md)
-- [MySQL数据库笔记](./docs/database/MySQL数据库笔记.md)
+- [MySQL](./docs/database/mysql/MySQL.md)
+- [MySQL基础](./docs/database/mysql/MySQL基础.md)
 - [MongoDB](./docs/database/MongoDB.md)
 - [Redis](./docs/database/redis/Redis.md)
 - [Redis面试](./docs/database/redis/Redis面试.md)
@@ -49,6 +49,7 @@
 
 - [代码随想录](https://programmercarl.com/)
 - [数据结构与算法](./docs/data-structure/TOC.md)
+- [红黑树](./docs/data-structure/红黑树.md)
 
 ### 前端 
 
