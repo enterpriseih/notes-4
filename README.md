@@ -14,17 +14,30 @@
 - [Lambda&StreamAPI](./docs/base/Lambda&StreamAPI.md)
 - [序列化与反序列化](./docs/base/序列化和反序列化.md)
 
-### J.U.C
-
-- [多线程并发](./docs/thread/多线程并发.md)
-- [Java的18把锁](./docs/thread/Java中的18把锁.md)
-- [Java内存模型](./docs/thread/Java内存模型.md)
-
-
 ### JVM
 
 - [JVM](./docs/JVM.md)
 
+### J.U.C
+
+- [多线程并发](./docs/thread/多线程并发.md)
+- [Java的18把锁](./docs/thread/Java中的18把锁.md)
+- [Java内存模型(JMM)](./docs/thread/Java内存模型.md)
+
+### :floppy_disk: 数据库
+
+- [MySQL](./docs/database/mysql/MySQL.md)
+- [MySQL基础](./docs/database/mysql/MySQL基础.md)
+- [MongoDB](./docs/database/MongoDB.md)
+- [Redis](./docs/database/redis/Redis.md)
+- [Redis面试](./docs/database/redis/Redis面试.md)
+- [数据字典&EasyExcel](./docs/database/数据字典.md)
+
+### :globe_with_meridians:网络编程
+
+- [计算机网络](./docs/计算机网络.md)
+- [攻击技术](./docs/攻击技术.md)
+- [Web](./docs/Web.md)
 
 ### 框架
 
@@ -35,15 +48,6 @@
 - [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)
 - [SpringBoot笔记](./docs/framework/spring/SpringBoot笔记.md)
 - [SpringCloud笔记](./docs/framework/spring/springcloud/SpringCloud.md)
-
-### :floppy_disk: 数据库
-
-- [MySQL](./docs/database/mysql/MySQL.md)
-- [MySQL基础](./docs/database/mysql/MySQL基础.md)
-- [MongoDB](./docs/database/MongoDB.md)
-- [Redis](./docs/database/redis/Redis.md)
-- [Redis面试](./docs/database/redis/Redis面试.md)
-- [数据字典&EasyExcel](./docs/database/数据字典.md)
 
 ### :pencil2: 算法
 
@@ -66,9 +70,6 @@
 ### else
 
 
-- [计算机网络](./docs/计算机网络.md)
-- [攻击技术](./docs/攻击技术.md)
-- [Web](./docs/Web.md)
 - [MyDebug](./docs/MyDebug.md)
 
 ### :wrench: 工具

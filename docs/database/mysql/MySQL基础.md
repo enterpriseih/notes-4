@@ -1,5 +1,3 @@
-
-
 # 导入表的问题
 
 **导入数据时外键约束问题**
@@ -83,7 +81,7 @@ SELECT department_id, location_id
 FROM departments;
 ```
 
-### 2) 列的别名
+### 2) 列的别名 (AS)
 
 * 重命名一个列 
 * 便于计算 
@@ -97,7 +95,7 @@ SELECT last_name AS name, commission_pct comm
 FROM employees;
 ```
 
-### 3) 去除重复行
+### 3) 去除重复行 (DISTINCT)
 
 DISTINCT关键字
 
@@ -105,7 +103,7 @@ DISTINCT关键字
 SELECT DISTINCT department_id FROM employees;
 ```
 
-### 4) 空值参与运算
+### 4) 空值参与运算 (IFNULL)
 
 空值：null ( 不等同于0, ’ ‘, ’null‘ )
 
@@ -117,7 +115,7 @@ SELECT employee_id, salary "月工资", salary * (1 + IFNULL(commission_pct, 0))
 
 这里你一定要注意，在 MySQL 里面， 空值不等于空字符串。一个空字符串的长度是 0，而一个空值的长 度是空。而且，在 MySQL 里面，空值是占用空间的。
 
-### 5) 着重号 ``
+### 5) 着重号 (``)
 
 必须保证你的字段没有和保留字、数据库系统或常见方法冲突。
 
@@ -246,7 +244,7 @@ mysql> SELECT 1 = 2, 0 = 'abc', 1 = 'abc' FROM DUAL;
 > + 如果等号两边的值、字符串或表达式中有一个为NULL，则比较结果为NULL。
 
 ```mysql
-ysql> SELECT 1 <=> '1', 1 <=> 0, 'a' <=> 'a', (5 + 3) <=> (2 + 6), '' <=> NULL,NULL <=> NULL FROM dual;
+mysql> SELECT 1 <=> '1', 1 <=> 0, 'a' <=> 'a', (5 + 3) <=> (2 + 6), '' <=> NULL,NULL <=> NULL FROM dual;
 +-----------+---------+-------------+---------------------+-------------+---------------+
 | 1 <=> '1' | 1 <=> 0 | 'a' <=> 'a' | (5 + 3) <=> (2 + 6) | '' <=> NULL | NULL <=> NULL |
 +-----------+---------+-------------+---------------------+-------------+---------------+
