@@ -474,8 +474,6 @@ public class Producer {
 >
 > 回答：RabbitMQ生产者投递消息如果**不指定Exchange**，那么就会默认使用**AMQP.default**这个Exchange，它的路由规则就是根据生产者指定的RoutingKey和Queue的名字去对比，如果名字一致就将生产者的消息发送给该队列。
 
-![image-20210410192213311](E:\Typora\image\image-20210410192213311.png)
-
 
 
 ## 6. Exchange交换机

@@ -241,6 +241,15 @@ protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
 ### 解法
 
 ```java
+// 存储缓存的内容
+Map<Integer, Node> cache; 
+// 存储每个频次对应的双向链表
+Map<Integer, DoublyLinkedList> freqMap; 
+```
+
+
+
+```java
 class Node {
     int key;
     int value;

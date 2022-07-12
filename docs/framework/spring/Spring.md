@@ -114,7 +114,15 @@ Bean缓存池为HashMap实现
 
 	- 一般应用于portlet应用环境
 
+#### 单例模式和单例bean
 
+例如，有一个bean，类型为User，则：
+
+单例Bean：spring容器中可以有多个beanName不同，但是类型相同的bean。例如，可以有beanName分别为user1和user2，对应的类型都是User。
+
+单例模式是指每次创建的对象都是同一个。
+
+单例模式是指在一个**JVM进程中**仅有一个实例，而单例bean是指在一个**Spring Bean容器** (ApplicationContext) 中仅有一个实例。
 
 ### 2、Bean的生命周期***
 
@@ -429,7 +437,7 @@ MVC 是一种软件架构的思想，将软件按照模型、视图、控制器�
 ## 一、MVC的工作流程
 
 1. 浏览器发送请求至前端控制器 DispatcherServlet
-2. DispatcherServlet对请求URL进行解析，得到请求资源标识符（URI），判断请求URI对应的映射，调用 HandlerMapping 处理器映射器
+2. DispatcherServlet收到请求，调用 HandlerMapping 处理器映射器
 3. HandlerMapping 找到具体的处理器（根据xml配置、注解进行查找），生成处理器及处理器拦截器（如果有则生成）一并返回给 DispatcherServlet
 4. DispatcherServlet 调⽤ HandlerAdapter 处理器适配器。 
 5. HandlerAdapter 经过适配调⽤具体的处理器(Controller，也叫后端控制器) 
@@ -458,7 +466,9 @@ initHandlerMappings(context)，处理器映射器，**根据用户请求的资�
 
 ### 2、HandlerAdapter
 
-initHandler Adapters(context)，适配器。因为SpringMVC中的Handler可以是任意的形式，只要能处理请求就ok，但是Servlet需要的处理方法的结构却是固定的，都是以request和response为参数的方法。
+initHandler Adapters(context)，适配器。**调用 Handler 处理请求**。
+
+因为SpringMVC中的Handler可以是任意的形式，只要能处理请求就ok，但是Servlet需要的处理方法的结构却是固定的，都是以request和response为参数的方法。
 
 如何让固定的Servlet处理方法调用灵活的Handler来进行处理呢？这就是HandlerAdapter要做的事情。
 
@@ -536,5 +546,59 @@ INF/spring.factories 下
 
 使用@lmport**导入自动配置类**
 
+### Note：SPI
+
+#### 1、spi是什么？
+
+SPI（service provider interface）机制是JDK内置的一种**服务发现机制**，可以**动态的发现服务**，即服务提供商，它通过在ClassPath路径下的META-INF/services文件夹查找文件，自动加载文件里所定义的类。目前这种大部分都利用SPI的机制进行服务提供，比如：dubbo、spring、JDBC等;
+
+#### 2、spi解决了什么问题？
+
+由于classLoader加载类的时候采用是【双亲委托模式】，意思是：首先委托父类去加载器获取，若父类加载器存在则直接返回，若加载器无法完成此加载任务，自己才去加载。该加载存在的弊端就是**上层的类加载永远无法加载下层的类加载器所加载的类，所以通过spi解决了该问题。**
+
+spi是一种将服务接口与服务实现分离以达到解耦、大大提升了程序可扩展性的机制。引入服务提供者就是引入了spi接口的实现者，通过本地的注册发现获取到具体的实现类，轻松可插拔spi实现了动态加载，插件化，
+
+#### 3、弊端
+
+资源浪费:由于 spi 是通过循环加载实现类，会导致所有的类全部一起加载！
+
+
 ## 二、SpringBoot的Starter
 
+starter 就是定义了一个 starter 的 jar 包，写一个 @Configuration 配置类，将这些 bean 定义在里面，然后在 starter 包的 META-INF/spring.factories 中写入该配置类，springboot 会按照约定来加载该配置类。
+
+开发者只需要导入相应的 starter 依赖包，比如 mybatis-spring-boot-starter
+
+
+
+## 三、嵌入式服务器
+
+不需要下载 tomcat，springboot 已经内置了 tomcat.jar，运行 main 方法时会去启动 tomcat，并利用 tomcat 的 spi 机制加载 springmvc
+
+### 1、启动流程
+
+1. springboot 启动的时候会创建一个 spring 容器
+2. 在创建 spring 容器的过程中，会利用 @ConditionalOnClass 技术来判断当前 classpath 是否存在 tomcat 依赖，若存在则会生成一个启动 tomcat 的 bean
+3. Spring 容器创建完之后，会获取启动 tomcat 的 bean，并创建 tomcat 对象，并绑定端口等，然后启动 tomcat。
+
+## 四、常用注解
+
+见springboot章节
+
+
+
+## 五、配置文件的加载顺序
+
+**bootstrap.yml** (bootstrap.properties) **先加载** 
+
+- bootstrap.yml 用于应用程序上下文的引导阶段。
+
+- bootstrap.yml 由父Spring ApplicationContext加载。 
+
+- 父ApplicationContext 被加载到使用 application.yml 的之前。
+- 定义系统级别的参数
+
+**application.yml** (application.properties) **后加载** 
+
+- 如果application里写了`spring.profiles.active=dev`，还回去加载application-dev.properties
+- 其中定义应用级别的配置
