@@ -24,7 +24,7 @@
 - [Java的18把锁](./docs/thread/Java中的18把锁.md)
 - [Java内存模型(JMM)](./docs/thread/Java内存模型.md)
 
-### :floppy_disk: 数据库
+### :floppy_disk: 数据库 
 
 - [MySQL](./docs/database/mysql/MySQL.md)
 - [MySQL基础](./docs/database/mysql/MySQL基础.md)
@@ -64,7 +64,9 @@
 ### 后端
 
 - [消息队列](./docs/message-queue/消息队列.md)
-- [RabbitMQ](./docs/message-queue/rabbitmq/RabbitMQ.md)
+- [RabbitMQ](./docs/message-queue/RabbitMQ.md)
+- [Kafka](./docs/message-queue/Kafka.md)
+- [RabbitMQ使用](./docs/message-queue/rabbitmq/RabbitMQ参考.md)
 - [分布式与微服务](./docs/distributed/分布式与微服务.md)
 
 ### else

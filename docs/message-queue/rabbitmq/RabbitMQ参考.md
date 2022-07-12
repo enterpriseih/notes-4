@@ -9,7 +9,7 @@
 - AMQP全称：`Advanced Message Queuing Protocol` 高级消息队列协议。
 - AMQP定义：是具有现代特征的二进制协议。是一个提供统一消息服务的应用层标准高级消息队列协议，是**应用层协议的一个开放标准，为面向消息的中间件设计**。
 
-<img src=".\image\2.3-1-AMQP协议模型.jpg" alt="AMQP协议模型"  />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121518726.jpg" alt="AMQP协议模型"  />
 
 
 
@@ -35,7 +35,7 @@
 
 ### 1.3. RabbitMQ架构
 
-![2.5-1-RabbitMQ的整体架构图](.\image\2.5-1-RabbitMQ的整体架构图.jpg)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121518968.jpg" alt="2.5-1-RabbitMQ的整体架构图" style="zoom:67%;" />
 
 
 
@@ -43,7 +43,7 @@
 
 ### 1.4. MQ消息流转
 
-![2.6-1-RabbitMQ消息流转图](.\image\2.6-1-RabbitMQ消息流转图.jpg)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121519197.jpg" alt="2.6-1-RabbitMQ消息流转图" style="zoom:67%;" />
 
 
 

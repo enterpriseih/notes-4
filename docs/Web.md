@@ -40,7 +40,7 @@ C为控制，也就是事件，用于流程的控制。
 
 # Session、Cookie和Token
 
-### Session
+## Session
 
 - 在**服务器端保存**（客户端只有Session ID）的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中
 - 可以保存在：内存、Cookie中、redis或memcached等缓存中、数据库中
@@ -49,11 +49,11 @@ C为控制，也就是事件，用于流程的控制。
 
 **活化**：服务器又重启了，将磁盘中的内容反序列化至session
 
-### Cookie
+## Cookie
 
 - **客户端**（浏览器）保存用户信息的一种机制，用来记录用户的一些信息，通常在Cookie中**记录Session ID**。
 
-### Token
+## Token
 
 - token是用户身份的验证方式，我们通常叫它：令牌。
 - 最简单的token组成:uid(用户唯一的身份标识)、time(当前时间的时间戳)、sign(签名，由token的前几位+以哈希算法压缩成一定长的十六进制字符串，可以防止恶意第三方拼接token请求服务器)。还可以把不变的参数也放进token，避免多次查库。
@@ -62,7 +62,7 @@ C为控制，也就是事件，用于流程的控制。
 
 
 
-### Cookie和Session的区别
+## Cookie和Session的区别
 
 1）cookie数据存放在客户的浏览器上，session数据放在服务器上；
 
@@ -78,7 +78,17 @@ C为控制，也就是事件，用于流程的控制。
 >
 > 第一次请求的响应中会生成一个对应session的cookie：JSESSIONID，下一次请求的响应不会生成，但是请求会将JSESSIONID传过去，寻找相应的session
 
+## 没有Cookie，session还能进行身份验证吗
 
+当服务器tomcat第一次接收到客户端的请求时，会开辟一块独立的session空间，建立一个session对象，同时会生成一个session id，通过响应头的方式保存到客户端浏览器的cookie当中。以后客户端的每次请求，都会在请求头部带上这个session id，这样就可以对应上服务端的一些会话的相关信息，比如用户的登录状态。
+
+如果没有客户端的Cookie， Session是无法进行身份验证的。
+
+当服务端从单体应用升级为分布式之后，cookie+session这种机制要怎么扩展？
+
+1. session粘贴：在负载均衡中，通过一个机制保证同一个客户端的所有请求都会转发到同一个tomcat实例当中。问题：当这个tomcat实例出现问题之后，请求就会被转发到其他实例，这时候用户的session信息就丟了。
+2. session复制：当一个tomcat实例上保存了session信息后，主动将session 复制到集群中的其他实例。问题：复制是需要时间的，在复制过程中，容易产生session信息丢失。
+3. session共享： 就是将服务端的session信息保存到一个第三方中，比如Redis。
 
 # JavaWeb的三大规范
 
@@ -306,3 +316,177 @@ base64编码，并不是加密，只是把明文信息变成了不可见的字�
 - JWT的最大缺点是服务器不保存会话状态，所以在使用期间不可能取消令牌或更改令牌的权限。也就 是说，一旦JWT签发，在有效期内将会一直有效。
 - JWT本身包含认证信息，token是经过base64编码，所以可以解码，因此token加密前的对象不应该 包含敏感信息，一旦信息泄露，任何人都可以获得令牌的所有权限。为了减少盗用，JWT的有效期不 宜设置太长。对于某些重要操作，用户在使用时应该每次都进行进行身份验证。
 - 为了减少盗用和窃取，JWT不建议使用HTTP协议来传输代码，而是使用加密的HTTPS协议进行传 输。
+
+
+
+
+
+# 跨域问题
+
+`No 'Access-Control-Allow-Origin'`
+
+### 概念
+
+出于浏览器的同源策略限制。
+
+**同源策略**会阻止一个域的javascript脚本和另外一个域的内容进行交互。所谓同源（即指在同一个域）就是两个页面具有相同的协议（protocol），主机（host）和端口号（port）
+
+**跨域问题**，三个地方，任何一个不相同都会产生跨域，不能访问
+
+- 访问协议：http 访问 https
+- 访问地址：192.128.1.1 访问 172.11.1.1
+- 访问端口：9528 访问 8201
+
+### 解决方式
+
+1、**返回新的CorsFilter（全局跨域）**
+
+2、重写 WebMvcConfigurer（全局跨域）
+
+3、**使用注解 @CrossOrigin**（在Controller类或方法上）（局部跨域）
+
+4、手动设置响应头 (HttpServletResponse)（局部跨域）
+
+5、自定web filter 实现跨域
+
+
+
+> - 上面前两种方式属于全局 CORS 配置，后两种属于局部 CORS配置。如果使用了局部跨域是会覆盖全局跨域的规则，所以可以通过 @CrossOrigin 注解来进行细粒度更高的跨域资源控制。
+> - 其实无论哪种方案，最终目的都是**修改响应头**，向响应头中添加浏览器所要求的数据，进而实现跨域
+
+
+
+### 具体实现
+
+#### 1、返回新的 CorsFilter(全局跨域)
+
+在任意配置类，返回一个新的CorsFIlter Bean ，并添加映射路径和具体的CORS配置路径。
+
+> gateway网关中使用
+
+```java
+@Configuration
+public class GlobalCorsConfig {
+    @Bean
+    public CorsFilter corsFilter() {
+        //1. 添加 CORS配置信息
+        CorsConfiguration config = new CorsConfiguration();
+        //放行哪些原始域
+        config.addAllowedOrigin("*");
+        //是否发送 Cookie
+        config.setAllowCredentials(true);
+        //放行哪些请求方式
+        config.addAllowedMethod("*");
+        //放行哪些原始请求头部信息
+        config.addAllowedHeader("*");
+        //暴露哪些头部信息
+        config.addExposedHeader("*");
+        //2. 添加映射路径
+        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.registerCorsConfiguration("/**",config);
+        //3. 返回新的CorsFilter
+        return new CorsFilter(corsConfigurationSource);
+    }
+}
+```
+
+
+
+#### 2、重写 WebMvcConfigurer(全局跨域)
+
+```java
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                //是否发送Cookie
+                .allowCredentials(true)
+                //放行哪些原始域
+                .allowedOrigins("*")
+                .allowedMethods(new String[]{"GET", "POST", "PUT", "DELETE"})
+                .allowedHeaders("*")
+                .exposedHeaders("*");
+    }
+}
+```
+
+
+
+#### 3、使用注解 (局部跨域)
+
+在控制器(类上)上使用注解 @CrossOrigin:，表示该类的所有方法允许跨域。
+
+```java
+@RestController
+@CrossOrigin(origins = "*")
+public class HelloController {
+    @RequestMapping("/hello")
+    public String hello() {
+        return "hello world";
+    }
+}
+```
+
+在方法上使用注解 @CrossOrigin:
+
+```java
+@RequestMapping("/hello")
+@CrossOrigin(origins = "*")
+//@CrossOrigin(value = "http://localhost:8081") //指定具体ip允许跨域
+public String hello() {
+    return "hello world";
+}
+```
+
+
+
+#### 4、手动设置响应头(局部跨域)
+
+使用 HttpServletResponse 对象添加响应头(Access-Control-Allow-Origin)来授权原始域，这里 Origin的值也可以设置为 “*”,表示全部放行。
+
+```java
+@RequestMapping("/index")
+public String index(HttpServletResponse response) {
+    response.addHeader("Access-Allow-Control-Origin","*");
+    return "index";
+}
+```
+
+
+
+#### 5、使用自定义filter实现跨域
+
+首先编写一个过滤器，可以起名字为MyCorsFilter.java
+
+```java
+@Component
+public class MyCorsFilter implements Filter {
+  public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+    HttpServletResponse response = (HttpServletResponse) res;
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+    response.setHeader("Access-Control-Max-Age", "3600");
+    response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
+    chain.doFilter(req, res);
+  }
+  public void init(FilterConfig filterConfig) {}
+  public void destroy() {}
+}
+```
+
+在web.xml中配置这个过滤器，使其生效
+
+```xml
+<!-- 跨域访问 START-->
+<filter>
+ <filter-name>CorsFilter</filter-name>
+ <filter-class>com.mesnac.aop.MyCorsFilter</filter-class>
+</filter>
+<filter-mapping>
+ <filter-name>CorsFilter</filter-name>
+ <url-pattern>/*</url-pattern>
+</filter-mapping>
+<!-- 跨域访问 END  -->
+```
+

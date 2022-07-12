@@ -140,11 +140,28 @@ StackOverflowError（栈溢出）
 	- ArithmeticException（数学运算异常）
 	- IllegalArgumentException（方法的参数错误）
 
+# String
 
+## 一、String的不可变
 
-# StringTable
+```java
+public final class String implements java.io.Serializable, Comparable<String>, CharSequence {
+    /* String本质是个char数组，而且用final修饰 */
+    private final char value[];
+}
+```
 
-## 一、字符串的拼接
+首先String类是用final关键字修饰，这说明String不可继承。且value也用final修饰value这个引用地址不可变。
+
+引用不可变，如果更改value内容不也是可以的吗？
+
+在源码中没有对value里的元素进行操作；并且string类是final不可继承，避免被别人继承后破坏。
+
+综上，才使得String是不可变的。
+
+## 二、StringTable
+
+### 1、字符串的拼接
 
 1. 常量与常量的拼接结果在字符串常量池，原理是编译期优化
 2. 字符串常量池中不会存在相同内容的常量
@@ -200,7 +217,7 @@ System.out.println(s3 == s11);// true
 
 
 
-## 二、intern()
+### 2、intern()
 
 native方法
 
