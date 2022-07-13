@@ -223,7 +223,7 @@ request.getRequestDispatcher("...").forward(request,response);
 
 - 由...响应
 
-- 地址栏没有变化
+- **地址栏没有变化**
 - 同一个request和response
 
 ## 2、客户端重定向
@@ -234,7 +234,7 @@ request.getRequestDispatcher("...").forward(request,response);
 
 - 两次请求响应的过程。客户端肯定知道请求URL有变化
 
-- 地址栏有变化
+- **地址栏有变化**
 - 不同的request和response
 
 
@@ -257,15 +257,52 @@ request.getRequestDispatcher("...").forward(request,response);
 
 # 单点登录SSO(Single Sign On)
 
-三种常用方式
+## 单一服务器模式登录
 
-1、session广播机制实现
+使用session对象实现
 
-2、cookie+redis实现
+登录成功之后，把用户数据放到session里面
 
-3、token实现
+判断是否登录，从session获取数据，可以获取到就登录
+
+```java
+session.setAttribute("user", user);
+session.getAttribute("user");
+```
+
+
+
+## 单点登录的三种常用方式
+
+分布式集群部署的时候，一个模块登陆，其余模块也同样登陆。
+
+### 1、session广播机制实现
+
+session复制
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202206281706291.png" alt="02 单点登录三种方式介绍" style="zoom:75%;" />
+
+### 2、cookie+redis实现***
+
+1. 在项目中任何一个模块进行登录，登录之后，把数据放到两个地方
+
+	redis：key -> 生成唯一随机值（ip、用户id等等），value -> 用户数据
+
+	cookie：把redis里面生成kev值放到cookie里面
+
+2. 访问项目中其他模块，发送请求带着cookie进行发送，获取cookie中的key，到redis进行查询，如果查询数据就是登录
+
+### 3、token实现***
+
+1. 在项目某个模块进行登录，登录之后，按照规则生成字符串token，把登录之后用户包含到生成字符串里面，将字符串返回。
+
+	(1）可以把字符串通过coolkie返回
+
+	(2）或者把字符串通过地址栏返回
+
+2. 再去访问项目其他模块，每次访问在地址栏带着生成字符串，在访问模块里面获取地址栏字符串，根据字符串获取用户信息。如果可以得到就登陆。
+
+
 
 # JWT
 
