@@ -280,7 +280,7 @@ session.getAttribute("user");
 
 session复制
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202206281706291.png" alt="02 单点登录三种方式介绍" style="zoom: 67%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202206281706292.png" style="zoom: 67%;" />
 
 ### 2、cookie+redis实现***
 
