@@ -110,7 +110,11 @@ public int[] relativeSortArray(int[] arr1, int[] arr2) {
 
 ## 12.2 快速排序O(nlogn)
 
-时间复杂度`O(nlogn)`
+平均时间复杂度`O(nlogn)`
+
+> 如果中间值每次都是头或尾，会退化成`O(n^2)`
+>
+> 在随机选取中间值的情况下才是`O(nlogn)`
 
 **分治思想**，过程如下
 

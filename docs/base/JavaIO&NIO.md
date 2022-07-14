@@ -18,6 +18,8 @@
 
 # 基础IO模型
 
+https://blog.csdn.net/shawntime/article/details/115089947
+
 ## 一、阻塞IO模型
 
 最传统的一种 IO 模型，即`在读写数据过程中会发生阻塞现象`。
@@ -60,13 +62,9 @@ Java NIO 实际上就是多路复用 IO。
 
 非阻塞IO中是通过用户线程去不断询问，而多路复用IO是单独的线程去轮询
 
-因为在多路复用 IO 模型中，只需要使用一个线程就可以管理多个socket，系统不需要建立新的进程或者线程，也不必维护这些线程和进程，并且只有在真正有socket 读写事件进行时，才会使用 IO 资源，所以它大大减少了资源占用。
+因为在多路复用 IO 模型中，只需要**使用一个线程就可以管理多个socket**，系统不需要建立新的进程或者线程，也不必维护这些线程和进程，并且只有在真正有socket 读写事件进行时，才会使用 IO 资源，所以它大大减少了资源占用。
 
-在 Java NIO 中，是通过 selector.select()去查询每个通道是否有到达事件，如果没有事件，则一直阻塞在那里，因此这种方式会导致用户线程的阻塞。
-
-多路复用 IO 模式，通过一个线程就可以管理多个 socket，只有当socket 真正有读写事件发生才会占用资源来进行实际的读写操作。因此，多路复用 IO 比较适合连接数比较多的情况。
-
-不过要注意的是，多路复用 IO 模型是通过轮询的方式来检测是否有事件到达，并且对到达的事件逐一进行响应。因此对于多路复用 IO 模型来说，`一旦事件响应体很大，那么就会导致后续的事件迟迟得不到处理，并且会影响新的事件轮询`。
+实现方式有select、poll、epoll
 
 ## 四、信号驱动IO模型
 
@@ -90,7 +88,7 @@ IO 操作的两个阶段都不会阻塞用户线程，这两个阶段都是由�
 
 <br>
 
-# I/O复用
+# select、poll、epoll
 
 select/poll/epoll 都是 I/O 多路复用的具体实现，select 出现的最早，之后是 poll，再是 epoll。
 
@@ -98,7 +96,7 @@ select/poll/epoll 都是 I/O 多路复用的具体实现，select 出现的最�
 
 [文件描述符](https://blog.csdn.net/weixin_43202123/article/details/121008441)
 
-Linux 系统中，把一切都看做是文件，当**进程打开现有文件**或创建新文件时，**内核向进程返回一个文件描述符**，文件描述符就是内核为了高效**管理已被打开的文件所创建的索引**，用来**指向被打开的文件**，所有执行I/O操作的系统调用都会通过文件描述符。
+Linux 系统中，把一切都看做是文件，当**进程打开现有文件**或创建新文件时，**内核向进程返回一个文件描述符**，文件描述符就是内核为了高效**管理已被打开的文件所创建的索引**，用来**指向被打开的文件**，所有执行I/O操作的系统调用都会通过文件描述符。用fd表示。
 
 ### select
 
@@ -108,50 +106,11 @@ int select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct t
 
 select 允许应用程序监视一组文件描述符，等待一个或者多个描述符成为就绪状态，从而完成 I/O 操作。
 
-- fd_set 使用数组实现，数组大小使用 FD_SETSIZE 定义，所以只能监听少于 FD_SETSIZE 数量的描述符。有三种类型的描述符类型：readset、writeset、exceptset，分别对应读、写、异常条件的描述符集合。
-
+- fd_set 使用**数组**实现，数组**大小**使用 FD_SETSIZE（**默认1024**）定义，所以只能监听少于1024个描述符。有三种类型的描述符类型：readset、writeset、exceptset，分别对应读、写、异常条件的描述符集合。
 - timeout 为超时参数，调用 select 会一直阻塞直到有描述符的事件到达或者等待的时间超过 timeout。
-
 - 成功调用返回结果大于 0，出错返回结果为 -1，超时返回结果为 0。
 
-```c
-fd_set fd_in, fd_out;
-struct timeval tv;
-
-// Reset the sets
-FD_ZERO( &fd_in );
-FD_ZERO( &fd_out );
-
-// Monitor sock1 for input events
-FD_SET( sock1, &fd_in );
-
-// Monitor sock2 for output events
-FD_SET( sock2, &fd_out );
-
-// Find out which socket has the largest numeric value as select requires it
-int largest_sock = sock1 > sock2 ? sock1 : sock2;
-
-// Wait up to 10 seconds
-tv.tv_sec = 10;
-tv.tv_usec = 0;
-
-// Call the select
-int ret = select( largest_sock + 1, &fd_in, &fd_out, NULL, &tv );
-
-// Check if select actually succeed
-if ( ret == -1 )
-    // report error and abort
-else if ( ret == 0 )
-    // timeout; no event detected
-else
-{
-    if ( FD_ISSET( sock1, &fd_in ) )
-        // input event on sock1
-
-    if ( FD_ISSET( sock2, &fd_out ) )
-        // output event on sock2
-}
-```
+需要维护一个用来存放大量fd的数据结构，每次调用select时把fd集合从用户态拷贝到内核态，这样会使得用户空间和内核空间在传递该结构时复制开销大。
 
 ### poll
 
@@ -161,46 +120,16 @@ int poll(struct pollfd *fds, unsigned int nfds, int timeout);
 
 poll 的功能与 select 类似，也是等待一组描述符中的一个成为就绪状态。
 
+采用链表存放   
+
 poll 中的描述符是 pollfd 类型的数组，pollfd 的定义如下：
 
 ```c
 struct pollfd {
-               int   fd;         /* file descriptor */
-               short events;     /* requested events */
-               short revents;    /* returned events */
-           };
-```
-
-
-```c
-// The structure for two events
-struct pollfd fds[2];
-
-// Monitor sock1 for input
-fds[0].fd = sock1;
-fds[0].events = POLLIN;
-
-// Monitor sock2 for output
-fds[1].fd = sock2;
-fds[1].events = POLLOUT;
-
-// Wait 10 seconds
-int ret = poll( &fds, 2, 10000 );
-// Check if poll actually succeed
-if ( ret == -1 )
-    // report error and abort
-else if ( ret == 0 )
-    // timeout; no event detected
-else {
-    // If we detect the event, zero it out so we can reuse the structure
-    if ( fds[0].revents & POLLIN )
-        fds[0].revents = 0;
-        // input event on sock1
-
-    if ( fds[1].revents & POLLOUT )
-        fds[1].revents = 0;
-        // output event on sock2
-}
+    int   fd;         /* file descriptor */
+    short events;     /* requested events */
+    short revents;    /* returned events */
+};
 ```
 
 ### 比较
@@ -210,7 +139,7 @@ else {
 select 和 poll 的功能基本相同，不过在一些实现细节上有所不同。
 
 - select 会修改描述符，而 poll 不会；
-- select 的描述符类型使用数组实现，FD_SETSIZE 大小默认为 1024，因此默认只能监听少于 1024 个描述符。如果要监听更多描述符的话，需要修改 FD_SETSIZE 之后重新编译；而 **poll 没有描述符数量的限制**；
+- select 的描述符类型使用数组实现，FD_SETSIZE 大小默认为 1024。如果要监听更多描述符的话，**需要修改 FD_SETSIZE 之后重新编译**；而 **poll 没有描述符数量的限制**；
 - poll 提供了更多的事件类型，并且对描述符的重复利用上比 select 高。
 - 如果一个线程对某个描述符调用了 select 或者 poll，另一个线程关闭了该描述符，会导致调用结果不确定。
 
@@ -230,75 +159,38 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)；
 int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);
 ```
 
-epoll_ctl() 用于向内核注册新的描述符或者是改变某个文件描述符的状态。**已注册的描述符在内核中会被维护在一棵红黑树上**，通过回调函数内核会将 I/O 准备好的描述符加入到一个链表中管理，进程调用 epoll_wait() 便可以得到事件完成的描述符。
+- 调用epoll_create()创建一个ep对象，即红黑树的根节点，返回一个文件句柄
+- 调用epoll_ctl()向这个ep对象（红黑树）中添加、删除、修改感兴趣的事件
+- 调用epoll_wait()等待，当有事件发生时网卡驱动会调用fd上注册的回调函数并将该fd添加到rdlist链表中，解除阻塞
 
-从上面的描述可以看出，epoll 只需要将描述符从进程缓冲区向内核缓冲区拷贝一次，并且进程不需要通过轮询来获得事件完成的描述符。
+epoll 只需要将描述符从进程缓冲区向内核缓冲区拷贝一次，并且进程**不需要通过轮询**来获得事件完成的描述符。
 
 epoll 仅适用于 Linux OS。
 
 epoll 比 select 和 poll 更加灵活而且**没有描述符数量限制**。
 
+内存拷贝，利用**mmap()文件映射内存**加速与内核空间的消息传递，减少复制开销。
+
 epoll 对多线程编程更有友好，一个线程调用了 epoll_wait() 另一个线程关闭了同一个描述符也不会产生像 select 和 poll 的不确定情况。
 
-```c
-// Create the epoll descriptor. Only one is needed per app, and is used to monitor all sockets.
-// The function argument is ignored (it was not before, but now it is), so put your favorite number here
-int pollingfd = epoll_create( 0xCAFE );
 
-if ( pollingfd < 0 )
- // report error
-
-// Initialize the epoll structure in case more members are added in future
-struct epoll_event ev = { 0 };
-
-// Associate the connection class instance with the event. You can associate anything
-// you want, epoll does not use this information. We store a connection class pointer, pConnection1
-ev.data.ptr = pConnection1;
-
-// Monitor for input, and do not automatically rearm the descriptor after the event
-ev.events = EPOLLIN | EPOLLONESHOT;
-// Add the descriptor into the monitoring list. We can do it even if another thread is
-// waiting in epoll_wait - the descriptor will be properly added
-if ( epoll_ctl( epollfd, EPOLL_CTL_ADD, pConnection1->getSocket(), &ev ) != 0 )
-    // report error
-
-// Wait for up to 20 events (assuming we have added maybe 200 sockets before that it may happen)
-struct epoll_event pevents[ 20 ];
-
-// Wait for 10 seconds, and retrieve less than 20 epoll_event and store them into epoll_event array
-int ready = epoll_wait( pollingfd, pevents, 20, 10000 );
-// Check if epoll actually succeed
-if ( ret == -1 )
-    // report error and abort
-else if ( ret == 0 )
-    // timeout; no event detected
-else
-{
-    // Check if any events detected
-    for ( int i = 0; i < ready; i++ )
-    {
-        if ( pevents[i].events & EPOLLIN )
-        {
-            // Get back our connection pointer
-            Connection * c = (Connection*) pevents[i].data.ptr;
-            c->handleReadEvent();
-         }
-    }
-}
-```
 
 
 #### 工作模式
 
 epoll 的描述符事件有两种触发模式：LT（level trigger）和 ET（edge trigger）。
 
-##### 1. LT 模式
+##### 1、LT 模式
+
+水平触发
 
 当 epoll_wait() 检测到描述符事件到达时，将此事件通知进程，进程可以不立即处理该事件，下次调用 epoll_wait() 会再次通知进程。是默认的一种模式，并且同时支持 Blocking 和 No-Blocking。
 
-##### 2. ET 模式
+##### 2、ET 模式
 
-和 LT 模式不同的是，通知之后进程必须立即处理事件，下次再调用 epoll_wait() 时不会再得到事件到达的通知。
+边缘触发
+
+和 LT 模式不同的是，通知之后进程必须**立即处理**事件，下次再调用 epoll_wait() 时不会再得到事件到达的通知。
 
 很大程度上减少了 epoll 事件被重复触发的次数，因此效率要比 LT 模式高。只支持 No-Blocking，以避免由于一个文件句柄的阻塞读/阻塞写操作把处理多个文件描述符的任务饿死。
 
@@ -326,9 +218,23 @@ poll 没**有最大描述符数量的限制**，如果平台支持并且对实�
 
 ### 三者对比
 
-1. select，使用的是**数组**来存储Socket连接文件描述符，容量是固定的，需要通过轮询来判断是否发生了IO事件
-2. poll，使用的是**链表**来存储Socket连接文件描述符，容量是不固定的，同样需要通过轮询来判断是否发生了IO事件
-3. epoll，epol和poll是完全不同的，epoll是一种**事件通知模型**，当发生了IO事件时，应用程序才进行IO操作，不需要像poll模型那样主动去轮询
+1. select数组、poll链表、epoll红黑树
+
+2. 最大连接数
+
+	select有限制；poll无限制；epoll有限制但是很大（1G内存就可以有10w的连接）
+
+3. FD 剧增后带来的IO效率问题
+
+	select/poll 因为每次调用时都会对连接进行线性遍历（**轮询**）。
+
+	epoll 因为epoll内核中实现是根据每个fd上的**callback函数**来实现的，只有活跃的socket才会主动调用callback，所以在活跃socket较少的情况下，使用epoll没有前面两者的线性下降的性能问题，但是所有socket都很活跃的情况下，可能会有性能问题。
+
+4. fd拷贝
+
+	select/poll 内核需要将消息传递到用户空间，都需要内核拷贝动作。
+
+	epoll通过内核和用户空间共享一块内存来实现的。mmap
 
 # Java IO
 
