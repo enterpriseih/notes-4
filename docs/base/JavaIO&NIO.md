@@ -191,8 +191,7 @@ if ( ret == -1 )
     // report error and abort
 else if ( ret == 0 )
     // timeout; no event detected
-else
-{
+else {
     // If we detect the event, zero it out so we can reuse the structure
     if ( fds[0].revents & POLLIN )
         fds[0].revents = 0;
@@ -211,7 +210,7 @@ else
 select 和 poll 的功能基本相同，不过在一些实现细节上有所不同。
 
 - select 会修改描述符，而 poll 不会；
-- select 的描述符类型使用数组实现，FD_SETSIZE 大小默认为 1024，因此默认只能监听少于 1024 个描述符。如果要监听更多描述符的话，需要修改 FD_SETSIZE 之后重新编译；而 poll 没有描述符数量的限制；
+- select 的描述符类型使用数组实现，FD_SETSIZE 大小默认为 1024，因此默认只能监听少于 1024 个描述符。如果要监听更多描述符的话，需要修改 FD_SETSIZE 之后重新编译；而 **poll 没有描述符数量的限制**；
 - poll 提供了更多的事件类型，并且对描述符的重复利用上比 select 高。
 - 如果一个线程对某个描述符调用了 select 或者 poll，另一个线程关闭了该描述符，会导致调用结果不确定。
 
@@ -231,13 +230,13 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)；
 int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);
 ```
 
-epoll_ctl() 用于向内核注册新的描述符或者是改变某个文件描述符的状态。已注册的描述符在内核中会被维护在一棵红黑树上，通过回调函数内核会将 I/O 准备好的描述符加入到一个链表中管理，进程调用 epoll_wait() 便可以得到事件完成的描述符。
+epoll_ctl() 用于向内核注册新的描述符或者是改变某个文件描述符的状态。**已注册的描述符在内核中会被维护在一棵红黑树上**，通过回调函数内核会将 I/O 准备好的描述符加入到一个链表中管理，进程调用 epoll_wait() 便可以得到事件完成的描述符。
 
 从上面的描述可以看出，epoll 只需要将描述符从进程缓冲区向内核缓冲区拷贝一次，并且进程不需要通过轮询来获得事件完成的描述符。
 
 epoll 仅适用于 Linux OS。
 
-epoll 比 select 和 poll 更加灵活而且没有描述符数量限制。
+epoll 比 select 和 poll 更加灵活而且**没有描述符数量限制**。
 
 epoll 对多线程编程更有友好，一个线程调用了 epoll_wait() 另一个线程关闭了同一个描述符也不会产生像 select 和 poll 的不确定情况。
 
@@ -309,13 +308,13 @@ epoll 的描述符事件有两种触发模式：LT（level trigger）和 ET（ed
 
 #### 1. select 应用场景
 
-select 的 timeout 参数精度为微秒，而 poll 和 epoll 为毫秒，因此 select 更加适用于实时性要求比较高的场景，比如核反应堆的控制。
+select 的 timeout 参数精度为微秒，而 poll 和 epoll 为毫秒，因此 select 更加适用于**实时性**要求比较高的场景，比如核反应堆的控制。
 
 select 可移植性更好，几乎被所有主流平台所支持。
 
 #### 2. poll 应用场景
 
-poll 没有最大描述符数量的限制，如果平台支持并且对实时性要求不高，应该使用 poll 而不是 select。
+poll 没**有最大描述符数量的限制**，如果平台支持并且对实时性要求不高，应该使用 poll 而不是 select。
 
 #### 3. epoll 应用场景
 
