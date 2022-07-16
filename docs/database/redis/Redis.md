@@ -987,7 +987,7 @@ Redis的key一般会设置一个过期时间，等过期之后Redis会从内存�
 
 - **内存失效满足不了的时候，走内存淘汰机制**
 
-# 缓存更新策略
+# 缓存更新策略（缓存一致性）
 
 缓存更新有三种常用策略：
 
@@ -1056,9 +1056,11 @@ Cache aside策略如果用错就会遇到深坑，下面我们来逐个踩。
 
 但其实上述问题发生的概率非常低，因为通常数据库更新操作比内存操作耗时多出几个数量级。如上图中最后一步回写缓存通常会在更新数据库之前完成。但是为了避免这种极端情况造成脏数据所产生的影响，我们还是要为缓存设置过期时间。
 
-## Read through
+## Read/Write through
 
-在 Cache Aside 更新模式中，应用代码需要维护两个数据存储，一个是缓存，一个是数据库。而在 Read-Through 策略下，应用程序无需管理缓存和数据库，只需要将数据库的同步委托给缓存提供程序 Cache Provider 即可。所有数据交互都是通过抽象缓存层完成的。
+### Read through
+
+在 Cache Aside 更新模式中，应用代码需要维护两个数据存储，一个是缓存，一个是数据库。而在 Read-Through 策略下，应用程序无需管理缓存和数据库，只需要**将数据库的同步委托给缓存提供程序 Cache Provider 即可**。所有**数据交互都是通过抽象缓存层完成**的。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205111713860.png" width="400"/>
 
@@ -1066,17 +1068,18 @@ Cache aside策略如果用错就会遇到深坑，下面我们来逐个踩。
 
 Read-Through 适用于多次请求相同数据的场景。这与 Cache-Aside 策略非常相似，但是二者还是存在一些差别，这里再次强调一下：
 
-* 在 Cache-Aside 中，应用程序负责从数据源中获取数据并更新到缓存。
-* 在 Read-Through 中，此逻辑通常是由独立的缓存提供程序支持。
-## Write through
+> * 在 Cache-Aside 中，应用程序负责从数据源中获取数据并更新到缓存。
+> * 在 Read-Through 中，此逻辑通常是由独立的缓存提供程序支持。
+
+### Write through
 
 Write-Through 策略下，当发生数据更新(Write)时，缓存提供程序 Cache Provider 负责更新底层数据源和缓存。缓存与数据源保持一致，并且写入时始终通过抽象缓存层到达数据源。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205111713063.png" width="500"/>
 
-## Write behind
+## Write behind caching
 
-数据更新时只更新缓存，每隔一段时间将数据刷新到数据库中。
+**数据更新时只更新缓存，每隔一段时间将数据刷新到数据库中**。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205111714701.png" width="500"/>
 

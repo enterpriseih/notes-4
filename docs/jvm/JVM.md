@@ -41,7 +41,7 @@ Java 源文件 → 编译器 → JVM可以理解的字节码文件 .class → JV
 
 # JVM运行机制
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311549622.png" alt="第02章_JVM架构-简图" style="zoom:33%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311549622.png" alt="第02章_JVM架构-简图" style="zoom:70%;" />
 
 **线程**
 

@@ -6,6 +6,33 @@ push(e)，pop，peek
 
 ## 6.1 应用
 
+## 补充：用栈实现队列
+
+A是逆序，将A中的数挪到B中，然后删除B的顶部，就是队列的首部元素
+
+```java
+class CQueue {
+    LinkedList<Integer> A, B;
+    public CQueue() {
+        A = new LinkedList<Integer>();
+        B = new LinkedList<Integer>();
+    }
+    public void appendTail(int value) {
+        A.addLast(value);
+    }
+    public int deleteHead() {
+        if(!B.isEmpty()) return B.removeLast();
+        if(A.isEmpty()) return -1;
+        while(!A.isEmpty())
+            B.addLast(A.removeLast());
+        return B.removeLast();
+    }
+}
+
+```
+
+
+
 ## 面试题36：后缀表达式
 
 ### 题目
