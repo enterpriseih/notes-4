@@ -88,4 +88,4 @@
 - [尚医通](./docs/project/尚医通.md)
 - [尚医通难点](./docs/project/尚医通难点.md)
 - [尚医通Debug](./docs/project/尚医通Debug.md)
-- [项目技术点总结](./docs/project/项目技术点总结.md)
+- [项目技术点总结](./docs/project/项目技术点总结.md) 

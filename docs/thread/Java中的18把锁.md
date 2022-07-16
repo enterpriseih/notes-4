@@ -16,7 +16,7 @@
 
 一个共享数据加了悲观锁，那线程每次想操作这个数据前都会假设其他线程也可能会操作这个数据，所以每次操作前都会上锁，这样其他线程想操作这个数据拿不到锁只能阻塞了。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051543754.png" alt="20210606232504-2021-06-06-23-25-04" style="zoom:40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051543754.png" alt="20210606232504-2021-06-06-23-25-04" style="zoom: 50%;" >
 
 在 Java 语言中 `synchronized` 和 `ReentrantLock`等就是典型的悲观锁，还有一些使用了 synchronized 关键字的容器类如 `HashTable` 等也是悲观锁的应用。
 
@@ -26,7 +26,7 @@ AQS框架下的锁则是先尝试cas乐观锁去获取锁，获取不到，才�
 
 乐观锁操作数据时不会上锁，在更新的时候会判断一下在此期间是否有其他线程去更新这个数据。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051543803.png" alt="20210606232434-2021-06-06-23-24-35" style="zoom:40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051543803.png" alt="20210606232434-2021-06-06-23-24-35" style="zoom: 50%;" >
 
 乐观锁可以使用`版本号机制`和`CAS算法`实现。在 Java 语言中 `java.util.concurrent.atomic`包下的原子类就是使用CAS 乐观锁实现的。
 
@@ -44,7 +44,7 @@ AQS框架下的锁则是先尝试cas乐观锁去获取锁，获取不到，才�
 
 `独占锁`是指锁一次只能被一个线程所持有。如果一个线程对数据加上排他锁后，那么其他线程不能再对该数据加任何类型的锁。获得独占锁的线程即能读数据又能修改数据。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051543655.png" alt="20210606232544-2021-06-06-23-25-45" style="zoom:40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051543655.png" alt="20210606232544-2021-06-06-23-25-45" style="zoom: 50%;" >
 
 JDK中的`synchronized`和`java.util.concurrent(JUC)`包中Lock的实现类就是独占锁。
 
@@ -52,7 +52,7 @@ JDK中的`synchronized`和`java.util.concurrent(JUC)`包中Lock的实现类就�
 
 `共享锁`是指锁可被多个线程所持有。如果一个线程对数据加上共享锁后，那么其他线程只能对数据再加共享锁，不能加独占锁。获得共享锁的线程只能读数据，不能修改数据。 
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051542018.png" alt="20210606232612-2021-06-06-23-26-13" style="zoom:40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051542018.png" alt="20210606232612-2021-06-06-23-26-13" style="zoom: 50%;" >
 
 在 JDK 中 `ReentrantReadWriteLock` 就是一种共享锁。
 
@@ -63,7 +63,7 @@ JDK中的`synchronized`和`java.util.concurrent(JUC)`包中Lock的实现类就�
 
 `互斥锁`是独占锁的一种常规实现，是指某一资源同时只允许一个访问者对其进行访问，具有唯一性和排它性。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051542734.png" alt="20210606232634-2021-06-06-23-26-35" style="zoom:40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051542734.png" alt="20210606232634-2021-06-06-23-26-35" style="zoom: 50%;" >
 
 互斥锁一次只能一个线程拥有互斥锁，其他线程只有等待。
 
@@ -79,7 +79,7 @@ JDK中的`synchronized`和`java.util.concurrent(JUC)`包中Lock的实现类就�
 
 > 写线程运行时，其他线程以及读线程都会被阻塞
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051542152.png" alt="20210606232658-2021-06-06-23-26-59" style="zoom:40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051542152.png" alt="20210606232658-2021-06-06-23-26-59" style="zoom: 50%;" >
 
 在 JDK 中定义了一个读写锁的接口：`ReadWriteLock`
 
@@ -105,7 +105,7 @@ public interface ReadWriteLock {
 
 `公平锁`是指多个线程按照申请锁的顺序来获取锁，这里类似排队买票，先来的人先买，后来的人在队尾排着，这是公平的。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051541251.png" alt="20210606232716-2021-06-06-23-27-17" style="zoom:40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051541251.png" alt="20210606232716-2021-06-06-23-27-17" style="zoom: 50%;" >
 
 在 java 中可以通过构造函数初始化公平锁
 
@@ -120,7 +120,7 @@ Lock lock = new ReentrantLock(true);
 
 `非公平锁`是指多个线程获取锁的顺序并不是按照申请锁的顺序，有可能后申请的线程比先申请的线程优先获取锁，在高并发环境下，有可能造成优先级翻转，或者饥饿的状态（某个线程一直得不到锁）。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051540864.png" alt="20210606232737-2021-06-06-23-27-38" style="zoom: 40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051540864.png" alt="20210606232737-2021-06-06-23-27-38" style="zoom: 50%;" >
 
 在 java 中 synchronized 关键字是非公平锁，ReentrantLock默认也是非公平锁。
 ```java
@@ -134,7 +134,7 @@ Lock lock = new ReentrantLock(false);
 
 `可重入锁`又称之为`递归锁`，是指同一个线程在外层方法获取了锁，在进入内层方法会自动获取锁。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051540621.png" alt="20210606232755-2021-06-06-23-27-56" style="zoom: 40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051540621.png" alt="20210606232755-2021-06-06-23-27-56" style="zoom: 50%;" >
 
 对于Java ReentrantLock而言, 他的名字就可以看出是一个可重入锁。对于Synchronized而言，也是一个可重入锁。
 
@@ -158,7 +158,7 @@ public synchronized void mehtodB() throws Exception{
 
 > 如果持有锁的线程能在很短时间内释放锁资源，那么那些等待竞争锁的线程就不需要做内核态和用户态之间的切换进入阻塞挂起状态，它们只需要等一等（自旋），等持有锁的线程释放锁后即可立即获取锁，这样就**避免用户线程和内核的切换的消耗**。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051539264.png" alt="20210606232809-2021-06-06-23-28-09" style="zoom: 40%;" >
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204051539264.png" alt="20210606232809-2021-06-06-23-28-09" style="zoom: 50%;" >
 
 自旋锁的目的是为了**减少线程被挂起的几率**，因为线程的挂起和唤醒也都是耗资源的操作。
 
