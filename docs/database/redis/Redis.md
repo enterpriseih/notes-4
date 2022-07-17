@@ -76,11 +76,32 @@ Redis 单命令的原子性主要得益于 Redis 的单线程
 
 
 
-Redis 基于 Reactor 模式开发了网络事件处理器、文件事件处理器，它是单线程的，所以 Redis才叫做单线程的模型。
+Redis 基于 Reactor 模式开发了网络事件处理器、**文件事件处理器**（file event handler），它是**单线程**的，所以 Redis才叫做单线程的模型。
 
 采用I/O多路复用机制来同时监听多个Socket， 根据Socket上的事件类型来选择对应的事件处理器来处理这个事件。可以实现高性能的网络通信模型，又可以跟内部其他单线程的模块进行对接，保证了 Redis 内部的线程模型的简单性。
 
 > Reactor 模式就是基于建立连接与具体服务之间线程分离的模式。在 Reactor 模式中，会有一个线程（负责与所有客户端建立连接，这个线程通常称之为 Reactor）。然后在建立连接之后，Reactor 线程会使用其它线程（可以有多个）来处理与每一个客户端之间的数据传输，这个（些）线程通常称之为 Handler。
+
+### 文件事件处理器四个部分
+
+- 多个 socket(客户端连接)
+- IO 多路复用程序(支持多个客户端连接的关键)
+- 文件事件分派器(将 socket 关联到相应的事件处理器) 
+- 事件处理器(连接应答处理器、命令请求处理器、命令回复处理器)
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207171259735.png" alt="iShot_2022-07-17_12.58.13" style="zoom:50%;" />
+
+### Redis6.0后加入了多线程，默认关闭
+
+https://mp.weixin.qq.com/s/FZu3acwK6zrCBZQ_3HoUgw
+
+# 为什么要用缓存/Redis
+
+高并发:
+
+一般像 MySQL 这类的数据库的 QPS 大概都在 1w 左右(4 核 8g) ，但是使用 Redis 缓存之后 很容易达到 10w+，甚至最高能达到 30w+(就单机 redis 的情况，redis 集群的话会更高)。
+
+> QPS(Query Per Second)：服务器每秒可以执行的查询次数
 
 # Redis数据结构和常用命令
 
@@ -189,7 +210,7 @@ getset <key><value>
 
 实现计数器，session共享，分布式id
 
-
+比如用户的访问次数、热点文章的点赞转发数量等。
 
 ## 2. Hash哈希
 
@@ -256,7 +277,7 @@ LREM KEY_NAME COUNT VALUE
 LLEN KEY_NAME 
 
 ```
-Redis 列表是简单的字符串列表，按照插入顺序排序，双向链表。
+Redis 列表是简单的字符串列表，按照插入顺序排序，**双向链表**。
 
 可以添加一个元素到列表的头部（左边）或者尾部（右边）
 
@@ -296,7 +317,7 @@ linsert <key> before/after <value><newvalue>
 
 Redis 将多个 ziplist 用链表结合起来组成了 quicklist。
 
-
+使用场景：发布与订阅或者说消息队列、慢查询。
 
 ## 4. Set集合
 
@@ -674,13 +695,13 @@ RDB(Redis Database)
 
 把当前内存数据生成**快照保存到硬盘**的过程，触发RDB持久化过程分为**手动触发**和**自动触发**。
 
-（1）手动触发save
+（1）手动触发**save**
 
-手动触发对应save命令，会阻塞当前Redis服务器，直到RDB过程完成为止，对于内存比较大的实例会造成长时间阻塞，线上环境不建议使用。
+手动触发对应save命令，且**同步**，会阻塞当前Redis服务器，直到RDB过程完成为止，对于内存比较大的实例会造成长时间阻塞，线上环境不建议使用。
 
-（2）自动触发bgsave
+（2）自动触发**bgsave**
 
-自动触发对应bgsave命令，Redis进程执行fork操作创建子进程，RDB持久化过程由子进程负责，完成后自动结束。阻塞只发生在fork阶段，一般时间很短。
+自动触发对应bgsave命令，Redis进程执行**fork操作创建子进程**，RDB持久化过程由子进程负责，完成后自动结束。阻塞只发生在fork阶段，一般时间很短。
 
 在redis.conf配置文件中可以配置：
 
@@ -991,7 +1012,7 @@ Redis的key一般会设置一个过期时间，等过期之后Redis会从内存�
 
 缓存更新有三种常用策略：
 
-* Cache aside
+* **Cache aside**：先更新DB，再删除cache
 * Read/Write through
 * Write behind caching
 ## Cache aside（旁路缓存）
@@ -1776,177 +1797,6 @@ mset name{user} lucy age{user} 20
 
 # 实战篇
 
-## 使用docker搭建redis主从复制集群
+## Java应用
 
-### 0. 目标
-
-本地搭建三个redis实例（一主两备），实现效果：主实例插入数据备实例可以复制同步过去。
-
-### 1. 安装docker，运行docker
-
-docker安装步骤省略，大家可以从官网下载并安装。
-
-检查docker是否运行成功：
-
-```plain
-docker info
-```
-出现回显表示运行成功，可以做下一步操作了。
-### 2. 拉取redis镜像文件
-
-执行以下命令默认拉取tag为latest的官方redis镜像
-
-```plain
-docker pull redis
-```
-### 3. 准备好redis配置文件redis.conf
-
-下载地址：[https://raw.githubusercontent.com/antirez/redis/5.0/redis.conf](https://raw.githubusercontent.com/antirez/redis/5.0/redis.conf)
-
-拷贝为3三份，如：redis01.conf, redis02.conf, redis03.conf
-
-打开所有的配置文件，修改如下配置项：
-
-* 注释只监听本地选项，可以远程连接。#bind 127.0.0.1
-* 关闭保护模式 protected-mode no
-* 打开AOF持久化开关 appendonly yes
-### 4. 启动redis实例
-
-```plain
-# 实例1
-docker run -p 6381:6379 --name redis-server-01 -v /your/path/redis/conf/redis01.conf:/etc/redis/redis.conf -v /your/path/redis/data01:/data -d redis redis-server /etc/redis/redis.conf
-# 实例2
-docker run -p 6382:6379 --name redis-server-02 -v /your/path/redis/redis/conf/redis02.conf:/etc/redis/redis.conf -v /your/path/redis/data02:/data -d redis redis-server /etc/redis/redis.conf
-# 实例3
-docker run -p 6383:6379 --name redis-server-03 -v /your/path/redis/conf/redis03.conf:/etc/redis/redis.conf -v /your/path/redis/data03:/data -d redis redis-server /etc/redis/redis.conf
-```
-对以上命令简单解释：
-* 参数-p 6381:6379，6381表示宿主机端口，6379表示容器实例端口，意思是将容器实例端口映射到宿主机端口。
-* 参数--name redis-server-01，给容器实例命名。
-* 参数-v /your/path/redis/conf/redis01.conf:/etc/redis/redis.conf，冒号前是宿主机配置文件路径，冒号后是容器的配置文件路径，意思是将容器实例的配置路径映射到宿主机的路径。
-* 参数-v /your/path/redis/data01:/data，如上面意思相同。
-* 选项-d表示以后台形式运行实例。
-* 参数redis-server /etc/redis/redis.conf表示执行redis-server命令， /etc/redis/redis.conf表示以该配置文件启动redis实例，注意配置文件必须为redis-server命令的第一个参数。
-### 5. 配置主从复制集群
-
-检查实例运行状态：
-
-```plain
-docker ps
-```
-回显有三个redis实例即为正常。
-查询实例1：redis-server-01 运行的内部ip
-
-```plain
-docker inspect redis-server-01
-```
-通过回显可以看到："IPAddress": "172.17.0.4"
-我们将实例1规划为主，另外两个实例自然为备了，通过将主的ip和port配置在备的配置文件中即可实现主从复制的效果。
-
-修改redis02.conf和redis03.conf配置文件，找到replicaof选项（redis5.0之前是slaveof），修改为：
-
-```plain
-replicaof 172.17.0.4 6379
-```
-修改完毕，重启实例2和实例3：
-```plain
-docker restart redis-server-02
-docker restart redis-server-03
-```
-检查实例1的状态是否为主，并且挂载两个备实例：
-```plain
-docker exec -it redis-server-01 redis-cli
-127.0.0.1:6379> info
-```
-回显如下表示主从复制配置成功：
-```plain
-# Replication
-role:master
-connected_slaves:2
-slave0:ip=172.17.0.3,port=6379,state=online,offset=84,lag=1
-slave1:ip=172.17.0.2,port=6379,state=online,offset=84,lag=1
-```
-### 6. 测试主从复制效果
-
-连接redis实例1插入一条记录：
-
-```plain
-docker exec -it redis-server-01 redis-cli # 连接实例1
-127.0.0.1:6379> set name ray  # 插入一条数据
-OK  # 插入成功
-```
-连接redis实例2和实例3查看是否复制成功：
-```plain
-docker exec -it redis-server-02 redis-cli # 连接实例2
-127.0.0.1:6379> get name
-"ray" # 可以查到，表明从实例已经将主实例的数据同步过来了
-```
---- 至此redis主从复制实例搭建和测试完毕，小伙伴们学会了吗。
-## 使用docker搭建redis主从复制+哨兵模式
-
-搭建三个Sentinel实例+Redis实例
-
-### 0. 哨兵作用
-
-* 监控（Monitoring）：哨兵会不断地检查主节点和从节点是否运作正常。
-* 自动故障转移（Automatic failover）：当主节点不能正常工作时，哨兵会开始自动故障转移操作，它会将失效主节点的其中一个从节点升级为新的主节点，并让其他从节点改为复制新的主节点。
-* 配置提供者（Configurationprovider）：客户端在初始化时，通过连接哨兵来获得当前 Redis 服务的主节点地址。
-* 通知（Notification）：哨兵可以将故障转移的结果发送给客户端。
-### 1. 准备好哨兵配置文件sentinel.conf
-
-官网下载源码包：[https://redis.io/download](https://redis.io/download)解压之后sentinel.conf
-
-拷贝为3三份，如：sentinel01.conf, sentinel02.conf, sentinel03.conf
-
-打开所有的配置文件，修改如下配置项：
-
-* 关闭保护模式 protected-mode no
-* 配置redis主实例ip和端口 sentinel monitor mymaster 172.17.0.4 6379 1 -配置日志文件  logfile "sentinel.log"
-### 2. 启动sentinel哨兵实例
-
-```plain
-# 实例1
-docker run -p 26381:26379 -v /your/path/sentinel01.conf:/etc/redis/sentinel.conf -v /your/path/sentinel-data01:/data --name sentinel-01 -d redis redis-sentinel /etc/redis/sentinel.conf
-# 实例2
-docker run -p 26382:26379 -v /your/path/sentinel02.conf:/etc/redis/sentinel.conf -v /your/path/sentinel-data02:/data --name sentinel-02 -d redis redis-sentinel /etc/redis/sentinel.conf
-# 实例3
-docker run -p 26383:26379 -v /your/path/sentinel03.conf:/etc/redis/sentinel.conf -v /your/path/sentinel-data03:/data --name sentinel-03 -d redis redis-sentinel /etc/redis/sentinel.conf
-```
-### 3. 测试哨兵模式
-
-连接哨兵实例1，查询当前状态：
-
-```plain
-docker exec -it sentinel-01 redis-cli -p 26379
-127.0.0.1:26379> info Sentinel
-回显如下
-# Sentinel
-sentinel_masters:1
-sentinel_tilt:0
-sentinel_running_scripts:0
-sentinel_scripts_queue_length:0
-sentinel_simulate_failure_flags:0
-master0:name=mymaster,status=ok,address=172.17.0.4:6379,slaves=2,sentinels=3
-```
-根据以上回显可以看出当前redis-server主实例ip为172.17.0.4
-现在模拟一下故障，停掉redis-server主实例，预期哨兵集群会从两个备实例选出一个作为主实例，下面开始测试：
-
-```plain
-docker stop redis-server-01 # 停主实例
-```
-连接哨兵实例1查询当前主实例ip是否变换：
-```plain
-docker exec -it sentinel-01 redis-cli -p 26379
-127.0.0.1:26379> info Sentinel
-回显如下
-# Sentinel
-sentinel_masters:1
-sentinel_tilt:0
-sentinel_running_scripts:0
-sentinel_scripts_queue_length:0
-sentinel_simulate_failure_flags:0
-master0:name=mymaster,status=ok,address=172.17.0.3:6379,slaves=2,sentinels=3
-```
-根据回显可以看出主ip已经换为172.17.0.3
---- 至此哨兵模式已经测试完毕。
-
+[应用](https://blog.csdn.net/whatfuswd/article/details/121806023?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-121806023-null-null.pc_agg_new_rank&utm_term=redis%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96java%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0&spm=1000.2123.3001.4430)

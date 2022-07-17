@@ -280,6 +280,7 @@ public int[] countBits(int num) {
         int j = i;
         while (j != 0) {
             result[i]++;
+            // 该运算将j的二进制表示的最右边的1变成0
             j = j & (j - 1);
         }
     }
@@ -299,7 +300,7 @@ public int[] countBits(int num) {
     int[] result = new int[num + 1];
     for (int i = 1; i <= num; ++i) {
         // 前面的个数已经计算得出，
-        // 最右边的1变为0后，该数将会是整数的前1，2，4，8...的数
+        // 最右边的1变为0后，该数将会是其前1，2，4，8...的数
         result[i] = result[i & (i - 1)] + 1;
     }
 

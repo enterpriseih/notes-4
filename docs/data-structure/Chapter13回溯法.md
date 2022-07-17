@@ -453,7 +453,7 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，�
 2. 不能同列
 3. 不能同斜线
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202206061457344.png" alt="image-20220606145656939" style="zoom: 33%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202206061457344.png" alt="image-20220606145656939" style="zoom: 33%;" />
 
 ```java
 List<List<String>> res = new ArrayList<>();

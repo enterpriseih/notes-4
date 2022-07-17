@@ -398,3 +398,198 @@ private boolean isPalindrome(String s, int start, int end) {
     }
 ```
 
+## 补充：最长公共前缀
+
+### 题目
+
+```
+输入：strs = ["flower","flow","flight"]
+输出："fl"
+```
+
+### 解法一
+
+按字典排序数组，比较第一个和最后一个单词，有多少前缀相同。
+
+```java
+public String longestCommonPrefix(String[] strs) {
+    Arrays.sort(strs);
+    StringBuilder res = new StringBuilder();
+    for (int i = 0; i < strs[0].length(); i++) {
+        if (strs[0].charAt(i) == strs[strs.length - 1].charAt(i)) {
+            res.append(strs[0].charAt(i));
+        } else {
+            break;
+        }
+    }
+    return res.toString();
+}
+```
+
+### 解法二
+
+```java
+public String longestCommonPrefix(String[] strs) {
+    if(strs.length == 0)return "";
+    //公共前缀比所有字符串都短，随便选一个先
+    String s = strs[0];
+    for (String string : strs) {
+        while(!string.startsWith(s)){
+            if(s.length() == 0)return "";
+            //公共前缀不匹配就让它变短！
+            s = s.substring(0,s.length()-1);
+        }
+    }
+    return s;
+}
+```
+
+## 补充：字符串匹配的KMP算法
+
+### 题目
+
+给定文本串S：“BBC_ABCDAB_ABCDABCDABDE”，和模式串P：“ABCDABD”，判断P是否为S的子串。
+
+### 解法
+
+https://blog.csdn.net/v_july_v/article/details/7041827
+
+https://www.zhihu.com/question/21923021
+
+#### 暴力解法O(nm)
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202207171441901.jpg" alt="img" style="zoom: 50%;" />
+
+```java
+int ViolentMatch(String s, String p){
+	int sLen = s.length();
+	int pLen = p.length();
+ 
+	int i = 0;
+	int j = 0;
+	while (i < sLen && j < pLen){
+		if (s.charAt(i) == p.charAt(j)) {
+			//①如果当前字符匹配成功（即S[i] == P[j]），则i++，j++    
+			i++;
+			j++;
+		}
+		else {
+			//②如果失配（即S[i]! = P[j]），令i = i - (j - 1)，j = 0    
+			i = i - j + 1;
+			j = 0;
+		}
+	}
+	//匹配成功，返回模式串p在文本串s中的位置，否则返回-1
+	if (j == pLen)
+		return i - j;
+	else
+		return -1;
+}
+```
+
+#### KMP算法O(n+m)
+
+##### next数组
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202207171524880.jpg" alt="img" style="zoom:50%;" />
+
+next数组是对于模式串而言的。**每次失配之后，移很多位**，**跳过那些不可能匹配成功的位置**。
+
+- 定义 “k-前缀” 为一个字符串的前 k 个字符； “k-后缀” 为一个字符串的后 k 个字符。
+- **next[x]** 定义为： P[0]~P[x] 这一段字符串，使得**k-前缀恰等于k-后缀**的最大的k.
+
+> 特别地，k 必须小于字符串长度。因为这个子串一共才 i+1 个字符，自己肯定与自己相等，就没有意义了。
+>
+> 使用next并不是真正的移位，只是**相对的移位**
+>
+
+```
+假如有三个元素ABA，
+从A开始考虑，A的前后缀都为空，所以next[0] = 0;
+考虑AB，前缀A，后缀B，没有共同字串，所以next[1] = 0;
+考虑ABA，前缀A，AB，后缀BA，A，有一个共同字串，并且长度为1，所以next[2] = 1;
+所以ABA的部分匹配表next={0,0,1}
+```
+
+- 如果next(j) == 0，说明走过的s上，没有路过能和前缀配对上的
+
+```
+   0 1 2 3 4 5 6
+s: c a b c a b ?
+p:   a b c a b d
+此时
+s6 != p5
+对比的路上，s对应p的部分可以跳过一些不匹配的
+p的0~4对应s的1~5是完全匹配的
+所以下一步，直接比较s6和p2
+前缀和后缀相同
+   0 1 2 3 4 5 6
+s: c a b c a b ?
+p:         a b c a b d
+```
+
+- 具体流程
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202207171609676.png" alt="1618846927-xFAEXE-010FD8AE2B79FFE03DC3735ACD224A6A" style="zoom:50%;" />
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202207171609085.png" alt="1618847960-lkVIDM-B9497542844478144BED83E9ADA0C12F" style="zoom:50%;" />
+
+。。。最后
+
+```
+p    : a a a b b a b
+next : 0 1 2 0 0 1 0
+```
+
+- buildNext()
+
+```java
+private int[] buildNext(String p) {
+    int pLen = p.length();
+    int[] next = new int[pLen];
+    // next[0] = 0;因为规定自身没有前后缀
+    for (int i = 1, j = 0; i < pLen; i++) {
+        while (j > 0 && p.charAt(i) != p.charAt(j)) {
+            j = next[j - 1];
+        }
+        if (p.charAt(i) == p.charAt(j)) {
+            j++;
+        }
+        // j已经自加1了
+        // 或者j == 0了，还是p[i] != p[j]
+        next[i] = j;
+    }
+    return next;   
+}
+```
+
+- 总体实现
+
+```java
+class Solution {
+    // KMP 算法
+    // ss: 原串(string)  pp: 匹配串(pattern)
+    public int strStr(String s, String p) {
+        if (p.isEmpty()) return 0;
+        int sLen = s.length(), pLen = p.length();
+        
+        int[] next = buildNext(p);
+		// i不回头
+        for (int i = 0, j = 0; i < sLen; i++) {
+            while (j > 0 && s.charAt(i) != p.charAt(j)) {
+                j = next[j - 1];
+            }
+            if (s.charAt(i) == p.charAt(j)) {
+                j++;
+            }
+            if (j == pLen) {
+                return i - pLen + 1;
+            }
+        }
+        return -1;
+    } 
+}
+```
+
+由next数组求最长重复子串
+

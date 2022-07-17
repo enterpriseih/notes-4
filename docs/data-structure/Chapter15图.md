@@ -769,7 +769,7 @@ public boolean exist(char[][] board, int m, int n, boolean[][] track, String wor
 
 如
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205182000642.png" alt="image-20220518200003787" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205182000642.png" alt="image-20220518200003787" style="zoom:50%;" />
 
 选一个入度为0的节点：1，然后删除
 
@@ -787,7 +787,7 @@ n门课程的编号从0到n-1。输入一个数组prerequisites，它的每个�
 
 画成图
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205182005577.png" alt="image-20220518200545866" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205182005577.png" alt="image-20220518200545866" style="zoom:50%;" />
 
 ### 参考代码
 
@@ -852,7 +852,7 @@ ac排在ab前，说明c在b前，即c->b
 
 
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205182116130.png" alt="image-20220518211640523" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205182116130.png" alt="image-20220518211640523" style="zoom:50%;" />
 
 ### 参考代码
 

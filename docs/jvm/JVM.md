@@ -120,7 +120,7 @@ public static void main(String[] args) {
 
 ### 对象头
 
-- 运行时元数据（MarkWorld）
+- 运行时元数据（MarkWord）
 
 	- 哈希值
 	- GC分代年龄
@@ -132,8 +132,30 @@ public static void main(String[] args) {
 - 类型指针
 
 	指向类元数据InstanceKlass，确定该对象所属的类型
+	
+- 数组长度
+
+  如果有的话，32bit
+
+> 对象头中的Mark Word（标记字）主要用来**表示对象的线程锁状态**，另外还可以用来配合GC、存放该对象的hashCode；
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207161444658.png"  />
+
+> 为什么从Young GC的对象最多经历15次Young GC还存活就会进入Old区（年龄是可以调的，默认是15）?
+>
+> 因为用了4个bit去表示分代年龄，那么能表示的最大范围就是0-15。所以这也就是为什么设置新生代的年龄不能超过15，可以通过-XX:MaxTenuringThreshold去调整（最大值为15）
 
 [对象头](https://blog.csdn.net/sumengnan/article/details/125035218)
+
+[锁升级与对象头](https://zhuanlan.zhihu.com/p/537852119)
+
+1、对于偏向锁而言， **一旦在对象头中设置过hashcode， 那么进入同步块时就不会进入偏向锁状态**，会直接跳到轻量级锁，毕竟偏向锁里没有存放hashcode的地方。
+
+2、轻量级锁中，除了锁状态标记位，其他的都变成了一个栈帧中lockRecord记的地址。分代年龄、hashcode等固有属性。这些信息会被存储到对应线程栈帧中的**lockRecord**中。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207161501955.jpg" alt="img" style="zoom:67%;" />
+
+3、重量级锁中，对象头中的markwod，和轻量级锁中的处理类似， 被存入objectMonitor对象的header字段中。
 
 ## 对象的访问定位
 
