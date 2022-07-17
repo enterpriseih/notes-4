@@ -528,15 +528,42 @@ s: c a b c a b ?
 p:         a b c a b d
 ```
 
-- 具体流程
+- next具体流程
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202207171609676.png" alt="1618846927-xFAEXE-010FD8AE2B79FFE03DC3735ACD224A6A" style="zoom:50%;" />
-
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202207171609085.png" alt="1618847960-lkVIDM-B9497542844478144BED83E9ADA0C12F" style="zoom:50%;" />
-
-。。。最后
+求next数组的过程完全可以看成字符串匹配的过程，即以模式字符串为主字符串，以模式字符串的前缀为目标字符串
 
 ```
+p - i, pp - j
+①
+        ↆ
+p   : a a a b b a b
+pp  :   a a a b b a b
+        𐌣
+if(p[i] == pp[j]) next[i] = j + 1;
+next: 0 1
+i++, j++;
+
+②
+          ↆ
+p   : a a a b b a b
+pp  :   a a a b b a b
+          𐌣
+next[i] = j + 1;
+next: 0 1 2 
+i++, j++;
+
+③
+            ↆ
+p   : a a a b b a b
+pp  :   a a a b b a b
+            𐌣
+while(p[i] != pp[j]) j = next[j - 1]
+until j == 0 or p[i] != pp[j];
+next[i] = j;
+next: 0 1 2 0
+
+...
+
 p    : a a a b b a b
 next : 0 1 2 0 0 1 0
 ```
@@ -591,5 +618,53 @@ class Solution {
 }
 ```
 
-由next数组求最长重复子串
+## 最长重复子串LeetCode1044
+
+### [题目](https://leetcode.cn/problems/longest-duplicate-substring)
+
+给你一个字符串 s ，考虑其所有 重复子串 ：即 s 的（连续）子串，在 s 中出现 2 次或更多次。这些出现之间可能存在重叠。
+
+返回 任意一个 可能具有最长长度的重复子串。如果 s 不含重复子串，那么答案为 "" 。
+
+```
+输入：s = "banana"
+输出："ana"
+```
+
+### 解法一（超时）
+
+KMP算法的next数组
+
+```java
+public String longestDupSubstring(String s) {
+    int ansMax = 0;
+    String res = "";
+    for (int i = 0; i < s.length(); i++) {
+        String p = s.substring(i);
+        int subLen = buildNext(p);
+        if (subLen > ansMax) {
+            ansMax = subLen;
+            res = p.substring(0, subLen);
+        }
+    }
+    return res;
+}
+
+private int buildNext(String p) {
+    int max = 0;
+    int[] next = new int[p.length()];
+    for (int i = 1, j = 0; i < p.length(); i++) {
+        while (j > 0 && p.charAt(i) != p.charAt(j)) {
+            j = next[j - 1];
+        }
+        if (p.charAt(i) == p.charAt(j)) {
+            j++;
+        }
+        next[i] = j;
+        max = Math.max(max, next[i]);
+    }
+    return max;
+    // return p.substring(0, max);
+}
+```
 
