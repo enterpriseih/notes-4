@@ -330,3 +330,84 @@ public List<Integer> rightSideView(TreeNode root) {
     return view;
 }
 ```
+
+## 补充：循环队列
+
+### 题目
+
+循环队列的一个好处是我们可以利用这个队列之前用过的空间。在一个普通队列里，一旦一个队列满了，我们就不能插入下一个元素，即使在队列前面仍有空间。但是使用循环队列，我们能使用这些空间去存储新的值。
+
+你的实现应该支持如下操作：
+
+```
+MyCircularQueue(k): 构造器，设置队列长度为 k 。
+Front: 从队首获取元素。如果队列为空，返回 -1 。
+Rear: 获取队尾元素。如果队列为空，返回 -1 。
+enQueue(value): 向循环队列插入一个元素。如果成功插入则返回真。
+deQueue(): 从循环队列中删除一个元素。如果成功删除则返回真。
+isEmpty(): 检查循环队列是否为空。
+isFull(): 检查循环队列是否已满。
+```
+
+
+
+### 解法
+
+用数组模拟
+
+`tailIndex = (headIndex + len − 1) mod capacity`
+
+其中 capacity 是数组长度，len 是队列长度，headIndex 和 tailIndex 分别是队首 head 和队尾 tail 索引。
+
+![img](https://pic.leetcode-cn.com/Figures/622/622_queue_with_array.png)
+
+```java
+class MyCircularQueue {
+    private int[] queue;
+    private int len;
+    private int capacity;
+    private int headIndex;
+    public MyCircularQueue(int k) {
+        queue = new int[k];
+        len = 0;
+        capacity = k;
+        headIndex = 0;
+    }
+    
+    public boolean enQueue(int value) {
+        if (len == capacity) return false;
+        // 队尾元素的下一个
+        queue[(headIndex + len) % capacity]  = value;
+        len++;
+        return true;
+    }
+    
+    public boolean deQueue() {
+        if (len == 0) return false;
+        // 将头索引后移
+        headIndex = (headIndex + 1) % capacity;
+        len--;
+        return true;
+    }
+    
+    public int Front() {
+        if (len == 0) return -1;
+        return queue[headIndex];
+    }
+    
+    public int Rear() {
+        if (len == 0) return -1;
+        return queue[(headIndex + len - 1) % capacity];
+    }
+    
+    public boolean isEmpty() {
+        return len == 0;
+    }
+    
+    public boolean isFull() {
+        return len == capacity;
+    }
+}
+
+```
+

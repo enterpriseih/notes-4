@@ -123,6 +123,45 @@ Outer.Inner inner = new Outer.Inner();
 
 Static Nested Class不依赖于外部类的实例对象，所以可以访问外部类的非static成员变量
 
+## 六、重载和重写
+
+### 重载overload
+
+重载就是**同一个类**中多个**同名方法**根据**不同的传参**来执行**不同的逻辑处理**。
+
+比如构造器，String类中有四个indexOf方法
+
+```
+方法签名：完整描述一个方法，要指出方法名以及参数类型，返回值不用标出。
+indexOf(int)
+indexOf(int, int)
+indexOf(String)
+indexOf(String, int)
+```
+
+编译期间
+
+### 重写override
+
+重写就是子类**对父类方法的重新改造**，外部样子不能改变，**内部逻辑可以改变**。
+
+运行期间
+
+> 如果方法的返回类型是**void和基本数据类型**，则返回值重写时**不可修改**。但是如果方法的返回值是**引用类型**， 重写时是可以返回该引用类型的**子类**的。
+
+### 对比
+
+|            | 重载     | 重写                                                         |
+| ---------- | -------- | ------------------------------------------------------------ |
+| 发生范围   | 同类     | 子类                                                         |
+| 参数列表   | 必须修改 | 不能修改                                                     |
+| 返回类型   | 可修改   | 子类方法返回值类型应比父类方法返回值类型更小或相等           |
+| 异常       | 可修改   | 子类方法声明抛出的异常类应比父类方法声明抛出的异常类更小或相等; |
+| 访问修饰符 | 可修改   | 一定不能做更严格的限制(可以降低限制)；                       |
+| 发生阶段   | 编译期   | 运行期                                                       |
+
+
+
 # 对象的实例化
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311610240.png" alt="第10章_对象的实例化" style="zoom:50%;" />
@@ -160,7 +199,10 @@ StackOverflowError（栈溢出）
 
 ```java
 public final class String implements java.io.Serializable, Comparable<String>, CharSequence {
-    /* String本质是个char数组，而且用final修饰 */
+    /* 
+    	String本质是个char数组，而且用final修饰 
+    	jdk9之后换成了byte数组
+    */
     private final char value[];
 }
 ```

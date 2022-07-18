@@ -39,3 +39,7 @@ kafka的生产者采用的是**异步发送消息机制**，当发送一条消�
 ## Kafka中是怎么体现消息顺序性的
 
 katka每个partition中的消息在写入时都是有序的，消费时，每个partition只能被每一个group中的一个消费者消费，保证了消费时也是有序的。整个topic不保证有序。如果为了保证topic整个有序，那么将partition调整为1。
+
+# Kafka的分区partition
+
+https://blog.csdn.net/ATYtian/article/details/125647322

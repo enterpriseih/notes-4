@@ -15,7 +15,7 @@
 
 **AMQP概念**：
 
-- **Server**：又称作Broker，接收客户端的连接，实现AMQP实体服务。
+- **Server**：又称作**Broker**，接收客户端的连接，实现AMQP实体服务。
 - **Connection**：连接，应用程序与Broker的网络连接， TCP/IP 三次握手和四次挥手。
 - **Channel**：网络信道，几乎所有的操作都在Channel中进行，Channel是进行消息读写的通道。客户端可以建立多个Channel，每个Channel代表一个会话任务。
 - **Message**：消息。服务器和应用程序之间传送的数据，由Properties和Body组成。
@@ -29,33 +29,35 @@
 - **Routing Key**：一个路由规则，虚拟机可以用它来确定如何路由一个特点消息。
 - **Queue**：也成为了Message Queue，消息队列，保存消息并转发给消费者。
 
-# MQ消息流转
-
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121519197.jpg" alt="2.6-1-RabbitMQ消息流转图" style="zoom:67%;" />
-
 
 
 # RabbitMQ架构
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121518968.jpg" alt="2.5-1-RabbitMQ的整体架构图" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207181619273.png" alt="RabbitMQ-00000007" style="zoom:75%;" />
 
 
 
 **Broker**：rabbitmq的服务节点
 
-**Queue**：队列，是RabbitMQ的内部对象，用于存储消息。RabbitMQ中消息只能存储在队列中。**生产者投递消息到队列，消费者从队列中获取消息井消费**。多个消费者可以订阅同一个队列，这时队列中的消息会被平均分摊(轮询)给多个消费者进行消费，而不是每个消费者都收到所有的消息进行消费。(注意：RabbitMQ不支持队列层面的广播消费，如果需要广播消费，可以采用一个交换器通过路由Key绑定多个队列，由多个消费者来订阅这些队列的方式。
+**Queue**：队列，是RabbitMQ的内部对象，用于存储消息。RabbitMQ中消息只能存储在队列中。**生产者投递消息到队列，消费者从队列中获取消息井消费**。
 
-**Exchange**：交换器。生产者将消息发送到Exchange，由交换器根据Routing Key将消息路由到一个或多个队列中。如果路由不到，或返回给生产者，或直接丢弃，或做其它处理。
+**Exchange**：交换机。生产者将消息发送到Exchange，由交换器根据Routing Key将消息路由到一个或多个队列中。如果路由不到，或返回给生产者，或直接丢弃，或做其它处理。
 
 **Routingkey**：路由Key。生产者将消息发送给交换器的时候，一般会指定一个Routingkey，**用来指定这个消息的路由规则**。这个路由Key需要与交换器类型和绑定键(BindingKey)联合使用才能最终生效。在交换器类型和绑定键固定的情况下，生产者可以在发送消息给交换器时**通过指定Routingkey来决定消息流向哪里**。
 
-**Binding**：通过绑定将交换器和队列关联起来，在绑定的时候一般会指定一个绑定键，这样RabbitiMQ就可以指定如何正确的路由到队列了。
+**Binding**：exchange 和 queue 之间的虚拟连接，binding 中可以包含 routing key，Binding 信息被保存到 exchange 中的查询表中，用于 message 的分发依据。
 
-> 交换器和队列实际上是多对多关系。就像关系数据库中的两张表。他们通过Bindingkey做关联(多对多关系表)。在投递消息时，可以通过Exchange和Routingkey(对应Bindingkey)就可以找到相对应的队列。
+> **交换器和队列实际上是多对多关系。**就像关系数据库中的两张表。他们通过Bindingkey做关联(多对多关系表)。在投递消息时，可以通过Exchange和Routingkey(对应Bindingkey)就可以找到相对应的队列。
 
-**Channel**：信道是建立在 Connection 之上的虛拟连接。当应用程序与Rabbit Broker建立TCP连接的时候，客户端紧接着可以创建一个 AMQP 信道(Channel)，每个信道都会被指派一个唯一的D。RabbitMQ 处理的每条 AMQP 指令都是通过信道完成的。
+**Connection**：publisher／consumer 和 broker 之间的 TCP 连接
 
-# 交换机
+**Channel**：Channel 是在 connection 内部建立的逻辑连接。如果应用程序支持多线程，通常每个 thread 创建单独的 channel 进行通讯，当应用程序与Rabbit Broker建立TCP连接的时候，客户端紧接着可以创建一个 AMQP 信道(Channel)，每个信道都会被指派一个唯一的ID。**RabbitMQ 处理的每条 AMQP 指令都是通过信道完成的。**
+
+> 有了Channel，每次不需要每次访问MQ都建立一个connection。
+>
+> Channel 作为轻量级的 Connection 极大减少了操作系统建立 TCP connection 的开销 
+
+# [交换机](./rabbitmq/RabbitMQ-交换机.md)
 
 Exchange属性：
 
@@ -117,9 +119,8 @@ Exchange属性：
 
 信道需要设置为 contirm 模式，则所有在信道上发布的消息都会分配一个唯一D。
 
-1. 一旦消息**被投递到queue**（可持久化的消息需要写入磁盘），信道会发送一个确认**ack**给生产者（包含消息
-	唯一ID）。如果 RabbitMQ 发生内部错误从而导致**消息丟失**，会发送一条 **nack**（未确认）消息给生产者。
-
+1. 一旦消息**被投递到queue**（可持久化的消息需要写入磁盘），信道会发送一个确认**ack**给生产者（包含消息唯一ID）。如果 RabbitMQ 发生内部错误从而导致**消息丟失**，会发送一条 **nack**（未确认）消息给生产者。
+	
 2. 所有被发送的消息都将被 contirm（即ack） 或者被nack一次。
 3. 但是没有对消息被 confirm 的快慢做任何保证，井且**同一条消息不会既被 confirm又被 nack**。
 
@@ -133,9 +134,9 @@ ReturnCallback接口：消息失败返回时回调
 
 消费者在声明队列时，可以**指定noAck參数**，当noAck=false时， RabbitMQ会**等待消费者显式发回ack**信号后**才从内存**(或者磁盘，持久化消息)中**移去消息**。否则，消息被消费后会被立即删除。
 
-消贵者接收每一条消息后都必须进行确认（消息接收和消息确认是两个不同操作)。**只有消费者确认了消息，RabbitMQ 才能安全地把消息从队列中删除**。
+消费者接收每一条消息后都必须进行确认（消息接收和消息确认是两个不同操作)。**只有消费者确认了消息，RabbitMQ 才能安全地把消息从队列中删除**。
 
-> RabbitMQ不会为末ack的消息设置超时时间，它判断此消息是否需要重新投递给消费者的唯一依据是消费该消息的消费者连接是否已经断开。这么设计的原因是RabbitMQ**允许消费者消费一条消息的时间可以很长**。保证数据的最终一致性。
+> RabbitMQ不会为未ack的消息设置超时时间，它判断此消息是否需要重新投递给消费者的唯一依据是消费该消息的消费者连接是否已经断开。这么设计的原因是RabbitMQ**允许消费者消费一条消息的时间可以很长**。保证数据的最终一致性。
 
 如果消费者返回ack之前断开了链接，RabbitMQ 会重新分发给下一个订阅的消费者。（可能存在消息重复消费的隐患，需要去重）。
 
