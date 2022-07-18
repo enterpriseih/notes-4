@@ -363,7 +363,7 @@ private boolean isPalindrome(String s, int start, int end) {
 
 给定一个字符串，请问字符串里有多少回文连续子字符串？例如，字符串里"abc"有3个回文字符串，分别为"a"、"b"、"c"；而字符串"aaa"里有6个回文子字符串，分别为"a"、"a"、"a"、"aa"、"aa"和"aaa"。
 
-> - 从字符串中心向两端延伸
+> - 从字符串中心向两端延伸：**中心扩展法**
 > - 第 i 个字符本身可以构成奇数回文的子字符串的中心
 > - 第 i 和 i + 1 个字符可以构成偶数回文的中心
 
@@ -579,6 +579,7 @@ private int[] buildNext(String p) {
         while (j > 0 && p.charAt(i) != p.charAt(j)) {
             j = next[j - 1];
         }
+        
         if (p.charAt(i) == p.charAt(j)) {
             j++;
         }

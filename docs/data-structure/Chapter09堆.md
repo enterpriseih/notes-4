@@ -144,8 +144,8 @@ public int[] maxSlidingWindow(int[] nums, int k) {
     }
 
     return res;
-
 }
+
 ```
 
 ### 解二：双向队列
