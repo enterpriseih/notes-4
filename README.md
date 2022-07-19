@@ -33,11 +33,12 @@
 - [Redis面试](./docs/database/redis/Redis面试.md)
 - [数据字典&EasyExcel](./docs/database/数据字典.md)
 
-### :globe_with_meridians:网络编程
+### :globe_with_meridians:计算机基础
 
-- [计算机网络](./docs/net/计算机网络.md)
-- [攻击技术](./docs/net/攻击技术.md)
-- [Web](./docs/net/Web.md)
+- [计算机网络](./docs/computer/计算机网络.md)
+- [攻击技术](./docs/computer/攻击技术.md)
+- [Web](./docs/computer/Web.md)
+- [IO模型](./docs/computer/IO模型.md)
 
 ### 框架
 
