@@ -116,13 +116,20 @@ Bean缓存池为HashMap实现
 
 #### 单例模式和单例bean
 
-例如，有一个bean，类型为User，则：
+单例模式是指在一个**JVM进程中**仅有一个实例，而单例bean是指在一个**Spring Bean容器** (ApplicationContext) 中仅有一个实例。一个JVM进程可以有多个SpringBean容器。
 
-单例Bean：spring容器中可以有多个beanName不同，但是类型相同的bean。例如，可以有beanName分别为user1和user2，对应的类型都是User。
+```java
+//  第一个Spring Bean容器
+ApplicationContext context_1 = new FileSystemXmlApplicationContext("classpath:/ApplicationContext.xml");
+Person person1 = context_1.getBean("person", Person.class);
+//  第二个Spring Bean容器
+ApplicationContext context_2 = new FileSystemXmlApplicationContext("classpath:/ApplicationContext.xml");
+Person person2 = context_2.getBean("person", Person.class);
+//  这里绝对不会相等，因为创建了多个实例
+System.out.println(person1 == person2);
+```
 
-单例模式是指每次创建的对象都是同一个。
-
-单例模式是指在一个**JVM进程中**仅有一个实例，而单例bean是指在一个**Spring Bean容器** (ApplicationContext) 中仅有一个实例。
+Spring的单例是用单例注册表实现的。
 
 ### 2、Bean的生命周期***
 
