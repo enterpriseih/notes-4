@@ -83,80 +83,6 @@ private TreeNode helper(int inleft, int inright) {
 
 
 
-## 补充：最近的公共祖先
-
-### 题目
-
-```
-     1
-   /   \
-  2     3
- / \   / \
-4   5 6   7
-```
-
-p：6，q：2，最近公共祖先：1
-
-
-
-### 解法
-
-根据以上定义，若 root 是 p, q 的 最近公共祖先 ，则只可能为以下情况之一：
-
-1、p 和 q 在 root 的子树中，且分列 root 的 异侧（即分别在左、右子树中）；
-
-2、p = root，且 q 在 root 的左或右子树中；
-
-3、q = root，且 p 在 root 的左或右子树中；
-
-**返回值**
-
-1. 当 left 和 right 同时为空 ：说明 root 的左 / 右子树中都不包含 p,q，返回 null；
-
-2. 当 left和 right 同时不为空 ：说明 p, q 分列在 root 的 异侧 （分别在 左 / 右子树），因此 root为最近公共祖先，返回 root ；
-
-3. 当 left 为空 ，right 不为空 ：p,q 都不在 root 的左子树中，直接返回 right 。具体可分为两种情况：
-	- p,q 其中一个在 root 的 右子树 中，此时 right 指向 p（假设为 p ）；
-	- p,q 两节点都在 root 的 右子树 中，此时的 right 指向 最近公共祖先节点 ；
-
-4. 当 left不为空 ， right 为空 ：与情况 3. 同理；
-
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205222144064.png" alt="image-20220522214443897" style="zoom:50%;" />
-
-```java
-public TreeNode lowestCommonAncestor(TreeNode root, 
-                                     TreeNode p, 
-                                     TreeNode q) {
-    if (root == null || root == p || root == q) { 
-        // 递归结束条件
-        // 只要当前根节点是p和q中的任意一个，
-        // 就返回（因为不能比这个更深了，再深p和q中的一个就没了）
-        return root;
-    }
-
-    // 根节点不是p和q中的任意一个，那么就继续分别往左子树和右子树找p和q
-    // 后序遍历
-    TreeNode left = lowestCommonAncestor(root.left, p, q);
-    TreeNode right = lowestCommonAncestor(root.right, p, q);
-
-    if(left == null && right == null) { 
-        // p和q都没找到，那就没有
-        return null;
-    }else if(left == null && right != null) { 
-        // 左子树没有p也没有q，就返回右子树的结果
-        return right;
-    }else if(left != null && right == null) { 
-        // 右子树没有p也没有q就返回左子树的结果
-        return left;
-    }else { 
-        // 左右子树都找到p和q了，
-        // 那就说明p和q分别在左右两个子树上，
-        // 所以此时的最近公共祖先就是root
-        return root;
-    }
-}
-```
-
 
 
 ## 8.1 二叉树的深度优先搜索
@@ -311,6 +237,80 @@ public List<Integer> inorderTraversal(TreeNode root) {
 
 
 
+## 补充：最近的公共祖先
+
+### 题目
+
+```
+     1
+   /   \
+  2     3
+ / \   / \
+4   5 6   7
+```
+
+p：6，q：2，最近公共祖先：1
+
+
+
+### 解法
+
+根据以上定义，若 root 是 p, q 的 最近公共祖先 ，则只可能为以下情况之一：
+
+1、p 和 q 在 root 的子树中，且分列 root 的 异侧（即分别在左、右子树中）；
+
+2、p = root，且 q 在 root 的左或右子树中；
+
+3、q = root，且 p 在 root 的左或右子树中；
+
+**返回值**
+
+1. 当 left 和 right 同时为空 ：说明 root 的左 / 右子树中都不包含 p,q，返回 null；
+
+2. 当 left和 right 同时不为空 ：说明 p, q 分列在 root 的 异侧 （分别在 左 / 右子树），因此 root为最近公共祖先，返回 root ；
+
+3. 当 left 为空 ，right 不为空 ：p,q 都不在 root 的左子树中，直接返回 right 。具体可分为两种情况：
+	- p,q 其中一个在 root 的 右子树 中，此时 right 指向 p（假设为 p ）；
+	- p,q 两节点都在 root 的 右子树 中，此时的 right 指向 最近公共祖先节点 ；
+
+4. 当 left不为空 ， right 为空 ：与情况 3. 同理；
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202205222144064.png" alt="image-20220522214443897" style="zoom:50%;" />
+
+```java
+public TreeNode lowestCommonAncestor(TreeNode root, 
+                                     TreeNode p, 
+                                     TreeNode q) {
+    if (root == null || root == p || root == q) { 
+        // 递归结束条件
+        // 只要当前根节点是p和q中的任意一个，
+        // 就返回（因为不能比这个更深了，再深p和q中的一个就没了）
+        return root;
+    }
+
+    // 根节点不是p和q中的任意一个，那么就继续分别往左子树和右子树找p和q
+    // 后序遍历
+    TreeNode left = lowestCommonAncestor(root.left, p, q);
+    TreeNode right = lowestCommonAncestor(root.right, p, q);
+
+    if(left == null && right == null) { 
+        // p和q都没找到，那就没有
+        return null;
+    }else if(left == null && right != null) { 
+        // 左子树没有p也没有q，就返回右子树的结果
+        return right;
+    }else if(left != null && right == null) { 
+        // 右子树没有p也没有q就返回左子树的结果
+        return left;
+    }else { 
+        // 左右子树都找到p和q了，
+        // 那就说明p和q分别在左右两个子树上，
+        // 所以此时的最近公共祖先就是root
+        return root;
+    }
+}
+```
+
 
 
 ## 面试题47：二叉树剪枝
@@ -343,19 +343,44 @@ public TreeNode pruneTree(TreeNode root) {
 请设计一个算法能将二叉树序列化成一个字符串并能将该字符串反序列化出原来二叉树的算法。
 
 ### 参考代码
+
+- 使用前序遍历，这样得到的序列化首位是根节点
+- 用#代替null，这样不会导致两个树的序列化相同
+
+```
+     6
+   /   \
+  6     6
+ / \   
+6   6 
+序列化：6,6,6,#,#,6,#,#,6,#,#
+     6
+   /   \
+  6     6
+       / \   
+      6   6 
+序列化：6,6,#,#,6,6,#,#,6,#,#
+```
+
+
+
 ``` java
 public String serialize(TreeNode root) {
     if (root == null) {
         return "#";
     }
-
+ 
     String leftStr = serialize(root.left);
     String rightStr = serialize(root.right);
+    // 将当前节点、左树、右树的序列化字符串拼接
     return String.valueOf(root.val) + "," + leftStr + "," + rightStr;
 }
 
+// 反序列化
 public TreeNode deserialize(String data) {
+    // 将逗号去掉
     String[] nodeStrs = data.split(",");
+    // i[0]可以随着递归传递
     int[] i = {0};
     return dfs(nodeStrs, i);
 }
@@ -372,7 +397,7 @@ private TreeNode dfs(String[] strs, int[] i) {
     node.left = dfs(strs, i);
     node.right = dfs(strs, i);
     return node;
-
+}
 ```
 
 

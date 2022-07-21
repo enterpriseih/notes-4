@@ -50,11 +50,12 @@
 - [SpringBoot笔记](./docs/framework/spring/SpringBoot笔记.md)
 - [SpringCloud笔记](./docs/framework/spring/springcloud/SpringCloud.md)
 
-### :pencil2: 算法
+### :pencil2: 数据结构与算法
 
 - [代码随想录](https://programmercarl.com/)
 - [数据结构与算法](./docs/data-structure/TOC.md)
 - [红黑树](./docs/data-structure/红黑树.md)
+- [跳表和B+树](./docs/data-structure/跳表和B+树.md)
 
 ### 前端 
 
@@ -62,7 +63,7 @@
 - [Vue空](./docs/front-end/Vue.md)
 - [前端debug空](./docs/front-end/前端debug.md)
 
-### 后端·
+### 后端
 
 - [消息队列](./docs/message-queue/消息队列.md)
 - [RabbitMQ](./docs/message-queue/RabbitMQ.md)

@@ -391,7 +391,7 @@ https://blog.csdn.net/weixin_43989347/article/details/124914215
 ```plain
 ZADD KEY_NAME SCORE1 VALUE1.. SCOREN VALUEN
 ```
-Redis zset 和 set 一样也是string类型元素的集合,且不允许重复的成员。
+Redis zset 和 set 一样也是string类型元素的集合，且不允许重复的成员。
 
 不同的是每个元素都会关联一个double类型的分数score。
 
