@@ -249,7 +249,8 @@ public int[] topKFrequent(int[] nums, int k) {
     }
 
     Queue<Map.Entry<Integer, Integer>> minHeap = new PriorityQueue<>(
-        (e1, e2) -> e1.getValue() - e2.getValue());
+        (e1, e2) -> e1.getValue() - e2.getValue()
+    );
     for (Map.Entry<Integer, Integer> entry : numToCount.entrySet()) {
         if (minHeap.size() < k) {
             minHeap.offer(entry);

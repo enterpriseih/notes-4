@@ -68,7 +68,6 @@
 - [消息队列](./docs/message-queue/消息队列.md)
 - [RabbitMQ](./docs/message-queue/RabbitMQ.md)
 - [Kafka](./docs/message-queue/Kafka.md)
-- [RabbitMQ使用](./docs/message-queue/rabbitmq/RabbitMQ参考.md)
 - [分布式与微服务](./docs/distributed/分布式与微服务.md)
 
 ### else
