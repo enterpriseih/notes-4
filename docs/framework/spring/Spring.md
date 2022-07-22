@@ -580,7 +580,7 @@ starter 就是定义了一个 starter 的 jar 包，写一个 @Configuration 配
 
 不需要下载 tomcat，springboot 已经内置了 tomcat.jar，运行 main 方法时会去启动 tomcat，并利用 tomcat 的 spi 机制加载 springmvc
 
-### 1、启动流程
+### 启动流程
 
 1. springboot 启动的时候会创建一个 spring 容器
 2. 在创建 spring 容器的过程中，会利用 @ConditionalOnClass 技术来判断当前 classpath 是否存在 tomcat 依赖，若存在则会生成一个启动 tomcat 的 bean

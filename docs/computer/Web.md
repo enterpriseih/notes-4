@@ -91,6 +91,41 @@ C为控制，也就是事件，用于流程的控制。
 2. session复制：当一个tomcat实例上保存了session信息后，主动将session 复制到集群中的其他实例。问题：复制是需要时间的，在复制过程中，容易产生session信息丢失。
 3. session共享： 就是将服务端的session信息保存到一个第三方中，比如Redis。
 
+# Tomcat
+
+轻量级Web应用服务器（web容器）
+
+具备web服务器的所有功能，不仅可以监听接收请求并响应静态资源，而且可以在后端运行特定规范的Java代码servlet，同时将执行的结果以HTML代码的形式返回客户端。
+
+## 核心组件
+
+**1、web容器**
+
+实现服务器功能
+
+**2、servlet容器**
+
+处理servlet代码
+
+**3、jsp容器**
+
+将jsp动态网页翻译成servlet代码
+
+## 打破双亲委派机制
+
+问题：同一个web容器中可能有多个web程序，不同的web程序中可能会用到同个第三方类库的不同版本。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207221554315.png" alt="img" style="zoom:80%;" />
+
+>  如上图，上面的橙色部分还是和原来一样，采用双亲委派机制，而黄色部分是tomcat第一部分自定义的类加载器，这部分主要加载tomcat包中的类，这一部分依然采用的是双亲委派机制，而绿色部分是tomcat第二部分自定义类加载器，正是这一部分，打破了类的双亲委派机制。
+
+java项目在打war包的时候，tomcat自动生成的类加载器，也就是说，每一个项目打成一个war包，tomcat都会自动生成一个类加载器，专门用来加载这个war包。而这个类加载器打破了双亲委派机制。
+
+- tomcat加载自身的api的时候使用双亲委派
+- 加载webapp的时候使用自定义的加载器
+
+> **看两个类对象是否是同一个，除了看类的包名和类名是否都相同之外，还需要他们的类加载器也是同一个才能认为他们是同一个。**
+
 # JavaWeb的三大规范
 
 Servlet程序、Listener监听器、Filter过滤器
@@ -99,7 +134,7 @@ Servlet程序、Listener监听器、Filter过滤器
 
 ## 1、Servlet
 
-
+用 Java 编写的服务器端程序
 
 ## 2、Listener
 

@@ -40,6 +40,10 @@
 - [Web](./docs/computer/Web.md)
 - [IO模型](./docs/computer/IO模型.md)
 
+### 分布式
+
+- [分布式与微服务](./docs/distributed/分布式与微服务.md)
+
 ### 框架
 
 - [Spring](./docs/framework/spring/Spring.md)
@@ -63,14 +67,13 @@
 - [Vue](./docs/front-end/Vue.md)
 - [前端debug空](./docs/front-end/前端debug.md)
 
-### 后端
+### 消息队列
 
 - [消息队列](./docs/message-queue/消息队列.md)
 - [RabbitMQ](./docs/message-queue/RabbitMQ.md)
 - [Kafka](./docs/message-queue/Kafka.md)
-- [分布式与微服务](./docs/distributed/分布式与微服务.md)
 
-### else
+### 其他
 
 
 - [MyDebug](./docs/MyDebug.md)
