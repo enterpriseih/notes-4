@@ -320,6 +320,7 @@ public static boolean searchMatrix(int[][] matrix, int target) {
     int l = 0, r = m-1;
     
     // 二分查找：在第0列中二分，找到小于target的最接近的元素，记录行号row
+    // 即找到第一个小于target的元素
     int row = 0;
     while (l <= r) {
         int mid = l + (r-l)/2;

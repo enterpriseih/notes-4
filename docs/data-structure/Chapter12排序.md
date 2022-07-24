@@ -2,6 +2,33 @@
 
 排序[leetcode](https://leetcode-cn.com/problems/sort-an-array/)
 
+```
+java中的comparator
+传入(o1,o2) => o1 - o2
+升序排列就是
+若o1-o2>0，则需要交换位置，说明o1比o2大
+若o1-o2<0，则不需要交换位置
+
+即返回-1不交换位置，返回1则交换位置
+```
+
+```java
+// 降序排列
+// sort里的Comparator不能使用基本数据类型，得用相对应的包装类型。
+Arrays.sort(nums, new Comparator<Integer>() {
+    @Override
+    public Integer compare(Integer o1, Integer o2) {
+        if (o1 != o2) {
+            return o2 - o1;
+        } else {
+            return 0;
+        }
+    }
+});
+```
+
+
+
 ## 面试题74：合并区间
 
 ### 题目

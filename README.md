@@ -60,8 +60,9 @@
 - [数据结构与算法](./docs/data-structure/TOC.md)
 - [红黑树](./docs/data-structure/红黑树.md)
 - [跳表和B+树](./docs/data-structure/跳表和B+树.md)
+- [笔试](./docs/data-structure/笔试题.md)
 
-### 前端 
+### 前端  
 
 - [前端大致](./docs/front-end/前端大致.md)
 - [Vue](./docs/front-end/Vue.md)
@@ -71,7 +72,7 @@
 
 - [消息队列](./docs/message-queue/消息队列.md)
 - [RabbitMQ](./docs/message-queue/RabbitMQ.md)
-- [Kafka](./docs/message-queue/Kafka.md)
+- [Kafka](./docs/message-queue/kafka/Kafka.md)
 
 ### 其他
 
