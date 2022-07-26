@@ -136,7 +136,7 @@ ttl key
 
 ```
 
-
+### 数据结构
 
 Redis是key-value数据库，key的类型只能是String，但是value的数据类型就比较丰富了，主要包括五种：
 
@@ -147,6 +147,16 @@ Redis是key-value数据库，key的类型只能是String，但是value的数据�
 * Sorted Set
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204162042741.png" style="zoom: 33%;" />
+
+### redisObject
+
+在Redis中有一个**核心的对象**叫做`redisObject` ，是用来表示所有的key和value的，用redisObject结构体来表示`String、Hash、List、Set、ZSet`五种数据类型。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207260938618.png" alt="640" style="zoom:67%;" />
+
+编码方式即该数据类型的存储方式。
+
+[参考](https://mp.weixin.qq.com/s/a_9Ve5W0Mh5uX1jWcQ1LaQ)
 
 ## 1.  String字符串
 
@@ -208,7 +218,27 @@ getset <key><value>
 
 ### 数据结构
 
-类似ArrayList
+#### 编码类型
+
+1. **int**：存储 8 个字节的长整型（long，2^63-1）。
+
+2. **embstr**：代表 embstr 格式的 SDS（Simple Dynamic String 简单动态字符串），存储小于 44 个字节的字符串，只分配一次内存空间（因为 Redis Object 和 SDS 是连续的）。
+
+3. **raw**：存储大于 44 个字节的字符串（3.2 版本之前是 39 个字节），需要分配两次内存空间（分别为 Redis Object 和 SDS 分配空间）。
+
+> 举例：整数型使用int，非整数型使用embstr。
+
+#### SDS
+
+假如存储的**字符串是一个字符串值**并且**长度大于32个字节**就会使用`SDS（simple dynamic string）`方式进行存储，并且encoding设置为raw；若是**字符串长度小于等于32个字节**就会将encoding改为embstr来保存字符串。
+
+SDS简单动态字符串，有三个属性：
+
+- int len：字符串长度。
+- int free：buf数组中未使用的字节数。
+- char buf[]：保存字符串每一个字符元素。
+
+SDS还可以保存二进制文件。
 
 ### 场景
 
@@ -218,7 +248,7 @@ getset <key><value>
 
 ## 2. Hash哈希
 
-**语法**
+### 语法
 
 ```plain
 HSET KEY_NAME FIELD VALUE
@@ -257,15 +287,46 @@ hsetnx <key><field><value>
 
 ```
 
-**数据结构**
+### 数据结构
 
-Hash 类型对应的数据结构是两种:ziplist(压缩列表)，hashtable(哈希表)。
+Hash 类型对应的数据结构是两种：ziplist(压缩列表)，hashtable(哈希表)。
 
 当field-value 长度较短且个数较少时，使用 ziplist，否则使用 hashtable。
 
+**压缩列表并不是以某种压缩算法进行压缩存储数据，而是它表示一组连续的内存空间的使用，节省空间**，使用多个节点存储数据。
+
+```
+zlbytes zltail zllen entry1 entry2 ... zlend
+```
+
+压缩列表中每一个节点表示的含义如下所示：
+
+1. `zlbytes`：4个字节的大小，记录压缩列表**占用内存的字节数**。
+2. `zltail`：4个字节大小，记录表尾节点距离起始地址的**偏移量**，用于**快速定位**到尾节点的地址。
+3. `zllen`：2个字节的大小，记录压缩列表中的**节点数**。
+4. `entry`：表示列表中的**每一个节点**。
+5. `zlend`：表示压缩列表的特殊**结束**符号`'0xFF'`。
+
+其中每一个entry节点又有三部分组成，包括`previous_entry_ength、encoding、content`。
+
+1. `previous_entry_ength`表示前一个节点entry的长度，可用于计算前一个节点的其实地址，因为他们的地址是连续的。
+2. `encoding`：这里保存的是content的内容类型和长度。
+3. `content`：content保存的是每一个节点的内容。
+
+> 什么时候使用压缩表
+>
+> - 保存的元素数量小于128个
+> - 保存的所有元素的长度小于 64字节
+
+
+
+> 如何保存hash
+>
+> - 将同一键值对的两个节点紧挨着保存，保存键的节点在前，保存值的节点在后，新加入的键值对，放在压缩列表表尾
+
 ## 3. List列表
 
-**语法**
+### 语法
 
 ```plain
 在 key 对应 list 的头部添加字符串元素
@@ -307,21 +368,17 @@ linsert <key> before/after <value><newvalue>
 在<value>的前面/后面插入<newvalue>插入值
 ```
 
+### 数据结构
 
+Redis中的列表在3.2之前的版本是使用`ziplist`和`linkedlist`进行实现的。在3.2之后的版本就是引入了`quicklist`。
 
-**数据结构**
-
-快速链表 quickList
-
-首先在列表元素较少的情况下会使用一块连续的内存存储，这个结构是 ziplist，也即是 压缩列表。
-
-它将所有的元素紧挨着一起存储，分配的是一块连续的内存。 当数据量比较多的时候才会改成 quicklist。
-
-因为普通的链表需要的附加指针空间太大，会比较浪费空间。比如这个列表里存的只是 int 类型的数据，结构上还需要两个额外的指针 prev 和 next。
+元素少用ziplist，元素多的时候用quicklist。
 
 Redis 将多个 ziplist 用链表结合起来组成了 quicklist。
 
-使用场景：发布与订阅或者说消息队列、慢查询。
+### 使用场景
+
+发布与订阅或者说消息队列、慢查询。
 
 ## 4. Set集合
 
@@ -370,9 +427,13 @@ sdiff <key1><key2>
 
 ### 数据结构
 
-dict 字典，字典是用哈希表实现
+底层**ht**和**intset**
 
-### 举例
+inset也叫做整数集合，用于保存整数值的数据结构类型，它可以保存`int16_t`、`int32_t` 或者`int64_t` 的整数值。
+
+在整数集合中，有三个属性值`encoding、length、contents[]`，分别表示编码方式、整数集合的长度、以及元素内容，length就是记录contents里面的大小。
+
+### 使用场景
 
 https://blog.csdn.net/qq_43514659/article/details/119750751
 
@@ -428,11 +489,15 @@ zrank <key><value>
 
 ```
 
+### 数据结构
+
 zset 底层使用了两个数据结构
 
-(1)、hash，hash 的作用就是关联元素 value 和权重 score，保障元素 value 的唯一性，可以通过元素 value 找到相应的 score 值。
+(1)、ziplist
 
-(2)、跳跃表，跳跃表的目的在于给元素 score 排序，根据范围获取元素列表。
+(2)、skiplist跳跃表，一种有序的数据结构，它通过每一个节点维持多个指向其它节点的指针，从而达到快速访问的目的。
+
+跳跃表的目的在于给元素 score 排序，根据范围获取元素列表。
 
 （其中每个节点都有指向元素成员的指针和当前元素成员对应的分数）
 

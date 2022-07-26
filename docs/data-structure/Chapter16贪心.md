@@ -1,6 +1,8 @@
 # 第十六章贪心
 
-## 题目一：跳跃游戏
+## 跳跃游戏
+
+### [题目](https://leetcode.cn/problems/jump-game/)
 
 给定一个非负整数数组 nums ，你最初位于数组的 **第一个下标** 。
 
@@ -27,7 +29,7 @@
 >
 > 局部最优推出全局最优，找不出反例，试试贪心！
 
-**贪心题解**
+### 贪心题解
 
 ```java
 public boolean canJump(int[] nums) {
@@ -46,7 +48,7 @@ public boolean canJump(int[] nums) {
 >
 > 如果cover大于等于了终点下标，直接return true就可以了。
 
-**动态规划题解**
+### 动态规划题解
 
 动态规划一遍循环，判断能否到达最后一个元素，就是判断倒数第二个能否到达倒数第一个元素，如果不能就是判断倒数第三个元素能否到达倒数第一个元素，如果能到达就是判断倒数第三个元素能否到达倒数第二个元素
 
@@ -76,7 +78,9 @@ public boolean canJump(int[] nums) {
 
 
 
-## 题目二：跳跃游戏2
+## 跳跃游戏2
+
+### 题目
 
 给定一个非负整数数组，你最初位于数组的第一个位置。
 
@@ -86,11 +90,18 @@ public boolean canJump(int[] nums) {
 
 说明: 假设你总是可以到达数组的最后一个位置。
 
+```
+输入: nums = [2,3,1,1,4]
+输出: 2
+解释: 跳到最后一个位置的最小跳跃数是 2。
+     从下标为 0 跳到下标为 1 的位置，跳 1 步，然后跳 3 步到达数组的最后一个位置。
+```
+
+### 题解
+
 > **要从覆盖范围出发，不管怎么跳，覆盖范围内一定是可以跳到的，以最小的步数增加覆盖范围，覆盖范围一旦覆盖了终点，得到的就是最小步数！**
 >
-> **这里需要统计两个覆盖范围，当前这一步的最大覆盖和下一步最大覆盖**。
-
-**题解**
+> **这里需要统计两个覆盖范围，当前当前能走到的最大区域点和当前区域里的最大的覆盖区域**。
 
 ```java
 public int jump(int[] nums) {
@@ -99,21 +110,21 @@ public int jump(int[] nums) {
     }
     //记录跳跃的次数
     int count = 0;
-    //当前的覆盖最大区域
-    int curDistance = 0;
-    //最大的覆盖区域
+    //当前能走到的最大区域点
+    int curEnd = 0;
+    //当前区域里的最大的覆盖区域
     int maxDistance = 0;
     for (int i = 0; i < nums.length; i++) {
         //在可覆盖区域内更新最大的覆盖区域
-        maxDistance = Math.max(maxDistance,i + nums[i]);
+        maxDistance = Math.max(maxDistance, i + nums[i]);
         //说明当前一步，再跳一步就到达了末尾
         if (maxDistance>=nums.length - 1){
             count++;
             break;
         }
         //走到当前覆盖的最大区域时，更新下一步可达的最大区域
-        if (i == curDistance){
-            curDistance = maxDistance;
+        if (i == curEnd){
+            curEnd = maxDistance;
             count++;
         }
     }

@@ -53,6 +53,7 @@
 - [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)
 - [SpringBoot笔记](./docs/framework/spring/SpringBoot笔记.md)
 - [SpringCloud笔记](./docs/framework/spring/springcloud/SpringCloud.md)
+- [SpringSecurity](./docs/framework/spring/SpringSecurity.md)
 
 ### :pencil2: 数据结构与算法
 
@@ -94,3 +95,4 @@
 - [尚医通难点](./docs/project/尚医通难点.md)
 - [尚医通Debug](./docs/project/尚医通Debug.md)
 - [项目技术点总结](./docs/project/项目技术点总结.md) 
+
