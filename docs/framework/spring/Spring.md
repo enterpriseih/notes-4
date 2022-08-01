@@ -415,6 +415,152 @@ spring事务的原理是AOP，进行了切面增强，失效的原因就是aop�
 
 6. 抛出的**异常没有被定义**，默认为RuntimeException；使用rollbakcFor指定非运行时异常。
 
+# Spring中的循环依赖
+
+https://blog.csdn.net/weixin_44129618/article/details/122839774
+
+先讲实例化依赖注入：setter注入和构造器注入
+
+再讲生命周期：实例化、属性赋值、初始化、销毁
+
+## 三种情况
+
+1. 构造器的循环依赖：这种依赖spring是处理不了的，直接抛出BeanCurrentlylnCreationException异常。
+2. 单例模式下的setter循环依赖：通过“三级缓存”处理循环依赖，能处理。
+3. 非单例循环依赖：无法处理。原型(Prototype)的场景是不支持循环依赖的，通常会走到AbstractBeanFactory类中下面的判断，抛出异常。
+
+```java
+if (isPrototypeCurrentlyInCreation(beanName)) {  
+    throw new BeanCurrentlyInCreationException(beanName);
+}
+```
+
+
+
+> 只能解决setter注入的单例的bean。
+
+## 三级缓存解决循环依赖
+
+一级缓存：用于存放完全初始化好的bean
+
+```java
+/** Cache of singleton objects: bean name -> bean instance */
+private final Map<String, Object> singletonObjects 
+    = new ConcurrentHashMap<String, Object>(256);
+```
+
+二级缓存：存放原始的bean 对象（**尚末填充属性**的半成品），用于解决循环依赖
+
+```java
+/** Cache of early singleton objects: bean name -> bean instance */
+private final Map<String, Object> earlySingletonObjects 
+    = new HashMap<String, Object>(16);
+```
+
+三级缓存：存放bean工厂对象，用于解决循环依赖
+
+```java
+/** Cache of singleton factories: bean name -> ObjectFactory */
+private final Map<String, ObjectFactory<?>> singletonFactories 
+    = new HashMap<String, ObjectFactory<?>>(16);
+```
+
+## 解决方式
+
+### 二级缓存
+
+假设一级缓存叫做map1，二级缓存叫做map2
+
+首先实例化A，将还未填充的A对象的**引用**放入map2，然后A去属性填充B，发现B没有实例化，于是B同样实例化后，将半成品放入map2。
+
+B开始填充，发现map1中没有A，就去map2中找，使用map2中的A填充自己，然后将自己B放入map1，并把map2中的半成品删除了。
+
+回到A的阶段，A发现map1中有了B，那么A就完成了属性填充。
+
+### 三级缓存
+
+主要因为Spring的AOP产生的代理对象问题。
+
+> Spring的代理对象产生阶段是在填充属性后才进行的，原理通过后置处理器BeanPostProcessor来实现。
+>
+> 如果 A 的原始对象注入给 B 的属性之后，A 的原始对象进行了 AOP 产生了一个代理对象，此时就会出现，对于 A 而言，它的 Bean 对象其实应该是 AOP 之后的代理对象，而 B 的 a 属性对应的并不是 AOP 之后的代理对象，这就产生了冲突。
+>
+> B 依赖的 A 和最终的 A 不是同一个对象。
+>
+
+三级缓存存放的是bean工厂对象，通过工厂在真正需要动态代理对象的时候才来获取。
+
+1. 实例化 A，此时 A 还未完成属性填充和初始化方法（@PostConstruct）的执行，A 只是一个半成品。
+2. 为 A 创建一个 Bean工厂，并放入到 singletonFactories 中。
+3. 发现 A 需要注入 B 对象，但是一级、二级、三级缓存均为发现对象 B。
+4. 实例化 B，此时 B 还未完成属性填充和初始化方法（@PostConstruct）的执行，B 只是一个半成品。
+5. 为 B 创建一个 Bean工厂，并放入到 singletonFactories 中。
+6. 发现 B 需要注入 A 对象，此时在一级、二级未发现对象 A，但是在三级缓存中发现了对象 A，从三级缓存中得到对象 A，并将对象 A 放入二级缓存中，同时删除三级缓存中的对象 A。（注意，此时的 A 还是一个半成品，并没有完成属性填充和执行初始化方法）
+7. 将对象 A 注入到对象 B 中。
+8. 对象 B 完成属性填充，执行初始化方法，并放入到一级缓存中，同时删除二级缓存中的对象 B。（此时对象 B 已经是一个成品）
+9. 对象 A 得到对象B，将对象 B 注入到对象 A 中。（对象 A 得到的是一个完整的对象 B）
+10. 对象 A完成属性填充，执行初始化方法，并放入到一级缓存中，同时删除二级缓存中的对象 A。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202208011304365.png" alt="在这里插入图片描述" style="zoom:67%;" />
+
+```java
+protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+    // 一级缓存
+    Object singletonObject = this.singletonObjects.get(beanName);
+    if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+        synchronized (this.singletonObjects) {
+            // 二级缓存
+            singletonObject = this.earlySingletonObjects.get(beanName);
+            if (singletonObject == null && allowEarlyReference) {
+                // 三级缓存
+                ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+                if (singletonFactory != null) {
+                    // Bean 工厂中获取 Bean
+                    singletonObject = singletonFactory.getObject();
+                    // 放入到二级缓存中
+                    this.earlySingletonObjects.put(beanName, singletonObject);
+                    this.singletonFactories.remove(beanName);
+                }
+            }
+        }
+    }
+    return singletonObject;
+}
+
+```
+
+## AOP问题的解决
+
+从 singletonFactories 根据 beanName 得到一个 ObjectFactory ，然后执行 ObjectFactory ，也就是执行 getEarlyBeanReference 方法，此时会得到一个 **A 原始对象经过 AOP 之后的代理对象**，然后把该代理对象放入 earlySingletonObjects 中。
+
+> 如果有AOP就返回AOP的代理对象，没有就返回原始对象。
+
+我们只得到了 A 原始对象的代理对象，这个对象还不完整，因为 A 原始对象还没有进行属性填充，所以此时不能直接把A的代理对象放入 singletonObjects 中，所以只能把代理对象放入earlySingletonObjects 。
+
+假设现在有其他对象依赖了 A，那么则可以从 earlySingletonObjects 中得到 A 原始对象的代理对象了，并且是A的同一个代理对象。
+
+当 B 创建完了之后，A 继续进行生命周期，而 A 在完成属性注入后，会按照它本身的逻辑去进行AOP，而此时我们知道 A 原始对象已经经历过了 AOP ，所以对于 A 本身而言，不会再去进行 AOP了。
+
+## 总结
+
+总结一下生命周期
+
+spring容器进行扫描->反射后封装成beanDefinition对象->放入beanDefinitionMap->遍历map->验证（是否单例、是否延迟加载、是否抽象）->推断构造方法->准备开始进行实例->去单例池（一级缓存）中查，没有->去二级缓存中找，没有提前暴露->生成一个objectFactory对象暴露到二级缓存中->属性注入，发现依赖Y->此时Y开始它的生命周期直到属性注入，发现依赖X->X又走一遍生命周期，当走到去二级缓存中找的时候找到了->往Y中注入X的objectFactory对象->完成循环依赖。
+
+## 问题
+
+1、为什么要使用X的objectFacory对象而不是直接使用X对象？
+
+利于拓展，程序员可以通过beanPostProcess接口操作objectFactory对象生成自己想要的对象
+
+2、是不是只能支持单例(scope=singleton)而不支持原型(scope=prototype)？
+
+是。因为单例是spring在启动时进行bean加载放入单例池中，在依赖的bean开始生命周期后，可以直接从二级缓存中取到它所依赖的bean的objectFactory对象从而结束循环依赖。而原型只有在用到时才会走生命周期流程，但是原型不存在一个已经实例化好的bean，所以会无限的创建->依赖->创建->依赖->...。
+
+3、循环依赖是不是只支持非构造方法？
+
+是。类似死锁问题
+
 
 
 # Spring中的设计模式
