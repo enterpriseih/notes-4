@@ -36,28 +36,45 @@ C为控制，也就是事件，用于流程的控制。
 
 
 
-
-
 # Session、Cookie和Token
 
 ## Session
 
-- 在**服务器端保存**（客户端只有Session ID）的一个数据结构，用来**跟踪用户的状态**，这个数据可以保存在集群、数据库、文件中
-- 可以保存在：内存、Cookie中、redis或memcached等缓存中、数据库中
+把客户端浏览器与服务器之间一系列交互的动作称为一个 Session。
+
+如果是微服务，session不会共享（除非通过一些手段共享session）
+
+- 在**服务器端保存数据**（客户端只有Session ID）的一个数据结构，用来**跟踪用户的状态**，这个数据可以保存在集群、数据库、文件中
+- 可以持久化保存在：内存、Cookie中、redis或memcached等缓存中、数据库中
+- 客户端只会保存sessionid在cookie中
 
 **钝化**：服务器关闭，但是浏览器没关闭，会话仍继续，需要将session中的内容序列化保存在磁盘上
 
 **活化**：服务器又重启了，将磁盘中的内容反序列化至session
+
+生命周期：默认20分钟
+
+[根据sessionId获取session](https://blog.csdn.net/sihai12345/article/details/81098765)
+
+```java
+// java不建议使用
+HttpSession sess = session.getSessionContext().getSession(sid)  
+// 实现自己的sessionContext并创建HttpSessionListener
+```
+
+
 
 ## Cookie
 
 - **客户端**（浏览器）保存**用户信息**的一种机制，通常在Cookie中**记录Session ID**。
 - 7天内不需要登陆，就可以用cookie保存，然后设置过期时间。
 
+
+
 ## Token
 
 - token是用户身份的验证方式，我们通常叫它：令牌。
-- 最简单的token组成:uid(用户唯一的身份标识)、time(当前时间的时间戳)、sign(签名，由token的前几位+以哈希算法压缩成一定长的十六进制字符串，可以防止恶意第三方拼接token请求服务器)。还可以把不变的参数也放进token，避免多次查库。
+- 最简单的token组成：uid(用户唯一的身份标识)、time(当前时间的时间戳)、sign(签名，由token的前几位 + 以哈希算法压缩成一定长的十六进制字符串，可以防止恶意第三方拼接token请求服务器)。还可以把不变的参数也放进token，避免多次查库。
 - 是否授权给软件
 - 服务器端会有校验机制，校验token是否合法
 
@@ -79,6 +96,8 @@ C为控制，也就是事件，用于流程的控制。
 >
 > 第一次请求的响应中会生成一个对应session的cookie：JSESSIONID，下一次请求的响应不会生成，但是请求会将JSESSIONID传过去，寻找相应的session
 
+
+
 ## 没有Cookie，session还能进行身份验证吗
 
 当服务器tomcat第一次接收到客户端的请求时，会开辟一块独立的session空间，建立一个session对象，同时会生成一个session id，通过响应头的方式保存到客户端浏览器的cookie当中。以后客户端的每次请求，都会在请求头部带上这个session id，这样就可以对应上服务端的一些会话的相关信息，比如用户的登录状态。
@@ -90,6 +109,8 @@ C为控制，也就是事件，用于流程的控制。
 1. session粘贴：在负载均衡中，通过一个机制保证同一个客户端的所有请求都会转发到同一个tomcat实例当中。问题：当这个tomcat实例出现问题之后，请求就会被转发到其他实例，这时候用户的session信息就丟了。
 2. session复制：当一个tomcat实例上保存了session信息后，主动将session 复制到集群中的其他实例。问题：复制是需要时间的，在复制过程中，容易产生session信息丢失。
 3. session共享： 就是将服务端的session信息保存到一个第三方中，比如Redis。
+
+
 
 # Tomcat
 
@@ -231,7 +252,7 @@ request.getSession().setAttribute(“cart”, cart);
 
 **application**：
 
- 应用对象，Tomcat启动到关闭，表示一个应用，在一个应用中有且只有一个application对象，作用于整个Web应用，可以实现多次会话之间的数据共享.
+应用对象，Tomcat启动到关闭，表示一个应用，在一个应用中有且只有一个application对象，作用于整个Web应用，可以实现多次会话之间的数据共享.
 
 ## 5、补充：page
 
@@ -324,7 +345,7 @@ session复制
 
 	redis：key -> 生成唯一随机值（ip、用户id等等），value -> 用户数据
 
-	cookie：把redis里面生成kev值放到cookie里面
+	cookie：把redis里面生成key值放到cookie里面
 
 2. 访问项目中其他模块，发送请求带着cookie进行发送，获取cookie中的key，到redis进行查询，如果查询数据就是登录
 
@@ -338,7 +359,7 @@ session复制
 
 2. 再去访问项目其他模块，每次访问在地址栏带着生成字符串，在访问模块里面获取地址栏字符串，根据字符串获取用户信息。如果可以得到就登陆。
 
-
+> token可以存在cookie中。
 
 # JWT
 

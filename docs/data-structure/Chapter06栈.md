@@ -143,6 +143,7 @@ public boolean isValid(String s) {
     if(s.length() > 0 && !map.containsKey(s.charAt(0))) return false;
     LinkedList<Character> stack = new LinkedList<Character>() {{ add('?'); }};
     for(Character c : s.toCharArray()){
+        // 如果是左括号直接放进去
         if(map.containsKey(c)) stack.addLast(c);
         else if(map.get(stack.removeLast()) != c) return false;
     }
@@ -162,9 +163,9 @@ public boolean isValid(String s) {
 
 	`单调栈里只需要存放元素的下标i`就可以了，如果需要使用对应的元素，直接T[i]就可以获取。
 
-2. 单调栈里元素是递增呢？ 还是递减呢？（**从栈头到栈底的顺序**）
+2. 单调栈里元素是递增呢？ 还是递减呢？（**从底到头的顺序**）
 
-	要找大的，就按照递增顺序，这样才知道遍历的元素`T[i] > T[stack.peek()]`
+	**要找大的，就按照递减顺序**（底大头小），这样才知道遍历的元素`T[i] > T[stack.peek()]`
 
 3. 单调栈的过程有如下三种
 
@@ -178,7 +179,7 @@ public boolean isValid(String s) {
 
 输入一个数组，它的每个数字是某天的温度。请计算在每一天需要等几天才会有更高的温度。例如，如果输入数组[35, 31, 33, 36, 34]，那么输出为[3, 1, 1, 0, 0]。由于第一天的温度是35，要等3天才会有更高的温度36，因此对应的输出为3。第四天的温度是36，后面没有更高的温度，它对应的输出是0。
 
-> 求右边第一个大于当前值的下标与当前下标差
+> **求右边第一个大于当前值的下标与当前下标差**
 >
 > 用栈存储数组下标，在遍历数组当前温度比较栈顶温度过程中，
 >
@@ -196,19 +197,16 @@ public boolean isValid(String s) {
  * 放入的是下标
  */
 public int[] dailyTemperatures(int[] temperatures) {
-    int[] result = new int[temperatures.length];        
-    Stack<Integer> stack = new Stack<>();
+    int[] ans = new int[temperatures.length];
+    Stack<Integer> st = new Stack<>();
     for (int i = 0; i < temperatures.length; i++) {
-        while (!stack.empty()
-            && temperatures[i] > temperatures[stack.peek()]) {
-            result[prev] = i - stack.peek();
-            stack.pop();
+        while (!st.isEmpty() && temperatures[st.peek()] < temperatures[i]) {
+            int prev = st.pop();
+            ans[prev] = i - prev;
         }
-
-        stack.push(i);
+        st.push(i);
     }
-
-    return result;
+    return ans;
 }
 ```
 
@@ -292,7 +290,7 @@ class Solution {
 
 
 
-## 补3：接雨水
+## 补3：[接雨水](https://leetcode.cn/problems/trapping-rain-water/)
 
 ### 题目
 
@@ -407,9 +405,9 @@ public int trap(int[] height) {
 
 **因为我们要求宽度的时候 如果遇到相同高度的柱子，需要使用最右边的柱子来计算宽度**。
 
-那么雨水高度是 min(凹槽左边高度, 凹槽右边高度) - 凹槽底部高度，代码为：`int h = min(height[st.top()], height[i]) - height[mid];`
+那么雨水高度是 min(凹槽左边高度, 凹槽右边高度) - 凹槽底部高度，代码为：`int h = min(height[st.peek()], height[i]) - height[mid];`
 
-雨水的宽度是 凹槽右边的下标 - 凹槽左边的下标 - 1（因为只求中间宽度），代码为：`int w = i - st.top() - 1 ;`
+雨水的宽度是 凹槽右边的下标 - 凹槽左边的下标 - 1（因为只求中间宽度），代码为：`int w = i - st.peek() - 1 ;`
 
 TIP：如果当前遍历的元素（柱子）高度等于栈顶元素的高度，要跟更新栈顶元素，因为遇到相相同高度的柱子，需要使用最右边的右边的柱子来计算宽度。
 

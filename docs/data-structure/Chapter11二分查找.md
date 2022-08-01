@@ -20,6 +20,23 @@ public int search(int[] nums, int target) {
     return -1;
 }
 
+// 第二种写法：左闭右开
+public int search(int[] nums, int target) {
+    // 此处右边界是长度
+    int left = 0, right = nums.length;
+    while (left < right) {
+        int mid = left + ((right - left) >> 1);
+        if (nums[mid] == target)
+            return mid;
+        else if (nums[mid] < target)
+            // 下一轮搜索的区间是 [mid + 1..right)
+            left = mid + 1;
+        else if (nums[mid] > target)
+            // 下一轮搜索的区间是 [left..mid)
+            right = mid;
+    }
+    return -1;
+}
 ```
 
 
@@ -57,28 +74,25 @@ public int searchInsert(int[] nums, int target) {
 ```
 
 ```java
-// 第二种写法：左开右闭
+// 第二种写法：左闭右开
 // while (left < right)，
 // 这里使用 < ,因为left == right在区间[left, right)是没有意义的
 public int searchInsert(int[] nums, int target) {
     int len = nums.length;
-    // 特殊判断
+    // 特殊判断，好像可以不需要，下面的程序包括了这种情况
     if (nums[len - 1] < target) {
         return len;
     }
 
     // 程序走到这里一定有 nums[len - 1] >= target，
-    // 插入位置在区间 [0..len - 1]
-    int left = 0;
-    int right = len - 1;
-    // 在区间 nums[left..right] 里查找第 1 个大于等于 target 的元素的下标
+    // 插入位置在区间 [0..len - 1]即[0..len)
+    int left = 0, right = len;
+    // 在区间 nums[left..right) 里查找第 1 个大于等于 target 的元素的下标
     while (left < right) {
         int mid = left + (right - left) / 2;
-        if (nums[mid] < target){
-            // 下一轮搜索的区间是 [mid + 1..right]
+        if (nums[mid] < target){ 
             left = mid + 1;
         } else {
-            // 下一轮搜索的区间是 [left..mid]
             right = mid;
         }
     }
@@ -161,9 +175,28 @@ public int singleNonDuplicate(int[] nums) {
 
 ### 题目
 
-输入一个正整数数组w，数组中的每个数字w[i]表示下标i的权重，请实现一个函数pickIndex根据权重比例随机选择一个下标。例如，如果权重数组w为[1, 2, 3, 4]，这pickIndex将有10%的概率选择0、20%的概率选择1、30%的概率选择2、40%的概率选择3。
+输入一个正整数数组w，数组中的每个数字w[i]表示下标i的权重，请实现一个函数pickIndex根据权重比例随机选择一个下标。
 
-### 参考代码
+例如，如果权重数组w为[1, 2, 3, 4]，这pickIndex将有10%的概率选择0、20%的概率选择1、30%的概率选择2、40%的概率选择3。
+
+### 题解
+
+先计算权重和total。
+
+sums[i]就是权重数组前i个元素和。
+
+找sums中第一个大于随机数的值的对应的下标就是求的答案。
+
+```
+[3,4,1,2]的权重为[3,7,8,10]
+0 1 2 3 4 5 6 7 8 9 10
+[0,3) - 3 在权重数组sums中的下标为0
+[3,7) - 7
+[7,8) - 8
+[8,10) - 10
+```
+
+
 
 ``` java
 class Solution {
@@ -180,16 +213,17 @@ class Solution {
     
     public int pickIndex() {
         Random random = new Random();
+        // 返回一个[0, total)的随机数，0～total-1
         int p = random.nextInt(total);
         int left = 0;
         int right = sums.length;
+        // 找第一个大于p的元素，对应的下标就是
         while (left <= right) {
             int mid = (left + right) / 2;
             if (sums[mid] > p) {
                 if (mid == 0 || (sums[mid - 1] <= p)) {
                     return mid;
                 }
-                
                 right = mid - 1;
             } else {
                 left = mid + 1;
@@ -234,9 +268,9 @@ A: 1 3 4 9
 B: 1 2 3 4 5 6 7 8 9
        ↑
 
-A：1 3 4 9
+A: 1 3 4 9
      ↑
-B：[1 2 3] 4 5 6 7 8 9
+B: [1 2 3] 4 5 6 7 8 9
              ↑
 
 A: [1 3] 4 9

@@ -1,5 +1,11 @@
 # 第十四章：动态规划
 
+1. 确定dp数组（dp table）以及下标的含义
+2. 确定递推公式
+3. dp数组如何初始化
+4. 确定遍历顺序
+5. 举例推导dp数组
+
 ## 补充：最大连续子数组之和
 
 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
@@ -377,7 +383,7 @@ public int minCost(int[][] costs) {
     // i是房号
     for (int i = 1; i < costs.length; i++) {
         for (int j = 0; j < 3; j++) {
-            // j+1和j+2是与j不同的房子
+            // j+1和j+2是与j不同颜色的房子
             int prev1 = dp[(j + 2) % 3][(i - 1) % 2];
             int prev2 = dp[(j + 1) % 3][(i - 1) % 2];
             dp[j][i % 2] = Math.min(prev1, prev2) + costs[i][j];
@@ -391,11 +397,24 @@ public int minCost(int[][] costs) {
 
 ## 面试题92：翻转字符
 
-### 题目
+### [题目](https://leetcode.cn/problems/flip-string-to-monotone-increasing/)
 
-输入一个只包含和'0'的'1'字符串，我们可以将其中的'0'的翻转成'1'，可以将'1'翻转成'0'。请问至少需要翻转几个字符，使得翻转之后的字符串中所有的'0'位于'1'的前面？翻转之后的字符串可能只含有'0'或者'1'。例如，输入字符串"00110"，至少需要翻转1个字符才能使所有的'0'位于'1'的前面。我们可以将最后一个字符'0'的翻转成'1'，得到字符串"00111"。
+输入一个只包含和'0'的'1'字符串，我们可以将其中的'0'的翻转成'1'，可以将'1'翻转成'0'。请问至少需要翻转几个字符，使得翻转之后的字符串中所有的'0'位于'1'的前面？翻转之后的字符串可能只含有'0'或者'1'。
+
+例如，输入字符串"00110"，至少需要翻转1个字符才能使所有的'0'位于'1'的前面。我们可以将最后一个字符'0'的翻转成'1'，得到字符串"00111"。
 
 ### 参考代码
+
+#### 解法一：动态规划
+
+```
+f0(i): s[0...i]翻转成以0为结尾的最小次数 => dp[0][i]
+f1(i): s[0...i]翻转成以1为结尾的最小次数 => dp[1][i]
+dp[0][i] = dp[0][i - 1] + (ch == '0' ? 0 : 1);
+dp[1][i] = Math.min(dp[0][i - 1], dp[1][i - 1]) + (ch == '1' ? 0 : 1);
+```
+
+
 
 ``` java
 public int minFlipsMonoIncr(String S) {
@@ -421,11 +440,146 @@ public int minFlipsMonoIncr(String S) {
 }
 ```
 
+#### 解法二***
+
+```java
+// 统计每个位置的前面有多少个1和后面有多少个0
+public int minFlipsMonoIncr(String s) {
+    int ans = Integer.MAX_VALUE;
+    int len = s.length();
+    int[] zero = new int[len];
+    int[] one = new int[len];
+    int cnt0 = 0, cnt1 = 0;
+    
+    for (int i = 1; i < len; i++) {
+        // i的左边有多少个1
+        if (s.charAt(i - 1) == '1') cnt1++;
+        one[i] = cnt1;
+        // i的右边有多少个0
+        if (s.charAt(len - i) == '0') cnt0++;
+        zero[len - i - 1] = cnt0;
+    }
+    for (int i = 0; i < len; i++) {
+        ans = Math.min(ans, one[i] + zero[i]);
+    }
+    return ans;
+}
+// 还可以直接计算前缀和for in 0:len
+// 设前缀1为one，则i的前面有one[i-1]个1，
+// 后面有one[len] - one[i]个1
+// 只是最后判断的时候for in 1:len
+// 单独判断i=0的情况。
+```
+
+## 补：最长递增子序列
+
+### 题目
+
+给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
+
+子序列 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。
+
+```
+输入：nums = [10,9,2,5,3,7,101,18]
+输出：4
+解释：最长递增子序列是 [2,3,7,101]，因此长度为 4 。
+```
+
+### 解法一：dp - O(N^2)
+
+```
+dp[i]: 0~i的最长子序列长
+dp[i]和dp[j]有关系，j < i
+
+dp[i] = max(dp[i], dp[j] + 1) for j in [0, i)
+```
+
+```java
+public int lengthOfLIS(int[] nums) {
+    int[] dp = new int[nums.length];
+    int res = 0;
+    // 初始化为1，至少有递增子序列长度为1
+    Arrays.fill(dp, 1);
+    for (int i = 0; i < nums.length; i++) {
+        for (int j = 0; j < i; j++) {
+            if (nums[j] < nums[i]) {
+                // max是取dp[i]的最大，dp[i]是会变的
+                dp[i] = Math.max(dp[i], dp[j] + 1);
+            }
+        }
+        res = Math.max(dp[i], res);
+    }
+    return res;
+}
+```
+
+
+
+### 解法二：dp+二分查找 - O(NlogN)
+
+**降低复杂度切入点**： 解法一中，遍历计算 dp 列表需 O(N)，计算每个 dp[k] 需 O(N)。
+
+- 动态规划中，通过线性遍历来计算 dp 的复杂度无法降低；
+
+- 每轮计算中，需要通过线性遍历 [0,k) 区间元素来得到 dp[k] 。**考虑**：是否可以通过重新设计状态定义，**使整个 dp 为一个排序列表**；这样在计算每个 dp[k] 时，就可以通过二分法遍历 [0,k) 区间元素，将此部分复杂度由 O(N) 降至 O(logN)。
+
+> tails[k]为长度为k+1的子序列最小的末尾元素
+>
+> 遍历nums，查找tails数组中第一个比num大元素的下标，即可插入的位置
+
+```
+比如
+tails[] = 1 3 7
+此时来了个5
+3 < 5 < 7
+5会覆盖掉7
+1 3 5
+再来个2
+1 < 2 < 5
+
+```
+
+
+
+```java
+public int lengthOfLIS(int[] nums) {
+    int len = nums.length;
+    int[] tails = new int[len];
+    int res = 0;
+    for (int num : nums) {
+        int i = 0, j = res;
+        while (i < j) {
+            int mid = (i + j) / 2;
+            if (tails[mid] < num) i = mid + 1;
+            else j = mid;
+        }
+        // tails是每个长度的子序列最小的末尾元素
+        // 为了使得后面的元素尽量都可以插进来
+        // 如果没有到达j==res这个条件 
+        // 就说明tail数组里只有部分比这个num要小 
+        // 那么就把num插入到tail数组合适的位置即可 
+        // 但是由于这样的子序列长度肯定是没有res长的 
+        // 因此res不需要更新
+        tails[i] = num;
+        // 如果该元素比tails里存在的元素还大，
+        // 说明有个新的更长的子序列
+        // i == j，都一样
+        // res是长度，比下标都大
+        if (i == res) res++;
+    }
+    return res;
+} 
+```
+
+
+
 ## 面试题93：最长斐波那契数列
 
 ### 题目
 
 输入一个没有重复数字的单调递增的数组，数组里至少有三个数字，请问数组里最长的斐波那契序列的长度是多少？例如，如果输入的数组是[1, 2, 3, 4, 5, 6, 7, 8]，由于其中最长的斐波那契序列是1、2、3、5、8，因此输出是5。
+
+> 一种最长递增子序列的问题
 
 ### 参考代码
 
@@ -497,11 +651,21 @@ public int minCut(String s) {
 
 ### 题目
 
-输入两个字符串，求出它们的最长公共子序列的长度。如果从字符串s1中删除若干个字符之后能得到字符串s2，那么s2就是s1的一个子序列。例如，从字符串"abcde"中删除两个字符之后能得到字符串"ace"，因此"ace"是"abcde"的一个子序列。但字符串"aec"不是"abcde"的子序列。如果输入字符串"abcde"和"badfe"，它们的最长公共子序列是"bde"，因此输出3。
+输入两个字符串，求出它们的最长公共子序列的长度。
+
+如果从字符串s1中删除若干个字符之后能得到字符串s2，那么s2就是s1的一个子序列。例如，从字符串"abcde"中删除两个字符之后能得到字符串"ace"，因此"ace"是"abcde"的一个子序列。但字符串"aec"不是"abcde"的子序列。
+
+如果输入字符串"abcde"和"badfe"，它们的最长公共子序列是"bde"，因此输出3。
 
 ### 参考代码
 
 #### 解法一
+
+```
+dp[i][j]是s1的0~i-1和s2的0~j-1的最长公共子序列长度
+int[][] dp = new int[len1 + 1][len2 + 1];
+这样初始化简单
+```
 
 ``` java
 public int longestCommonSubsequence(String text1, String text2) {

@@ -24,7 +24,7 @@
 - [Java的18把锁](./docs/thread/Java中的18把锁.md)
 - [Java内存模型(JMM)](./docs/thread/Java内存模型.md)
 
-### :floppy_disk: 数据库 
+### :floppy_disk: 数据库
 
 - [MySQL](./docs/database/mysql/MySQL.md)
 - [MySQL基础](./docs/database/mysql/MySQL基础.md)

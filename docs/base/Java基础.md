@@ -246,11 +246,11 @@ StackOverflowError（栈溢出）
 
 **设计或实现上的问题**，代码编写或逻辑上的，**可以进行异常处理**
 
-- 编译时异常(checked)
+- 编译时异常(checked)：编译器会提示trycatch或者向上抛出
 	- IOException
 		- FileNotFoundException
 	- ClassNotFoundException
-- 运行时异常(unchecked)
+- 运行时异常(unchecked)：编译时不会提示
 	- NullPointerException
 	- ArrayIndexOutOfBoundsException
 	- ClassCastException（数据类型转换异常）
