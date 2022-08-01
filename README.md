@@ -17,6 +17,7 @@
 ### JVM
 
 - [JVM](./docs/jvm/JVM.md)
+- [JVM内存区域](./docs/jvm/JVM内存区域.md)
 
 ### J.U.C
 
