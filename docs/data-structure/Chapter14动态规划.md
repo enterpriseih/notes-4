@@ -1626,4 +1626,53 @@ public void testMultiPack2(){
 }
 ```
 
-## 
+
+
+## 预测玩家
+
+### 题目
+
+给一个非负数组nums，玩家1和玩家2轮流进行自己的回合，玩家1先手，从数组两端取数字；最后算出得分，玩家1赢或者平局都返回true。
+
+```
+输入：nums = [1,5,2]
+输出：false
+解释：一开始，玩家 1 可以从 1 和 2 中进行选择。
+如果他选择 2（或者 1 ），那么玩家 2 可以从 1（或者 2 ）和 5 中进行选择。如果玩家 2 选择了 5 ，那么玩家 1 则只剩下 1（或者 2 ）可选。 
+所以，玩家 1 的最终分数为 1 + 2 = 3，而玩家 2 为 5 。
+因此，玩家 1 永远不会成为赢家，返回 false 。
+```
+
+### 题解
+
+```
+dp[i][j]: nums[i,j]范围内, 甲相对于乙的净胜分。
+最终求的就是，甲先手面对区间[0...n-1]时，甲对乙的净胜分dp[0][n-1]是否>=0。
+1、i > j时, 无意义, dp=0
+2、i == j时, dp[i][i] = nums[i], 只能选这个
+3、i < j时
+- 如果甲拿nums[i]，那么变成乙先手面对区间[i+1...j]，
+  这段区间内乙对甲的净胜分为dp[i+1][j]；
+  那么甲对乙的净胜分就应该是nums[i] - dp[i+1][j]。
+- 如果甲拿nums[j]，同理可得甲对乙的净胜分为是nums[j] - dp[i][j-1]。
+
+=> dp[i][j] = Max(nums[i] - dp[i+1][j], nums[j] - dp[i][j-1])
+```
+
+```java
+public boolean PredictTheWinner(int[] nums) {
+    int length = nums.length;
+    int[][] dp = new int[length][length];
+    for (int i = 0; i < length; i++) {
+        dp[i][i] = nums[i];
+    }
+    for (int i = length - 2; i >= 0; i--) {
+        for (int j = i + 1; j < length; j++) {
+            dp[i][j] = Math.max(nums[i] - dp[i + 1][j], nums[j] - dp[i][j - 1]);
+        }
+    }
+    return dp[0][length - 1] >= 0;
+}
+
+```
+
