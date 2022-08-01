@@ -23,6 +23,9 @@
 - [多线程并发](./docs/thread/多线程并发.md)
 - [Java的18把锁](./docs/thread/Java中的18把锁.md)
 - [Java内存模型(JMM)](./docs/thread/Java内存模型.md)
+- [多线程中的锁](./docs/thread/多线程中的锁.md)
+- [ThreadLocal](./docs/thread/ThreadLocal本地线程变量.md)
+- [CAS和AQS](./docs/thread/CAS和AQS.md)
 
 ### :floppy_disk: 数据库
 

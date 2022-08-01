@@ -1,5 +1,3 @@
-> 本文首发我的微信公众号『[爱笑的架构师](https://mp.weixin.qq.com/s?__biz=MzIwODI1OTk1Nw==&mid=2650322098&idx=1&sn=100089ec2d8c49b85f4acc5ff2af8ca5&chksm=8f09caa8b87e43be0454c4583a914779a5d78d2ae0493e2ec54fd2337d3be9ae99b391a1a35c&token=1553501157&lang=zh_CN#rd)』，欢迎大家关注。
-
 <!-- TOC -->
 
 - [人类选举的基本原理](#人类选举的基本原理)

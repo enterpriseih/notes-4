@@ -219,14 +219,16 @@ public enum ResponseDto {
 
 ## 八、作用域
 
-|           | 当前类 | 同一package | 子孙类 | 其他package |
-| --------- | ------ | ----------- | ------ | ----------- |
-| public    | √      | √           | √      | √           |
-| protected | √      | √           | √      | ×           |
-| friendly  | √      | √           | ×      | ×           |
-| private   | √      | ×           | ×      | ×           |
+|                  | 当前类 | 同一package | 子孙类 | 其他package |
+| ---------------- | ------ | ----------- | ------ | ----------- |
+| public           | √      | √           | √      | √           |
+| protected        | √      | √           | √      | ×           |
+| friendly/default | √      | √           | ×      | ×           |
+| private          | √      | ×           | ×      | ×           |
 
 > note：外部类可以访问内部类的private，内部类和外部类的成员变量是同一级别的。
+>
+> 不加默认是default
 
 # 对象的实例化
 
