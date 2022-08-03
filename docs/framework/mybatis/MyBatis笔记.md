@@ -344,13 +344,15 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
 	```
 - 注意：
 
-1. 查询的标签select必须设置属性resultType或resultMap，
-   用于设置实体类和数据库表的映射关系  
-	- resultType：自动映射，用于属性名和表中字段名一致的情况  
-    - resultMap：自定义映射，用于一对多或多对一或字段名和属性名不一致的情况  
+1. 查询的标签select必须设置属性resultType或resultMap，用于设置实体类和数据库表的映射关系  
+   - resultType：自动映射，用于属性名和表中字段名一致的情况  
+	 - resultMap：自定义映射，用于一对多或多对一或字段名和属性名不一致的情况  
+   
 2. 当查询的数据为多条时，不能使用实体类作为返回值，只能使用集合，
-否则会抛出异常TooManyResultsException；
-但是若查询的数据只有一条，可以使用实体类或集合作为返回值
+
+  否则会抛出异常TooManyResultsException；
+
+  但是若查询的数据只有一条，可以使用实体类或集合作为返回值
 
 # 六、MyBatis获取参数值的两种方式（重点***）
 - MyBatis获取参数值的两种方式：${}和#{}  

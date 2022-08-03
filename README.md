@@ -47,6 +47,7 @@
 ### 分布式
 
 - [分布式与微服务](./docs/distributed/分布式与微服务.md)
+- [接口的幂等性](./docs/distributed/接口的幂等性.md)
 
 ### 框架
 
