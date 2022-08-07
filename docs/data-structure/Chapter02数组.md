@@ -399,6 +399,8 @@ public int numSubarrayProductLessThanK(int[] nums, int k) {
 
 ### 参考代码
 
+前缀和
+
 ``` java
 public int subarraySum(int[] nums, int k) {
     // key：前i个数字和；value：每个和出现的次数
@@ -422,13 +424,15 @@ public int subarraySum(int[] nums, int k) {
 
 
 
-## 面试题11：0和1个数相同的子数组
+## 面试题11：0和1个数相同的最长子数组长度
 
 ### 题目
 
 输入一个只包含0和1的数组，请问如何求最长0和1的个数相同的连续子数组的长度？例如在数组[0, 1, 0]中有两个子数组包含相同个数的0和1，分别是[0, 1]和[1, 0]，它们的长度都是2，因此输出2。
 
 ### 参考代码
+
+前缀和
 
 ``` java
 // 将0都变成-1
@@ -556,6 +560,8 @@ public int[] productExceptSelf(int[] nums) {
 
 ### 解法
 
+双指针
+
 ```java
 public void moveZeroes(int[] nums) {
     // 双指针
@@ -632,3 +638,70 @@ class NumMatrix {
     }
 }
 ```
+
+
+
+## 补：移除数组中的k个元素
+
+### 题目
+
+给你一个以字符串表示的非负整数 `num` 和一个整数 `k` ，移除这个数中的 `k` 位数字，使得剩下的数字最小。请你以字符串形式返回这个最小的数字。
+
+```
+输入：num = "1432219", k = 3
+输出："1219"
+解释：移除掉三个数字 4, 3, 和 2 形成一个新的最小的数字 1219 。
+```
+
+### 题解
+
+半个单调栈
+
+- 从左至右扫描，当前扫描的数还不确定要不要删，入栈暂存。
+- 123531这样「高位递增」的数，肯定不会想删高位，会尽量删低位。
+- 432135这样「高位递减」的数，会想干掉高位，直接让高位变小，效果好。
+- 所以，如果当前遍历的数比栈顶大，符合递增，是满意的，让它入栈。
+- 如果当前遍历的数比栈顶小，栈顶立刻出栈，不管后面有没有更大的，因为栈顶的数属于高位，删掉它，小的顶上，高位变小，效果好于低位变小。
+
+```
+"1432219"  k = 3
+bottom[1       ]top		 1入
+bottom[1 4     ]top		 4入
+bottom[1 3     ]top	4出	3入
+bottom[1 2     ]top	3出	2入
+bottom[1 2 2   ]top		 2入  
+bottom[1 2 1   ]top	2出	1入	出栈满3个，停止出栈
+bottom[1 2 1 9 ]top		 9入
+```
+
+- 入栈道时候需要避免0在栈底
+
+```java
+public String removeKdigits(String num, int k) {
+    // if (k >= num.length()) return "0";
+    LinkedList<Character> st = new LinkedList<>();
+    for (int i = 0; i < num.length(); i++) {
+        Character ch = num.charAt(i);
+        while (k > 0 && !st.isEmpty() && ch < st.peekLast()) {
+            st.pollLast();
+            k--;
+        }
+        // 只要不是栈底就可以
+        if (ch != '0' || !st.isEmpty()) st.offerLast(ch);
+    }
+
+    while (k-- > 0 && !st.isEmpty()) {
+        st.pollLast();
+    }
+
+    StringBuilder sb = new StringBuilder();
+    while (!st.isEmpty()) {
+        sb.append(st.pollFirst());
+    }
+
+    // 10 k=1 => “0”, 上述代码会输出"0"
+    return sb.length() == 0 ? "0" : sb.toString();
+
+}
+```
+

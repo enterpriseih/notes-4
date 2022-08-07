@@ -48,17 +48,18 @@ Arrays.sort(nums, new Comparator<Integer>() {
 
 ```java
 public String largestNumber(int[] nums) {
-    String[] numsStr = new String[nums.length];
+    String[] strs = new String[nums.length];
     for (int i = 0; i < nums.length; i++) {
-        numsStr[i] = "" + nums[i];
+        strs[i] = "" + nums[i];
+        // strs[i] = String.valueOf(nums[i]);
     }
-    Arrays.sort(numsStr, (x, y) -> (y + x).compareTo(x + y));
+    Arrays.sort(strs, (x, y) -> (y + x).compareTo(x + y));
     StringBuilder sb = new StringBuilder();
-    for (String str : numsStr) {
+    for (String str : strs) {
         sb.append(str);
     }
     // 去除[0,0,0]的情况
-    if(numsStr[0].equals("0")) return "0";
+    if(strs[0].equals("0")) return "0";
     return sb.toString();
 }
 ```

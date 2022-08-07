@@ -4,6 +4,15 @@ Stack
 
 push(e)，pop，peek
 
+建议使用ArrayDeque
+
+```java
+Deque<?> stack = new ArrayDeque<>();
+
+```
+
+
+
 ## 6.1 应用
 
 ## 补充：用栈实现队列
@@ -361,37 +370,7 @@ public int trap(int[] height) {
 
 - 空间复杂度：O(n)，其中 n 是数组 height 的长度。需要创建两个长度为 n 的数组 leftMax 和 rightMax。
 
-
-
-### 解法二：双指针
-
-```java
-public int trap(int[] height) {
-    int sum = 0;
-    for (int i = 0; i < height.length; i++) {
-        // 第一个柱子和最后一个柱子不接雨水
-        if (i == 0 || i == height.length - 1) continue;
-
-        int rightMax = height[i]; // 记录右边柱子的最高高度
-        int leftMax = height[i]; // 记录左边柱子的最高高度
-        for (int r = i+1; r < height.length; r++) {
-            if (height[r] > rightMax) rightMax = height[r];
-        }
-        for (int l = i-1; l >= 0; l--) {
-            if(height[l] > leftMax) leftMax = height[l];
-        }
-        int h = Math.min(leftMax, rightMax) - height[i];
-        if (h > 0) sum += h;
-    }
-    return sum;
-}
-// 时间复杂度O(n^2)
-// 空间复杂度O(1)
-```
-
-
-
-### 解法三：单调栈
+### 解法二：单调栈
 
 1、按照行方向计算雨水
 

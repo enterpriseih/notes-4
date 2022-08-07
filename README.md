@@ -37,6 +37,10 @@
 - [Redis面试](./docs/database/redis/Redis面试.md)
 - [数据字典&EasyExcel](./docs/database/数据字典.md)
 
+### 测试
+
+- [测试基础](./docs/test/测试基础.md)
+
 ### :globe_with_meridians:计算机基础
 
 - [计算机网络](./docs/computer/计算机网络.md)
@@ -52,7 +56,6 @@
 ### 框架
 
 - [Spring](./docs/framework/spring/Spring.md)
-- [MyBatis](./docs/framework/mybatis/MyBatis.md)
 - [SpringMVC笔记](./docs/framework/spring/SpringMVC笔记.md)
 - [MyBatis笔记](./docs/framework/mybatis/MyBatis笔记.md)
 - [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)
@@ -66,6 +69,7 @@
 - [数据结构与算法](./docs/data-structure/TOC.md)
 - [红黑树](./docs/data-structure/红黑树.md)
 - [跳表和B+树](./docs/data-structure/跳表和B+树.md)
+- [哈希](./docs/data-structure/哈希.md)
 - [笔试](./docs/data-structure/笔试题.md)
 
 ### 前端  
@@ -96,8 +100,11 @@
 ### 项目
 
 - [方案分析](./docs/project/方案分析.md)
-- [尚医通](./docs/project/尚医通.md)
-- [尚医通难点](./docs/project/尚医通难点.md)
+- [项目面试问题](./docs/project/项目面试问题.md)
+- [尚医通](./docs/project/尚医通.md) 
 - [尚医通Debug](./docs/project/尚医通Debug.md)
 - [项目技术点总结](./docs/project/项目技术点总结.md) 
 
+### 面试
+
+- [Spring](./docs/interview/Spring.md)

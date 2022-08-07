@@ -1,7 +1,7 @@
 # Spring、Spring MVC和Spring Boot
 
 - spring是⼀个IOC**容器框架**，⽤来**管理Bean** (Java 对象)，使⽤依赖注⼊实现控制反转，可以很⽅便的整合各种框架，提供AOP机制弥补OOP (面向对象程序设计，`Object Oriented Programming`) 的代码重复问题、更⽅便将不同类不同⽅法中的共同处理抽取成切⾯、⾃动注⼊给⽅法执⾏，⽐如⽇志、异常等 。
-- springmvc是spring对web框架的⼀个解决⽅案，提供了⼀个总的`前端控制器DispatcherServlet`，⽤来接收请求，然后定义了⼀套路由策略（url到handle的映射）及适配执⾏handle，将handle结果使⽤视图解析技术⽣成视图展现给前端 。
+- springmvc是spring**对web框架的⼀个解决⽅案**，提供了⼀个总的`前端控制器DispatcherServlet`，⽤来接收请求，然后定义了⼀套路由策略（url到handle的映射）及适配执⾏handle，将handle结果使⽤视图解析技术⽣成视图展现给前端 。
 - springboot是spring提供的⼀个快速开发⼯具包，让程序员能更⽅便、更快速的开发spring+springmvc应⽤，**简化了配置**（约定了默认配置），整合了⼀系列的解决⽅案（starter机制）、redis、mongodb、es，可以开箱即⽤。
 
 
@@ -195,6 +195,8 @@ public class UserService {
 
 - @Resource：可以根据类型也可以根据名称
 
+	默认byName，无法通过名称注入的时候，转为byType
+
 ```java
 // 注：是javax中的，不是spring中的
 // @Resource
@@ -241,35 +243,45 @@ Spring中的事务管理就用到AOP
 
 ## 一、核心概念
 
+- 目标（target）：被通知的对象
 - 连接点（joinpoint）
-	- 可以被增强的方法
+	- 可以被增强的方法：目标对象的所属类中，定义的所有方法都是连接点
 	- 被拦截的点，被拦截到的方法
 - 切入点（pointcut）
 	- 实际**被增强的方法**，有的方法可能没被增强
 	- 对连接点进行拦截的定义
+	- 被增强的连接点：切入点一定是连接点，连接点不一定是切入点
 - 通知（advice，又称增强）
 	- 实际**增强的逻辑部分**
-	- 拦截到连接点之后要执行的代码
+	- **拦截到连接点之后要执行的代码**
 	- 类型
 		- 前置通知Before
 		- 后置通知After Returning（方法返回值之后执行）
 		- 环绕通知Around
 		- 异常通知After Throwing
 		- 最终通知After（方法之后执行）
-- 切面（aspect）
+- 切面（aspect）：切入点+通知
 	- 类是对物体特征的抽象，**切面就是对横切关注点的抽象（模块化）**
 	  - 横切关注点：对哪些方法进行拦截，拦截之后怎么处理，这些关注点称之为横切关注点
-	- 通知和切入点共同定义了切面的全部内容 — 它是什么，在何时和在何处完成其功能
+	- **通知和切入点共同定义了切面的全部内容** — 它是什么，在何时和在何处完成其功能
 - 织入（weave）
-	- 将切面应用到代理的目标对象并导致代理对象创建的过程
+	- 将切面/通知应用到代理的目标对象并导致代理对象创建的过程
 - 引入（introduction）
 	- 在不修改代码的前提下，引入可以在运行期为类动态地添加一些方法或字段
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203241614714.jpeg" alt="AOP核心概念" />
 
-## 二、AOP中的动态代理
+> **多个切面的执行顺序**
+>
+> 1. 通过@Order注解
+>
+> 	@Order(3)值越小，优先级越高
+>
+> 2. 实现Ordered接口重写getOrder方法
 
-> [动态代理](../base/动态代理.md)
+## 二、AOP中的代理
+
+> [动态代理](./动态代理.md)
 
 - JDK动态代理：有接口的情况
 - CGLIB动态代理，没有接口的情况
@@ -281,12 +293,15 @@ Spring中的事务管理就用到AOP
 
 ### 2、CGLIB动态代理
 
-- 创建子类的代理对象，增强类的方法
+- **创建子类的代理对象，增强类的方法**
+- 生成目标类的子类，而子类是通过增强过的，这个子类对象就是代理对象。
+- 所以，使用cglib生成动态代理，要求目标类必须能够被继承，即不能是final的类。
 
 ### 3、AspectJ
 
 - Spring一般基于AspectJ实现AOP操作，其不是 Spring 的组成，是独立AOP框架
 - Spring会自行判断并调用JDK还是CGLIB
+- aspectj
 
 
 
@@ -434,8 +449,6 @@ if (isPrototypeCurrentlyInCreation(beanName)) {
     throw new BeanCurrentlyInCreationException(beanName);
 }
 ```
-
-
 
 > 只能解决setter注入的单例的bean。
 
@@ -682,7 +695,11 @@ initMultipartResolver(context)，用于**处理上传请求**。
 
 initFlashMapManager(context)，用来管理FlashMap的，FlashMap主要用在redirect中传递参数。
 
+### 10、HandlerInterceptor
 
+Spring MVC 的拦截器（Interceptor）与 Java Servlet 的过滤器（Filter）类似，它主要用于拦截用户的请求并做相应的处理，通常应用在权限验证、记录请求信息的日志、判断用户是否登录等功能上。
+
+[拦截器](https://blog.csdn.net/qq_45515182/article/details/124739633?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-124739633-blog-123307319.pc_relevant_aa&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-124739633-blog-123307319.pc_relevant_aa&utm_relevant_index=1)
 
 # SpringBoot
 

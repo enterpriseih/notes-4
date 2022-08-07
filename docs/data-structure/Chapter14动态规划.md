@@ -444,6 +444,7 @@ public int minFlipsMonoIncr(String S) {
 
 ```java
 // 统计每个位置的前面有多少个1和后面有多少个0
+// 只要改变左边的1和右边的0，改变次数之和就是结果
 public int minFlipsMonoIncr(String s) {
     int ans = Integer.MAX_VALUE;
     int len = s.length();
@@ -649,13 +650,19 @@ public int minCut(String s) {
 
 ## 面试题95：最长公共子序列
 
-### 题目
+### [题目](https://leetcode.cn/problems/longest-common-subsequence/)
 
 输入两个字符串，求出它们的最长公共子序列的长度。
 
 如果从字符串s1中删除若干个字符之后能得到字符串s2，那么s2就是s1的一个子序列。例如，从字符串"abcde"中删除两个字符之后能得到字符串"ace"，因此"ace"是"abcde"的一个子序列。但字符串"aec"不是"abcde"的子序列。
 
-如果输入字符串"abcde"和"badfe"，它们的最长公共子序列是"bde"，因此输出3。
+```
+如果输入字符串"abcde"和"badfe"，
+它们的最长公共子序列是"bde"，
+因此输出3。
+```
+
+
 
 ### 参考代码
 
@@ -824,7 +831,7 @@ public boolean isInterleave(String s1, String s2, String s3) {
 
 ## 面试题97：子序列的数目
 
-### 题目
+### [题目](https://leetcode.cn/problems/distinct-subsequences/)
 
 输入字符串S和T，请计算S有多少个子序列等于T。例如，在字符串"appplep"中，有三个子序列等于字符串"apple"，如图14.6所示。 
 
@@ -836,9 +843,38 @@ public boolean isInterleave(String s1, String s2, String s3) {
 
 #### 解法一
 
+```
+dp[i][j]: s[0:i-1]中t[0:j-1]个数，记作s_i, t_j
+前i个，前j个
+
+dp[i][j]显然要从dp[i-1][?]递推而来。
+立即思考dp[i-1][j], dp[i-1][j-1]分别与dp[i][j]的关系。
+
+若s[i]!=t[j]：
+说明s[i]这个数没用，
+即s_i-1和s_i中t_j的数量是一样的
+dp[i][j] = dp[i-1][j]
+
+若s[i]==t[j]：
+1、s[i]选择与t[j]配对，
+如果配对了，结果就和dp[i-1][j-1]一样
+2、不配对
+dp[i-1][j]
+所以: dp[i][j] = dp[i-1][j-1] + dp[i-1][j]
+
+综上
+s[i]==t[j]: dp[i][j] = dp[i-1][j-1] + dp[i-1][j];
+s[i]!=t[j]: dp[i][j] = dp[i-1][j];
+
+```
+
+
+
 ``` java
 public int numDistinct(String s, String t) {
+    
     int[][] dp = new int[s.length() + 1][t.length() + 1];
+    // ""和""匹配
     dp[0][0] = 1;
 
     for (int i = 0; i < s.length(); i++) {
@@ -1627,72 +1663,4 @@ public void testMultiPack2(){
 ```
 
 
-
-## 预测玩家
-
-### 题目
-
-给一个非负数组nums，玩家1和玩家2轮流进行自己的回合，玩家1先手，从数组两端取数字；最后算出得分，玩家1赢或者平局都返回true。
-
-```
-输入：nums = [1,5,2]
-输出：false
-解释：一开始，玩家 1 可以从 1 和 2 中进行选择。
-如果他选择 2（或者 1 ），那么玩家 2 可以从 1（或者 2 ）和 5 中进行选择。如果玩家 2 选择了 5 ，那么玩家 1 则只剩下 1（或者 2 ）可选。 
-所以，玩家 1 的最终分数为 1 + 2 = 3，而玩家 2 为 5 。
-因此，玩家 1 永远不会成为赢家，返回 false 。
-```
-
-### 题解
-
-```
-dp[i][j]: nums[i,j]范围内, 甲相对于乙的净胜分。
-最终求的就是，甲先手面对区间[0...n-1]时，甲对乙的净胜分dp[0][n-1]是否>=0。
-1、i > j时, 无意义, dp=0
-2、i == j时, dp[i][i] = nums[i], 只能选这个
-3、i < j时
-- 如果甲拿nums[i]，那么变成乙先手面对区间[i+1...j]，
-  这段区间内乙对甲的净胜分为dp[i+1][j]；
-  那么甲对乙的净胜分就应该是nums[i] - dp[i+1][j]。
-- 如果甲拿nums[j]，同理可得甲对乙的净胜分为是nums[j] - dp[i][j-1]。
-
-=> dp[i][j] = Max(nums[i] - dp[i+1][j], nums[j] - dp[i][j-1])
-```
-
-```java
-public boolean PredictTheWinner(int[] nums) {
-    int length = nums.length;
-    int[][] dp = new int[length][length];
-    for (int i = 0; i < length; i++) {
-        dp[i][i] = nums[i];
-    }
-    // 要考虑填充顺序
-    for (int i = length - 2; i >= 0; i--) {
-        for (int j = i + 1; j < length; j++) {
-            dp[i][j] = Math.max(nums[i] - dp[i + 1][j], nums[j] - dp[i][j - 1]);
-        }
-    }
-    return dp[0][length - 1] >= 0;
-}
-```
-
-### 补充
-
-如果加上限制条件
-
-- 数组的长度是偶数；
-- 数组的元素之和是奇数，所以没有平局。
-
-一定是先手赢
-
-因为可以按照下标的奇偶分成两堆，一定有一堆比另一堆大
-
-假如先手选奇数堆，那么后手只能选偶数堆
-
-```
-序号: 1 2 3 4 5 6
-堆数: 8 7 9 2 4 5
-奇数堆大
-甲先手，甲选了1，那么乙只能在2和6之间选了，所以甲必胜。
-```
 

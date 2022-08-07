@@ -6,6 +6,19 @@
 
 不抛异常：offer(e)，poll，peek
 
+Queue是FIFO的单端队列，[Deque](https://blog.csdn.net/onedegree/article/details/108295374)是双端队列
+
+```java
+// 队列和栈都用ArrayDeque最方便
+// 自己控制从哪个口出就可以
+pollLast();
+pollFirst();
+...
+// ArrayDeque的pop和push都是往队头进行操作
+```
+
+
+
 ## 7.1 应用
 
 ## 面试题41：滑动窗口的平均值

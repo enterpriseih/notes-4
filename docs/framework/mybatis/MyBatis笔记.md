@@ -1,4 +1,13 @@
+# ORM对象关系映射
+
+1. 简单：ORM以最基本的形式建模数据。比如**ORM会将MySQL的一张表映射成一个Java类（模型）**，**表的字段就是这个类的成员变量**
+2. 精确：ORM使所有的MySQL数据表都按照统一的标准精确地映射成java类，使系统在代码层面保持准确统一
+3. 易懂：ORM**使数据库结构文档化**。比如MySQL数据库就被ORM转换为了java程序员可以读懂的java类，java程序员可以只把注意力放在他擅长的java层面（当然能够熟练掌握MySQL更好）
+4. 易用：ORM**包含对持久类对象进行CRUD操作的API**，例如create(), update(), save(), load(), find(), find_all(), where()等，也就是讲sql查询全部封装成了编程语言中的函数，通过函数的链式组合生成最终的SQL语句。通过这种封装避免了不规范、冗余、风格不统一的SQL语句，可以避免很多人为Bug，方便编码风格的统一和后期维护。
+	
+
 # 一、Mybatis简介
+
 ## 1、MyBatis历史
 -    MyBatis最初是Apache的一个开源项目iBatis, 2010年6月这个项目由Apache Software Foundation迁移到了Google Code。随着开发团队转投Google Code旗下，iBatis3.x正式更名为MyBatis。代码于2013年11月迁移到Github
 - iBatis一词来源于“internet”和“abatis”的组合，是一个基于Java的持久层框架。iBatis提供的持久层框架包括SQL Maps和Data Access Objects（DAO）

@@ -1,5 +1,13 @@
 # 基础的基础
 
+## Java的三大特性
+
+1. 封装：是指隐藏对象的属性和实现细节，仅对外提供公共访问方式；
+
+2. 继承：从已有的类中派生出新的类，新的类能吸收已有类的数据属性和行为，并能扩展新的能力；
+
+3. 多态：一个方法可以有多种实现版本，即“一种定义，多种实现”。
+
 ## Java程序编译解释过程
 
 不准确的：Java 源文件 → 编译器 → JVM可以理解的字节码文件 .class → JVM解释/JIT编译器 →机器可以执行的二进制机器码
@@ -234,6 +242,54 @@ public enum ResponseDto {
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311610240.png" alt="第10章_对象的实例化" style="zoom:50%;" />
 
+# Java只支持值传递
+
+值传递：形参修改，实参不改
+
+引用传递：形参修改，实参也改
+
+> 引用在栈中，对象在堆中。
+
+**基本数据类型传递时，是将实参的副本传递给形参。**
+
+```java
+public static void main(String[] args) {
+    Person p = new Person("张三");
+    f(p);
+    System.out.println("实参: " + p);
+}
+public static void f(Person p) {
+    p.name = "李四";
+    System.out.println("形参: " + p);
+}
+
+// 打印结果
+// 形参: Person{name='李四'}
+// 实参: Person{name='李四'}
+```
+
+上述看似是引用传递，传递p的时候是创建了一个p的引用副本，同时都指向堆中的同一个对象。
+
+下述中，重新将p指向了堆中的新建对象。
+
+```java
+public static void main(String[] args) {
+    Person p = new Person("张三");
+    f(p);
+    System.out.println("实参: " + p);
+}
+public static void f(Person p) {
+    p = new Person("李四");
+    System.out.println("形参: " + p);
+}
+
+// 打印结果
+// 形参: Person{name='李四'}
+// 实参: Person{name='张三'}
+```
+
+**综上：形参操作的始终是实参的副本。**
+
 # 异常体系
 
 ## 一、error
@@ -269,7 +325,7 @@ StackOverflowError（栈溢出）
 public final class String implements java.io.Serializable, Comparable<String>, CharSequence {
     /* 
     	String本质是个char数组，而且用final修饰 
-    	jdk9之后换成了byte数组
+    	jdk9之后换成了byte数组，为了减少存储的占用空间
     */
     private final char value[];
 }
@@ -282,6 +338,16 @@ public final class String implements java.io.Serializable, Comparable<String>, C
 在源码中没有对value里的元素进行操作；并且string类是final不可继承，避免被别人继承后破坏。
 
 综上，才使得String是不可变的。
+
+### 补充：jdk9的改变
+
+采用Latin-1和UTF-16字符集共存，Latin-1字符集可以用一个字节保存拉丁文字符
+
+jdk9中还有个coder字段，标识判断字符串中是否包含非拉丁文字符，如果有就使用UTF-16
+
+不使用UTF-8（其也可以用一个字节到四个字节保存）是因为str.charAt(6)需要随机访问。
+
+UTF-8不定长，处理起来会影响性能，频繁计算。
 
 ## 二、StringTable
 
@@ -904,43 +970,111 @@ synchronized则是JVM直接支持的，JVM能够在运行时作出相应的优�
 
 # 泛型
 
-## 一、泛型中entends和super的区别
+允许在定义类、接口时通过一个**标识表示**类中某个属性的类型或者是某个方法的返回值及参数**类型**。
 
-1. <? extends T>表示包括T在内的任何T的⼦类 
+这个类型参数将在使用时（例如，继承或实现这个接口，用这个类型声明变量、创建对象时）确定（即传入实际的类型参数，也称为类型实参）。
 
-2. <? super T>表示包括T在内的任何T的⽗类 
+> JVM对泛型其实一无所知，所有的工作都是**编译器**做的。编译阶段，编译器会进行类型检测。
+
+## 一、基本概念
+
+### 泛型在继承上的体现
+
+虽然类A是类B的父类，但是`G<A>`和`G<B>`二者不具备子父类关系，二者是并列关系
+
+### 泛型中entends和super的区别
+
+1. <? extends T>表示包括T在内的任何T的⼦类`(无穷小, T] `
+2. <? super T>表示包括T在内的任何T的⽗类`[T, 无穷大]` 
+
+### 通配符
+
+约定俗成
+
+- ? 表示不确定的 java 类型
+- T (type) 表示具体的一个java类型
+- K V (key value) 分别代表java键值中的Key Value
+- E (element) 代表Element
+
+## 二、范型擦除
+
+### 概念
+
+编译阶段，编译器会进行类型检测，不符合就会报错，一旦编译通过，编译器就会将泛型擦除，对于JVM来讲，没有泛型类型的对象。
+
+```java
+List<Integer> ints = new ArraysList<>();
+List<String> strs = new ArraysList<>();
+System.out.println(ints.getClass == strs.getClass()); // true
+
+// 编译器通过后，进行类型擦除
+// JVM中是如下的感觉
+List ints = new ArraysList();
+List strs = new ArraysList();
+/**
+ * 不存在List<Integer>类型以及List<String>类型
+ */
+```
+
+> - **Raw Type 原始类型**：泛型擦除后的类型被称为原始类型。
+
+**范型擦除后**，**所有范型会被替换成他的第一个上界**；没有边界时，就会被替换成顶层父类Object。
+
+```java
+public class NumberHandler<T extends Number> {
+    public final T number;
+    public NumberHandler(T number) {
+        this.number = number;
+    }
+}
+
+// 范型擦除后，所有范型会被替换成他的第一个上界
+public class NumberHandler {
+    public final Number number;
+    public NumberHandler(Number number) {
+        this.number = number;
+    }
+}
+
+```
+
+> 泛型擦除后的代码和JDK1.5之前的代码是一致的，因为类型擦除的目的就是**向低版本兼容**。
 
 
 
-# 哈希
+### 弊端
 
-## 一、哈希碰撞处理方法
+1、**泛型不支持基本数据类型**，只支持引用类型，因为泛型最终会被擦除成Object，其不能存储基本数据类型。
 
-### 1、开放地址
+2、运行时只能对原始类型进行类型检测
 
-按照一定算法寻找一个空位置存放
+```java
+if (obj instanceof List) {}
+if (obj instanceof List<String>) {} // 编译错误
+if (obj instanceof T) {} // 编译错误
+```
 
-- **线性探测再散列**
+3、不能实例化具体参数，因为运行时无法确定具体类型，也无法知道是不是存在无参构造器。
 
-	依次向后
+```java
+T data = new T(); // 编译错误
+```
 
-- **二次探测再散列**
+4、不能实例化范型数组，因为最终会被擦除成Object，数组返回的时候无法变成String类型会报错。
 
-	依次向前后查找，增量为1、2、3的二次方
+```java
+public static <T> T[] randomTwo(T... t) {
+    T[] array = new T[2];
+    return array;
+}
+public static void main(String[] args) {
+    // ClassCastException: Object cannot be cast to String
+    String[] strings = randomTwo("1", "2");
+}
+```
 
-- **伪随机探测再散列**
 
-	随机产生一个增量位移
 
-### 2、再哈希
+### 细节
 
-出现冲突后采用其他的哈希函数计算，直到不再冲突为止
-
-### 3、链地址
-
-在出现冲突的地方存储一个链表，如 HashMap。
-
-### 4、建立公共溢出区
-
-假设哈希函数的值域是[1,m-1]，则设向量HashTable[0...m-1]为**基本表**，每个分量存放一个记录，另外设向量OverTable[0...v]为**溢出表**，所有关键字和基本表中关键字为同义词的记录，不管它们由哈希函数得到的哈希地址是什么，一旦**发生冲突，都填入溢出表**。
-
+泛型擦除只是运行时对于JVM而言，泛型参数被擦除掉了，但泛型信息还是会被保留在.class字节码文件中，即可以通过反射机制去恢复范型信息。

@@ -54,7 +54,55 @@
 
 显示xxx相关的进程
 
-```
+```shell
 ps -ef|grep xxx
 ```
+
+基于rpm安装
+
+```shell
+# 列出所有可以安装的软件包
+yum list
+# 安装软件
+yum install -y 软件名
+# 卸载软件
+yum remove 软件名
+# 查找软件包
+yum search all 软件名
+```
+
+服务相关
+
+```shell
+# 服务器管理命令
+systemctl status 服务名
+# 启动服务
+systemctl start 服务名
+# 重启服务
+systemctl restart 服务名
+# 停止服务
+systemctl stop 服务名
+# 禁止服务随linux启动。
+systemctl disable 服务名
+# 设置服务随linux启动。
+systemctl enable 服务名
+```
+
+查看cpu使用效率[top](https://blog.csdn.net/u012102536/article/details/122221926)
+
+```shell
+top
+```
+
+杀死程序
+
+```shell
+kill
+```
+
+> **kill -15** **和** **kill -9** **的区别**
+>
+> kill -9 PID 是操作系统从内核级别**强制杀死一个进程****.** killed
+>
+> kill -15 PID 可以理解为操作系统**发送一个通知告诉应用主动关闭**. terminated
 
