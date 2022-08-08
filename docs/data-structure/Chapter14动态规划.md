@@ -672,6 +672,8 @@ public int minCut(String s) {
 dp[i][j]是s1的0~i-1和s2的0~j-1的最长公共子序列长度
 int[][] dp = new int[len1 + 1][len2 + 1];
 这样初始化简单
+s1[i]==s2[j]: dp[i+1][j+1] = dp[i][j] + 1;
+s1[i]!=s2[j]: 说明s1[i]和s2[j]不可能同时出现在s1_i-1和s2_j-1的公共子序列中。
 ```
 
 ``` java
@@ -929,7 +931,7 @@ public int numDistinct(String s, String t) {
 
 ### 参考代码
 
-#### 解法一
+#### 解法一：递归
 
 ``` java
 public int uniquePaths(int m, int n) {
@@ -950,7 +952,7 @@ private int helper(int i, int j, int[][] dp) {
 }
 ```
 
-#### 解法二
+#### 解法二：迭代
 
 ``` java
 public int uniquePaths(int m, int n) {
