@@ -8,32 +8,39 @@
 
 # 一、Mybatis简介
 
-## 1、MyBatis历史
--    MyBatis最初是Apache的一个开源项目iBatis, 2010年6月这个项目由Apache Software Foundation迁移到了Google Code。随着开发团队转投Google Code旗下，iBatis3.x正式更名为MyBatis。代码于2013年11月迁移到Github
-- iBatis一词来源于“internet”和“abatis”的组合，是一个基于Java的持久层框架。iBatis提供的持久层框架包括SQL Maps和Data Access Objects（DAO）
 ## 2、MyBatis特性
 1. MyBatis 是支持定制化 SQL、存储过程以及高级映射的优秀的持久层框架
 2. MyBatis 避免了几乎所有的 JDBC 代码和手动设置参数以及获取结果集
 3. MyBatis可以使用简单的XML或注解用于配置和原始映射，将接口和Java的POJO（Plain Old Java Objects，普通的Java对象）映射成数据库中的记录
 4. MyBatis 是一个`半自动的ORM（Object Relation Mapping）`框架
-## 3、MyBatis下载
-- [MyBatis下载地址](https://github.com/mybatis/mybatis-3)
-- <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122307205.png" style="zoom:67%;" />
 ## 4、和其它持久化层技术对比
-- JDBC  
-	- SQL 夹杂在Java代码中耦合度高，导致硬编码内伤  
-	- 维护不易且实际开发需求中 SQL 有变化，频繁修改的情况多见  
-	- 代码冗长，开发效率低
-- Hibernate 和 JPA
-	- 操作简便，开发效率高  
-	- 程序中的长难复杂 SQL 需要绕过框架  
-	- 内部自动生产的 SQL，不容易做特殊优化  
-	- 基于全映射的全自动框架，大量字段的 POJO 进行部分映射时比较困难。  
-	- 反射操作太多，导致数据库性能下降
-- MyBatis
-	- 轻量级，性能出色  
-	- SQL 和 Java 编码分开，功能边界清晰。Java代码专注业务、SQL语句专注数据  
-	- 开发效率稍逊于HIbernate，但是完全能够接受
+JDBC  
+
+ - SQL 夹杂在Java代码中耦合度高，导致硬编码内伤 
+  - 维护不易且实际开发需求中 SQL 有变化，频繁修改的情况多见 
+  - 代码冗长，开发效率低
+
+Hibernate 和 JPA
+
+- 操作简便，开发效率高 
+- Hibernate基本不再需要编写SQL就可以通过映射关系来操作数据库，是一种**全表映射**的体现，而MyBatis需要我们提供SQL去运行。
+
+  - 程序中的长难复杂 SQL 需要绕过框架 
+
+  - 内部自动生产的 SQL，不容易做特殊优化 
+
+  - 基于全映射的全自动框架，大量字段的 POJO 进行部分映射时比较困难。 
+
+  - 反射操作太多，导致数据库性能下降
+
+MyBatis
+
+ - 轻量级，性能出色 
+
+  - SQL 和 Java 编码分开，功能边界清晰。Java代码专注业务、SQL语句专注数据 
+
+  - 开发效率稍逊于HIbernate，但是完全能够接受
+
 # 二、搭建MyBatis
 ## 1、开发环境
 - IDE：idea 2019.2  
@@ -1144,7 +1151,7 @@ public void getEmpByChoose() {
 ```
 - 相当于`if a else if b else if c else d`，只会执行其中一个
 
-## foreach
+## foreach批量
 属性：  
  - collection：设置要循环的数组或集合  
 
@@ -1661,3 +1668,37 @@ prePage=0, nextPage=2, isFirstPage=true, isLastPage=false, hasPreviousPage=false
 - hasPreviousPage/hasNextPage：是否存在上一页/下一页  
 - navigatePages：导航分页的页码数  
 - navigatepageNums：导航分页的页码，\[1,2,3,4,5]
+
+
+
+
+
+# Mybatis面试题目
+
+[#](https://javaguide.cn/system-design/framework/mybatis/mybatis-interview.html#_14、mybatis-中如何指定使用哪一种-executor-执行器)
+
+### ${}和#{}的区别
+
+${}的本质就是**字符串拼接**，#{}的本质就是**占位符赋值**
+
+### 为什么说 MyBatis 是半自动 ORM 映射工具？它与全自动的区别在哪里？
+
+Hibernate 属于全自动 ORM 映射工具，使用 Hibernate 查询关联对象或者关联集合对象时，可以根据对象关系模型直接获取，所以它是全自动的。而 MyBatis 在查询关联对象或关联集合对象时，需要手动编写 sql 来完成，所以，称之为半自动 ORM 映射工具。
+
+### MyBatis 中如何执行批处理？
+
+使用 BatchExecutor 完成批处理。
+
+### Mybatis都有哪些Executor
+
+MyBatis 有三种基本的 Executor 执行器， `SimpleExecutor` 、 `ReuseExecutor` 、 `BatchExecutor` 。
+
+`SimpleExecutor` ：每执行一次 update 或 select，就开启一个 Statement 对象，用完立刻关闭 Statement 对象。
+
+`ReuseExecutor` ：执行 update 或 select，以 sql 作为 key 查找 Statement 对象，存在就使用，不存在就创建，用完后，不关闭 Statement 对象，而是放置于 Map<String, Statement>内，供下一次使用。简言之，就是重复使用 Statement 对象。
+
+`BatchExecutor` ：执行 update（没有 select，JDBC 批处理不支持 select），将所有 sql 都添加到批处理中（addBatch()），等待统一执行（executeBatch()），它缓存了多个 Statement 对象，每个 Statement 对象都是 addBatch()完毕后，等待逐一执行 executeBatch()批处理。与 JDBC 批处理相同。
+
+作用范围：Executor 的这些特点，都严格限制在 SqlSession 生命周期范围内。
+
+#### 

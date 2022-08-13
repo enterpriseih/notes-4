@@ -90,11 +90,15 @@ j++;
 
 # AQS（抽象的队列同步器）
 
-AbstractQueuedSynchronizer 类如其名，抽象的队列式的同步器，AQS 定义了一套多线程访问共享资源的同步器框架，许多同步类实现都依赖于它，如常用的
+[参考](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)
 
-ReentrantLock、Semaphore、CountDownLatch
+AQS 定义了一套多线程访问共享资源的同步器框架，许多同步类实现都依赖于它，如常用的 ReentrantLock、Semaphore、CountDownLatch。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204072047099.png" alt="image-20220407204738166" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202208111012317.png" alt="img"  />
+
+
+
+**AQS核心思想**：如果被请求的共享资源空闲，那么就将当前请求资源的线程设置为有效的工作线程，将共享资源设置为锁定状态；如果共享资源被占用，就需要一定的阻塞等待唤醒机制来保证锁分配。这个机制主要用的是CLH队列的变体实现的，将暂时获取不到锁的线程加入到队列中。
 
 它维护了一个**信号量 volatile int state**（代表共享资源）和一个 **FIFO 线程等待队列**（双向链表队列，多线程争用资源被阻塞时会进入此队列）。这里 volatile 是核心关键词。state 的访问方式有三种：
 
@@ -149,5 +153,19 @@ AQS定义两种资源共享方式：
 >
 > 等到所有子线程都执行完后(即 state =0)，会unpark()主调用线程，然后主调用线程
 > 就会从 await() 函数返回，继续后余动作。
+
+## 三、应用场景
+
+- **ReentrantLock**
+
+	使用AQS保存锁重复持有的次数。当一个线程获取锁时，ReentrantLock记录当前获得锁的线程标识，用于检测是否重复获取，以及错误线程试图解锁操作时异常情况的处理。
+
+- **Semaphore**
+
+	使用AQS同步状态来保存信号量的当前计数。tryRelease会增加计数，acquireShared会减少计数。
+
+- **CountDownLatch**
+
+	使用AQS同步状态来表示计数。计数为0时，所有的Acquire操作（CountDownLatch的await方法）才可以通过。
 
 <br>

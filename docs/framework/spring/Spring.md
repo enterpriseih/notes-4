@@ -770,3 +770,13 @@ starter 就是定义了一个 starter 的 jar 包，写一个 @Configuration 配
 
 - 如果application里写了`spring.profiles.active=dev`，还回去加载application-dev.properties
 - 其中定义应用级别的配置
+
+
+
+# 替换Spring容器中已经存在的Bean
+
+https://blog.csdn.net/fu_huo_1993/article/details/124313557
+
+在系统中根据 @Bean或通过 @Component 定义的Bean对象在Spring中都会转换成一个个的BeanDefinition对象，如果我们在Spring创建这些对象加入到Spring容器之前，将不想要的BeanDefinition对象删除，而加入我们自己想要的BeanDefinition对象是不是就可以实现了？而Spring提供的BeanDefinitionRegistryPostProcessor接口正好可以帮助我们实现这个功能。
+
+BeanDefinitionRegistryPostProcessor 是在系统加载完所有的BeanDefinition对象来进行回调。

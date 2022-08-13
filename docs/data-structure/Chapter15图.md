@@ -1074,8 +1074,6 @@ private void findCircle(int[][] M, boolean[]visited, int i) {
 - 第一个子图的根节点是 i，第二个子图的根节点是 j
 - 令`father[i]=j`，即完成合并
 
-
-
 ``` java
 public int findCircleNum(int[][] M) {
     int[] fathers = new int[M.length];
@@ -1105,7 +1103,6 @@ private boolean union(int[] fathers, int i, int j) {
         fathers[fatherOfI] = fatherOfJ;
         return true;
     }
-
     return false;
 }
 
@@ -1372,5 +1369,6 @@ private void union(Map<Integer, Integer> fathers, Map<Integer, Integer> counts, 
         counts.put(fatherOfJ, countOfI + countOfJ);
     }
 }
+
 ```
 

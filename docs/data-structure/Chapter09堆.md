@@ -84,7 +84,8 @@ PriorityQueue<Integer> minHeap = new PriorityQueue<>();
 PriorityQueue<Integer> maxHeap = new PriorityQueue<>(
     (e1, e2) -> e2 - e1
 );
-
+// 如果存的是Double这样的非int类型，
+// 要用e1 - e2 => e1.compareTo(e2)
 // 使用函数和Queue一样，offer、poll、peek
 ```
 

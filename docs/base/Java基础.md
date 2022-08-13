@@ -3,10 +3,10 @@
 ## Java的三大特性
 
 1. 封装：是指隐藏对象的属性和实现细节，仅对外提供公共访问方式；
-
 2. 继承：从已有的类中派生出新的类，新的类能吸收已有类的数据属性和行为，并能扩展新的能力；
-
 3. 多态：一个方法可以有多种实现版本，即“一种定义，多种实现”。
+	- 继承是多态的基础
+	- 要有方法的重写
 
 ## Java程序编译解释过程
 
@@ -607,7 +607,6 @@ public static void main(String[] args) {
         System.out.println(o);
         // System.out.println(it2.next());
     }
-
     System.out.println(c2.size()); //0
 }
 ```
@@ -621,6 +620,8 @@ public static void main(String[] args) {
 ### 1、HashMap
 
 #### a>添加过程
+
+> put的时候，如果数组为空的话，会先去初始化。
 
 ```
 map.put(key1,value1):
