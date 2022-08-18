@@ -228,10 +228,16 @@ RabbitMQ 有三种模式：单机模式、普通集群模式、镜像集群模�
 
 ### 普通集群
 
-普通集群模式简单的讲就是在多台机器上分别安装rabbitmq服务，然后在多台机器上分分别启动rabbitmq实例，创建好的queue只会放在其中一个rabbitmq实例上，其他每个实例都会同步这个queue上的元数据（元数据可以认为是queue的一些配置信息，通过元数据可以找到queue所在的实例），消费数据的时候，如果是连接到了其他实例，那么该实例还是要queue所在的实例上拉取数据。
+普通集群模式简单的讲就是在多台机器上分别安装rabbitmq服务，然后在多台机器上分分别启动rabbitmq实例，创建好的queue只会**放在其中一个**rabbitmq实例上，其他每个实例都会**同步这个queue上的元数据**（元数据可以认为是queue的一些配置信息，通过元数据可以找到queue所在的实例），**消费数据的时候**，如果是连接到了其他实例，那么该实例还是要**从queue所在的实例上拉取数据**。
 
 这种方式并不能做到高可用，仅仅是个普通的集群，**只能提高吞吐量**。
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/33df5995230e4dc3a2084de4fc794c3f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBATGVuZ3RoTmlnaHQ=,size_20,color_FFFFFF,t_70,g_se,x_16)
+
+这种集群消费者消费数据要么就是随机连接一个机器拉取数据，要么固定来接queue所在实例获取数据，但是都不能做到高可用，前者数据获取会产生大量的网络开销，后者会产生单节点性能瓶颈。如果放 queue 的实例宕机了，会导致接下来其他实例就无法从那个实例拉取，如果你开启了消息持久化，让 RabbitMQ 落地存储消息的话，消息不一定会丢，但是必须要等这个实例恢复了，才可以继续从这个 queue实例拉取数据。
+
 #### 镜像集群（高可用集群）
 
-镜像集群才是RabbitMQ所谓的高可用集群模式，镜像集群与普通集群的区别就在于镜像集群模式下，创建的queue，不管是元数据还是queue的data都会存在于多个实例节点上，每个RabbitMQ节点上都会有一个完整的queue镜像，每次把数据写到queue里的时候，都会自动同步消息到每个queue的节点上。
+镜像集群才是RabbitMQ所谓的高可用集群模式，镜像集群与普通集群的区别就在于镜像集群模式下，创建的queue，**不管是元数据还是queue的data都会存在于多个实例节点上**，每个RabbitMQ节点上都会有一个完整的queue镜像，每次把数据写到queue里的时候，都会自动同步消息到每个queue的节点上。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/6115882b73a94bc28da8235b140bf3b2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBATGVuZ3RoTmlnaHQ=,size_20,color_FFFFFF,t_70,g_se,x_16)

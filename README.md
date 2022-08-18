@@ -59,6 +59,7 @@
 - [MyBatis笔记](./docs/framework/mybatis/MyBatis笔记.md)
 - [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)
 - [SpringBoot笔记](./docs/framework/spring/SpringBoot笔记.md)
+- [SpringBoot常用注解](./docs/framework/spring/spring-common-annotations.md)
 - [SpringCloud笔记](./docs/framework/spring/springcloud/SpringCloud.md)
 - [SpringSecurity](./docs/framework/spring/SpringSecurity.md)
 
@@ -92,7 +93,8 @@
 
 - [git教程](./docs/tools/git/git教程.md)
 - [JUnit5](./docs/tools/JUnit5Test.md)
-- [Linux](./docs/tools/Linux.md)
+- [Linux](./docs/tools/linux.md)
+- [Shell](./docs/tools/shell.md)
 - [Maven](./docs/maven/Maven.md)
 - [Docker](./docs/Docker.md)
 

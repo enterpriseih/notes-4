@@ -92,6 +92,8 @@ j++;
 
 [参考](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)
 
+AbstractQueuedSynchronizer
+
 AQS 定义了一套多线程访问共享资源的同步器框架，许多同步类实现都依赖于它，如常用的 ReentrantLock、Semaphore、CountDownLatch。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202208111012317.png" alt="img"  />

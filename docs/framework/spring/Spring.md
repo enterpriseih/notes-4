@@ -301,7 +301,12 @@ Spring中的事务管理就用到AOP
 
 - Spring一般基于AspectJ实现AOP操作，其不是 Spring 的组成，是独立AOP框架
 - Spring会自行判断并调用JDK还是CGLIB
-- aspectj
+
+> **Spring AOP 属于运行时增强，而 AspectJ 是编译时增强。** Spring AOP 基于代理(Proxying)，而 AspectJ 基于字节码操作(Bytecode Manipulation)。
+>
+> Spring AOP 已经集成了 AspectJ ，AspectJ 应该算的上是 Java 生态系统中最完整的 AOP 框架了。AspectJ 相比于 Spring AOP 功能更加强大，但是 Spring AOP 相对来说更简单，
+>
+> 如果我们的切面比较少，那么两者性能差异不大。但是，当切面太多的话，最好选择 AspectJ ，它比Spring AOP 快很多。
 
 
 
@@ -749,9 +754,9 @@ starter 就是定义了一个 starter 的 jar 包，写一个 @Configuration 配
 2. 在创建 spring 容器的过程中，会利用 @ConditionalOnClass 技术来判断当前 classpath 是否存在 tomcat 依赖，若存在则会生成一个启动 tomcat 的 bean
 3. Spring 容器创建完之后，会获取启动 tomcat 的 bean，并创建 tomcat 对象，并绑定端口等，然后启动 tomcat。
 
-## 四、常用注解
+## 四、[常用注解](./spring-common-annotations.md)
 
-见springboot章节
+
 
 
 

@@ -7,6 +7,7 @@
 3. 多态：一个方法可以有多种实现版本，即“一种定义，多种实现”。
 	- 继承是多态的基础
 	- 要有方法的重写
+	- 要有父类引用指向子类对象
 
 ## Java程序编译解释过程
 
@@ -38,6 +39,14 @@ a+=1;
 // java编译器会对+=进行特殊处理，进行了类型转换，
 // 通过反编译.class源码可以看到a+=1被编译为：
 // a=(short)(a + 1);
+
+// 有些浮点数不能完全精确的表示出来
+System.out.println(3 * 0.1); // 0.30000000000000004
+System.out.println(4 * 0.1); // 0.4
+System.out.println(3 * 0.1 == 0.3); // false
+System.out.println(13 * 0.1 == 1.3); // true
+System.out.println(9 * 0.1 == 0.9); // true
+System.out.println(3 * 0.1 / 3); // 0.10000000000000002
 ```
 
 
@@ -199,7 +208,7 @@ indexOf(String, int)
 
 运行期间
 
-> 如果方法的返回类型是**void和基本数据类型**，则返回值重写时**不可修改**。但是如果方法的返回值是**引用类型**， 重写时是可以返回该引用类型的**子类**的。
+> 注：如果方法的返回类型是**void和基本数据类型**，则返回值重写时**不可修改**。但是如果方法的返回值是**引用类型**， 重写时是可以返回该引用类型的**子类**的。
 
 ### 对比
 
@@ -260,9 +269,8 @@ public enum ResponseDto {
 
 # Java只支持值传递
 
-值传递：形参修改，实参不改
-
-引用传递：形参修改，实参也改
+- **值传递** ：方法接收的是实参值的拷贝，会创建副本。
+- **引用传递** ：方法接收的直接是实参所引用的对象在堆中的地址，不会创建副本，对形参的修改将影响到实参。
 
 > 引用在栈中，对象在堆中。
 
@@ -505,11 +513,14 @@ System.out.println(s3 == s4);
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061519804.png" alt="image-20220406151857332" style="zoom: 50%;" />
 
-Note：无序是指存储位置的无序，不是按照索引顺序添加，而是按照hash值添加
-
 threshold：扩容的阈值，=容量*加载因子，超过阈值就扩容
 
 工具类：Collections操作集合、Arrays操作数组
+
+### 无序性和不可重复性的含义是什么
+
+- 无序性不等于随机性 ，无序性是指存储的数据在底层数组中并非按照数组索引的顺序添加 ，而是根据数据的哈希值决定的。
+- 不可重复性是指添加的元素按照 `equals()` 判断时 ，返回 false，需要同时重写 `equals()` 方法和 `hashCode()` 方法。
 
 ## 一、Collection
 
@@ -611,13 +622,76 @@ public static void main(String[] args) {
 }
 ```
 
+### 3、ArrayList
 
+[底层](./collection/arraylist-source-code.md)
+
+初始容量为10；
+
+扩容1.5倍；
+
+底层用Object数组来存放。
+
+可以指定初始容量（通过含参的构造函数）。
+
+### 4、比较 HashSet、LinkedHashSet 和 TreeSet 三者的异同
+
+- `HashSet`、`LinkedHashSet` 和 `TreeSet` 都是 `Set` 接口的实现类，都能保证元素唯一，并且都不是线程安全的。
+- `HashSet`、`LinkedHashSet` 和 `TreeSet` 的主要区别在于底层数据结构不同。`HashSet` 的底层数据结构是哈希表（基于 `HashMap` 实现）。`LinkedHashSet` 的底层数据结构是链表和哈希表，元素的插入和取出顺序满足 FIFO。`TreeSet` 底层数据结构是红黑树，元素是有序的，排序的方式有自然排序和定制排序。
+- 底层数据结构不同又导致这三者的应用场景不同。`HashSet` 用于不需要保证元素插入和取出顺序的场景，`LinkedHashSet` 用于保证元素的插入和取出顺序满足 FIFO 的场景，`TreeSet` 用于支持对元素自定义排序规则的场景。
+
+### 5、comparable和comparator
+
+comparable是待排序的类实现的接口，在类中需要重写compareTo方法
+
+comparator是个比较器接口，实现该接口的类是个比较器，其中可以实现compare方法，进行定制排序。
+
+### 6、集合的遍历
+
+- for与foreach都可以遍历数组/集合，不过for则在较复杂的循环中效率更高。
+- foreach不可以删除/修改集合元素，而for可以
+- foreach和for都可以修改元素里面的属性
 
 ## 二、Map
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061510286.png" alt="image-20220406151031801" style="zoom:67%;" />
 
+### HashMap 和 Hashtable 的区别
+
+- **线程是否安全：** `HashMap` 是非线程安全的，`Hashtable` 是线程安全的,因为 `Hashtable` 内部的方法基本都经过`synchronized` 修饰。（如果你要保证线程安全的话就使用 `ConcurrentHashMap` 吧！）；
+- **效率：** 因为线程安全的问题，`HashMap` 要比 `Hashtable` 效率高一点。另外，`Hashtable` 基本被淘汰，不要在代码中使用它；
+- **对 Null key 和 Null value 的支持：** `HashMap` 可以存储 null 的 key 和 value，但 null 作为键只能有一个，null 作为值可以有多个；Hashtable 不允许有 null 键和 null 值，否则会抛出 `NullPointerException`。
+- **初始容量大小和每次扩充容量大小的不同 ：**
+	- ① 创建时如果不指定容量初始值，`Hashtable` 默认的初始大小为 11，之后每次扩充，容量变为原来的 2n+1。`HashMap` 默认的初始化大小为 16。之后每次扩充，容量变为原来的 2 倍。
+	- ② 创建时如果给定了容量初始值，那么 `Hashtable` 会直接使用你给定的大小，而 `HashMap` 会将其扩充为 2 的幂次方大小（`HashMap` 中的`tableSizeFor()`方法保证，下面给出了源代码）。也就是说 `HashMap` 总是使用 2 的幂作为哈希表的大小,后面会介绍到为什么是 2 的幂次方。
+- **底层数据结构：** JDK1.8 以后的 `HashMap` 在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）时，将链表转化为红黑树（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树），以减少搜索时间（后文中我会结合源码对这一过程进行分析）。`Hashtable` 没有这样的机制。
+
+### HashMap 和 HashSet 区别
+
+如果你看过 `HashSet` 源码的话就应该知道：`HashSet` 底层就是基于 `HashMap` 实现的。（`HashSet` 的源码非常非常少，因为除了 `clone()`、`writeObject()`、`readObject()`是 `HashSet` 自己不得不实现之外，其他方法都是直接调用 `HashMap` 中的方法。
+
+|               `HashMap`                |                          `HashSet`                           |
+| :------------------------------------: | :----------------------------------------------------------: |
+|           实现了 `Map` 接口            |                       实现 `Set` 接口                        |
+|               存储键值对               |                          仅存储对象                          |
+|     调用 `put()`向 map 中添加元素      |             调用 `add()`方法向 `Set` 中添加元素              |
+| `HashMap` 使用键（Key）计算 `hashcode` | `HashSet` 使用成员对象来计算 `hashcode` 值，对于两个对象来说 `hashcode` 可能相同，所以`equals()`方法用来判断对象的相等性 |
+
+### TreeMap
+
+**相比于`HashMap`来说 `TreeMap` 主要多了对集合中的元素根据键排序的能力以及对集合内元素的搜索的能力。**
+
 ### 1、HashMap
+
+[底层](./collection/hashmap-source-code.md)
+
+初始容量16，因为hashcode是与length-1求与，16或2^n减一后的二进制都是1
+
+元素超过8个会变成红黑树，小于6再变回链表
+
+加载因子0.75，2倍扩容
+
+key和value允许null
 
 #### a>添加过程
 
@@ -660,7 +734,13 @@ map.put(key1,value1):
 > jdk1.8之后改为尾插法
 > 
 
-#### b>细节
+#### b>为什么是16？减少hash碰撞，同时提升效率
+
+为了能让 HashMap 存取高效，尽量较少碰撞，也就是要尽量把数据分配均匀。我们上面也讲到了过了，Hash 值的范围值-2147483648 到 2147483647，前后加起来大概 40 亿的映射空间，只要哈希函数映射得比较均匀松散，一般应用是很难出现碰撞的。但问题是一个 40 亿长度的数组，内存是放不下的。所以这个散列值是不能直接拿来用的。用之前还要先做对数组的长度取模运算，得到的余数才能用来要存放的位置也就是对应的数组下标。这个数组下标的计算方法是“ `(n - 1) & hash`”。（n 代表数组长度）。这也就解释了 HashMap 的长度为什么是 2 的幂次方。
+
+**这个算法应该如何设计呢？**
+
+我们首先可能会想到采用%取余的操作来实现。但是，重点来了：**“取余(%)操作中如果除数是 2 的幂次则等价于与其除数减一的与(&)操作（也就是说 hash%length==hash&(length-1)的前提是 length 是 2 的 n 次方；）。”** 并且 **采用二进制位操作 &，相对于%能够提高运算效率，这就解释了 HashMap 的长度为什么是 2 的幂次方。**
 
 初始容量：16（为了服务于hash函数）
 
@@ -705,6 +785,8 @@ index = HashCode（Key） & （Length - 1）;
 > 	- 如果该位置下的元素个数没有超过8，那么则⽣成⼀个链表，并将链表的头节点添加到新数组的对应位置
 >
 > 5. 所有元素转移完了之后，将新数组赋值给HashMap对象的table属性
+
+
 
 ### 2、Map的方法
 
@@ -899,6 +981,8 @@ private boolean addIfAbsent(E e, Object[] snapshot) {
 
 
 ## 三、Map
+
+[底层](./collection/concurrent-hash-map-source-code.md)
 
 ```java
 java.util.concurrent.ConcurrentHashMap
