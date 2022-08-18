@@ -101,6 +101,7 @@
 ### 项目
 
 - [方案分析](./docs/project/方案分析.md)
+- [系统设计](./docs/project/系统设计.md)
 - [项目面试问题](./docs/project/项目面试问题.md)
 - [尚医通](./docs/project/尚医通.md) 
 - [尚医通Debug](./docs/project/尚医通Debug.md)
