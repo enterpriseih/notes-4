@@ -656,6 +656,93 @@ public int minCut(String s) {
 }
 ```
 
+## 补：股票买卖问题
+
+### 题目
+
+给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
+
+你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一个算法来计算你所能获取的最大利润。
+
+返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 0 。
+
+```
+输入：[7,1,5,3,6,4]
+输出：5
+解释：
+在第 2 天（股票价格 = 1）的时候买入，
+在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；
+同时，你不能在买入前卖出股票。
+```
+
+### 题解一
+
+```java
+// 遍历一次，nums[i] - nums[0:i]的最小值
+public int maxProfit(int[] prices) {
+    int res = 0;
+    int min = Integer.MAX_VALUE;
+    for (int price : prices) {
+        min = Math.min(min, price);
+        res = Math.max(res, price - min);
+    }
+    return res;
+}
+```
+
+### 题解二：主要为了学dp
+
+```
+dp[i][0]: 第i天持有(!=买入)股票所得最多现金
+假设一开始现金为0，则第i天买入股票后所得现金为-prices[i]
+dp[i][1]: 第i天不持有股票所得最多现金
+
+如果第i天持有股票即dp[i][0]， 那么可以由两个状态推出来
+- 第i-1天就持有股票，那么就保持现状，所得现金就是昨天持有股票的所得现金 即：dp[i - 1][0]
+- 第i天买入股票，所得现金就是买入今天的股票后所得现金即：-prices[i]
+那么dp[i][0]应该选所得现金最大的，所以dp[i][0] = max(dp[i - 1][0], -prices[i]);
+
+如果第i天不持有股票即dp[i][1]， 也可以由两个状态推出来
+- 第i-1天就不持有股票，那么就保持现状，所得现金就是昨天不持有股票的所得现金 即：dp[i - 1][1]
+- 第i天卖出股票，所得现金就是按照今天股票佳价格卖出后所得现金即：prices[i] + dp[i - 1][0]
+同样dp[i][1]取最大的，dp[i][1] = max(dp[i - 1][1], prices[i] + dp[i - 1][0]);
+
+return dp[len][1]
+不持有股票才说明已经卖出去了，这样的钱才会多
+
+由递推公式 dp[i][0] = max(dp[i - 1][0], -prices[i]); 
+和 dp[i][1] = max(dp[i - 1][1], prices[i] + dp[i - 1][0]);
+可以看出，其基础都是要从dp[0][0]和dp[0][1]推导出来。
+那么dp[0][0]表示第0天持有股票，此时的持有股票就一定是买入股票了，
+因为不可能由前一天推出来，所以dp[0][0] -= prices[0];
+dp[0][1]表示第0天不持有股票，不持有股票那么现金就是0，所以dp[0][1] = 0;
+```
+
+
+
+```java
+public int maxProfit(int[] prices) {
+    if (prices == null || prices.length == 0) return 0;
+    int length = prices.length;
+    // dp[i][0]代表第i天持有股票的最大收益
+    // dp[i][1]代表第i天不持有股票的最大收益
+    int[][] dp = new int[length][2];
+    int result = 0;
+    dp[0][0] = -prices[0];
+    dp[0][1] = 0;
+    for (int i = 1; i < length; i++) {
+        dp[i][0] = Math.max(dp[i - 1][0], -prices[i]);
+        dp[i][1] = Math.max(dp[i - 1][0] + prices[i], dp[i - 1][1]);
+    }
+    return dp[length - 1][1];
+}
+```
+
+
+
+
+
 ## 14.2 双序列问题
 
 ## 面试题95：最长公共子序列
@@ -775,19 +862,35 @@ public int longestCommonSubsequence(String text1, String text2) {
 
 #### 解法一
 
+```
+f(i,j)表示s1[0:i]和s2[0:j]能否组成s3[0:i+j+1]
+if s3[i+j+1] == s1[i]
+    f(i,j) = f(i-1,j)
+if s3[i+j+1] == s2[j]
+    f(i,j) = f(i,j-1)
+if s3[i+j+1] == s1[i] == s2[j]
+    f(i,j) = f(i-1,j) || f(i,j-1)
+
+```
+
+
+
 ``` java
 public boolean isInterleave(String s1, String s2, String s3) {
+    // 首先判断s1和s2的长度相加是否是s3
     if (s1.length() + s2.length() != s3.length()) {
         return false;
     }
-
+    
     boolean[][] dp = new boolean[s1.length() + 1][s2.length() + 1];
+    // dp[0][0] 代表的是s1为“”， s2为“”，s3为“”。
     dp[0][0] = true;
-
+	
+    // 单独看s1能否组成s3
     for (int i = 0; i < s1.length(); i++) {
         dp[i + 1][0] = s1.charAt(i) == s3.charAt(i) && dp[i][0];
     }
-
+    // 单独看s2能否组成s3
     for (int j = 0; j < s2.length(); j++) {
         dp[0][j + 1] = s2.charAt(j) == s3.charAt(j) && dp[0][j];
     }
@@ -1299,24 +1402,14 @@ class Solution {
         int target = sum / 2;
         int len = nums.length;
         int[] dp = new int[target + 1];
-
-        for (int num : nums) {
-            for (int j = target; j >= 1; j--) {
-                // dp[i][j] = dp[i - 1][j] -> dp[j] = dp[j];
-                if (j >= num) {
-                    dp[j] = Math.max(dp[j], dp[j - num] + num);
-                }
-            }
-        }
-        /*
-        // 这样也是对的，
+        
         for (int num : nums) {
             for (int j = target; j >= num; j--) {
+            	// dp[i][j] = dp[i - 1][j] -> dp[j] = dp[j];
             	dp[j] = Math.max(dp[j], dp[j - num] + num);
             }
         }
-        */
-        
+                
         return dp[target] == target;
     }
 }
@@ -1339,29 +1432,7 @@ public boolean canPartition(int[] nums) {
 
     return subsetSum(nums, sum / 2);
 }
-// 二维
-private boolean subsetSum(int[] nums, int target) {
-    boolean[][] dp = new boolean[nums.length + 1][target + 1];
-    for (int i = 0; i <= nums.length; i++) {
-        dp[i][0] = true;
-    }
 
-    for (int i = 1; i <= nums.length; i++) {
-        for (int j = 1; j <= target; j++) {
-            dp[i][j] = dp[i - 1][j];
-            if (!dp[i][j] && j >= nums[i - 1]) {
-                dp[i][j] =  dp[i - 1][j - nums[i - 1]];
-            }
-        }
-    }
-
-    return dp[nums.length][target];
-}
-```
-
-
-```java
-// 一维
 private boolean subsetSum(int[] nums, int target) {
     boolean dp[] = new boolean[target + 1];
     dp[0] = true;

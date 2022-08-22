@@ -1457,12 +1457,21 @@ selectid，name，age from employee limit 10000，10
 
 ```sql
 # 方案一 ：返回上次查询的最大记录(偏移量)
-select id，name from employee where id > 10000 limit 10
+select id, name from employee where id > 10000 limit 10
+# 只适用于自增主键
 
 # 方案二：orderby + 索引
-select id，name from employee order by id limit 10000，10
+select id, name from employee order by id limit 10000, 10
 
 # 方案三：在业务允许的情况下限制页数：大多数用户都不会往后翻太多页
+
+# 方案四：limit id
+select id, name from employee 
+where id>(select id from employee limit 2000,1) limit 20
+# 由于id是主键，拥有主键索引，所以对一个主键id进行limit范围查询，
+# 相比于select * from areas limit 2000,20;速度会快很多。
+
+
 ```
 
 

@@ -13,7 +13,8 @@
 
 ```java
 int option = in.nextInt();
-in.nextLine();  //**
+////////重点//////////
+in.nextLine();  //****
 if (option == 0) {
        System.out.println("请输入个人信息：");
        System.out.println("姓名：");
@@ -28,7 +29,7 @@ if (option == 0) {
 }
 ```
 
-nextInt()输入option值，之后用户输入换行符想要结束，可是nextInt()方法并不会读取换行符，因此换行符被读取放到了下一个nextLine()中，nextLine()读取换行符，直接输入结束，因此若没有第2行**的nextLine()方法，输入的姓名name值将会是空（“”）
+nextInt()输入option值，之后用户输入换行符想要结束，可是nextInt()方法并不会读取换行符，因此换行符被读取放到了下一个nextLine()中，nextLine()读取换行符，直接输入结束，**因此若没有第2行**的nextLine()方法**，输入的姓名name值将会是空（“”）
 
 
 

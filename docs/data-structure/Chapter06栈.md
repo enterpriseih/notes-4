@@ -50,6 +50,13 @@ class CQueue {
 
 补充：(2+1)\*3 -->21+3\*
 
+```
+9+(3-1)*3+10/2
+9 3 1 - 3 * + 10 2 / +
+```
+
+
+
 ### 参考代码
 
 ``` java
@@ -63,7 +70,7 @@ public int evalRPN(String[] tokens) {
             case "/":
                 int num1 = stack.pop();
                 int num2 = stack.pop();
-                // num2是先放进去的，他是计算的首位
+                // num2是先放进去的，是计算的首位
                 stack.push(calculate(num2, num1, token));
                 break;
             default:

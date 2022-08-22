@@ -1244,14 +1244,13 @@ public void insertMoreByList() {
 	4. 同一个SqlSession两次查询期间手动清空了缓存`sqlSession.clearCache()`
 
 ## MyBatis的二级缓存
-- `二级缓存是SqlSessionFactory级别`，通过同一个SqlSessionFactory创建的SqlSession查询的结果会被缓存；此后若再次执行相同的查询语句，结果就会从缓存中获取  
+- `二级缓存是SqlSessionFactory级别`，通过同一个SqlSessionFactory（**即同一个nameSpace下的mapper映射文件内容**，即一个mapper.xml）创建的SqlSession查询的结果会被缓存；此后若再次执行相同的查询语句，结果就会从缓存中获取  
 - **二级缓存开启的条件**
 
 	1. 在核心配置文件中，设置全局配置属性cacheEnabled="true"，默认为true，不需要设置
 	2. 在映射文件中设置标签`<cache />`
 	3. 二级缓存必须在SqlSession关闭或提交之后有效
 	4. 查询的数据所转换的实体类类型必须实现序列化的接口
-
 - 使二级缓存失效的情况：**两次查询之间执行了任意的增删改**，会使一级和二级缓存同时失效
 ## 二级缓存的相关配置
 - 在mapper配置文件中添加的cache标签可以设置一些属性
@@ -1283,6 +1282,14 @@ public void insertMoreByList() {
 - 如果二级缓存没有命中，再查询一级缓存  
 - 如果一级缓存也没有命中，则查询数据库  
 - SqlSession关闭之后，一级缓存中的数据会写入二级缓存
+### 为什么还要用redis
+
+1. mybatis一级缓存作用域是session，session在commit之后缓存就消失了。
+2. mybatis二级缓存作用域是sessionFactory，该缓存是以nameSpace为单位的（也就是一个Mapper.xml文件），不同nameSpace下操作互不影响。
+3. 所有对数据表的改变操作都会刷新缓存，但是一般不用二级缓存。例如，在UserMapper.xml中有大多数针对User表的操作，但是在另外一个XXXMapper.xml中，还有针对user单表的操作，这会导致user在两个命名空间下的数据不一致。
+4. 如果UserMapper.xml中做了刷新缓存的操作，在XXXMapper.xml中缓存依然有效，如果针对user单表查询，使用缓存的结果可能会不正确，读到脏数据。
+5. redis很好的解决了这个问题，而且比之一、二级缓存的更好，redis可以搭建在其他服务器上，缓存容量可扩展，redis可以灵活的使用在需要的缓存数据上。
+
 ## 整合第三方缓存EHCache（了解）
 ### 添加依赖
 ```xml

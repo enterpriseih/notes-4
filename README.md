@@ -51,6 +51,7 @@
 
 - [分布式与微服务](./docs/distributed/分布式与微服务.md)
 - [接口的幂等性](./docs/distributed/接口的幂等性.md)
+- [Zookeeper](./docs/distributed/zookeeper/Zookeeper.md)
 
 ### 框架
 

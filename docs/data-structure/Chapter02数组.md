@@ -705,3 +705,85 @@ public String removeKdigits(String num, int k) {
 }
 ```
 
+
+
+## 补：长城数[4,5,4,5,4,5]
+
+### 题目
+
+数组可构成长城数组，比如[4,5,4,5,4,5]这样的是长城数组，即每个元素左右数相同但和该数不同。每次操作可对原数组某一位元素进行+1操作，求最少操作次数。
+
+```
+输入: [1,1,4,5,1,4]
+输出: 11
+```
+
+### 题解
+
+```
+分别计算奇偶位上的数字的最大值
+然后再分别计算奇偶位上的数到所在位最大值需要的次数
+总和就是总操作数。
+```
+
+
+
+```java
+public int solution(int[] nums) {
+    int n = nums.length;
+    int max1 = 0, max2 = 0;
+    int res = 0;
+    for (int i = 0; i < n; i += 2) {
+        max1 = Math.max(max1, nums[i]);
+    }
+    for (int i = 1; i < n; i += 2) {
+        max2 = Math.max(max2, nums[i]);
+    }
+    for (int i = 0; i < n; i++) {
+        if (i % 2 == 0) res += (max1 - nums[i]);
+        else res += (max2 - nums[i]);
+    }
+    // 如果奇偶位最大数字相同，则再加一半的数字
+    // 偶数就是刚好一半，奇数就是少的那部分的个数
+    if (max1 == max2) {
+        res += n / 2;
+    }
+    return res;
+}
+```
+
+
+
+## 补：最小操作数使数组元素相等
+
+### 题目
+
+给你一个长度为 `n` 的整数数组，每次操作将会使 `n - 1` 个元素增加 `1` 。返回让数组所有元素相等的最小操作次数。
+
+```
+输入：nums = [1,2,3]
+输出：3
+解释：
+只需要3次操作（注意每次操作会增加两个元素的值）：
+[1,2,3]  =>  [2,3,3]  =>  [3,4,3]  =>  [4,4,4]
+```
+
+### 题解
+
+给n-1个数加1，就是给1个数减1，就是逆向思维，把相等的数组减回原样
+
+```java
+public int minMoves(int[] nums) {
+    int minNum = Arrays.stream(nums).min().getAsInt();
+    int res = 0;
+    for (int num : nums) {
+        res += num - minNum;
+    }
+    return res;
+}
+```
+
+
+
+
+
