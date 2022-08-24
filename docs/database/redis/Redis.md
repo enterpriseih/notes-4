@@ -97,6 +97,8 @@ Redis 基于 Reactor 模式开发了网络事件处理器、**文件事件处理
 
 ### Redis6.0后加入了多线程，默认关闭
 
+主要是网络io的时候多线程，读写操作仍然是单线程
+
 https://mp.weixin.qq.com/s/FZu3acwK6zrCBZQ_3HoUgw
 
 # 为什么要用缓存/Redis

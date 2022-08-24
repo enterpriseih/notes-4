@@ -423,7 +423,7 @@ spring事务的原理是AOP，进行了切面增强，失效的原因就是aop�
 
 1. **发生自调**，类里面使用this调用本类的方法（this通常省略），此时这个this对象不是代理类，而是UserService本身。
 
-	解决：让this变成UserService的代理类即可。
+	解决：让this变成UserService的代理类即可`AopContext.currentProxy()`。
 
 2. **方法不是public**，@Transactional只能用于public的方法上，否则事务不会生效；要用在非public方法上，需要开启AspectJ代理模式。
 
@@ -434,6 +434,43 @@ spring事务的原理是AOP，进行了切面增强，失效的原因就是aop�
 5. **异常被吃掉**（被try...catch了），事务不会回滚
 
 6. 抛出的**异常没有被定义**，默认为RuntimeException；使用rollbakcFor指定非运行时异常。
+
+### 补充：
+
+#### 1、同类自调
+
+- 1.1、A方法中无事务，B方法中有事务 => 无事务
+
+在同一个类中的不同方法调用中，A方法调用B方法，A中无事务，B中有事务，此时事务不会生效。Spring采用动态代理（AOP）实现对bean的管理和切片，它为每个class都会生成一个代理对象。只有在代理对象之间调用时，可以触发切面逻辑。
+
+而**同一个class中，方法A调用方法B，且方法A无事务，调用的是原对象this的方法，而不是通过代理对象**，因此Spring无法切换到这次调用，也就无法通过注解保证事务性了。
+
+```
+使用xml配置方式暴露代理对象/或者代理类上注解
+然后在service中通过代理对象AopContext.currentProxy()去调用方法。
+```
+
+```xml
+<aop:aspectj-autoproxy proxy-target-class="true" expose-proxy="true"/>
+```
+
+```java
+@EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)  
+被代理类{
+    ((被代理对象) AopContext.currentProxy()).xxx;
+}
+
+```
+
+
+
+- 1.2、A方法中有事务，B方法中无事务 => 有事务
+
+- 1.3、A方法中有事务，B方法中有事务 => 有事务：A的事务
+
+#### 2、不同类
+
+A方法中无事务，B方法中有事务 => B会回滚
 
 # Spring中的循环依赖
 

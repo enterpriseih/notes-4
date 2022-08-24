@@ -173,6 +173,8 @@ public static void main(String[] args) {
 
 # [JVM内存区域](./JVM内存区域.md)
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203301347028.png" alt="image-20220330134754626" style="zoom:40%;" />
+
 # JVM类加载机制
 
 加载、验证、准备、解析、初始化

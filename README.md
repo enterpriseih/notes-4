@@ -22,6 +22,7 @@
 ### J.U.C
 
 - [多线程并发](./docs/thread/多线程并发.md)
+- [进程间通信方式](./docs/thread/进程间通信方式.md)
 - [Java内存模型(JMM)](./docs/thread/Java内存模型.md)
 - [多线程中的锁](./docs/thread/多线程中的锁.md)
 - [ThreadLocal](./docs/thread/ThreadLocal本地线程变量.md)

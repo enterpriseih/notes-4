@@ -911,6 +911,15 @@ B+Tree
 
 [创建](./索引的创建.md)
 
+创建普通索引`CREATE INDEX indexName ON table_name (column_name)`
+
+删除普通索引`DROP INDEX [indexName] ON mytable;`
+
+创建唯一索引`CREATE UNIQUE INDEX indexName ON mytable(username(length))`
+
+显示索引信息`SHOW INDEX FROM table_name\G` 备注： \G 来格式化输出信息
+
+
 <br>
 
 ## 五、索引的设计原则
