@@ -101,6 +101,21 @@ HttpSession sess = session.getSessionContext().getSession(sid)
 >
 > 第一次请求的响应中会生成一个对应session的cookie：JSESSIONID，下一次请求的响应不会生成，但是请求会将JSESSIONID传过去，寻找相应的session
 
+5）session不支持跨域名使用，cookie得设置。
+
+www.baidu.com与blog.baidu.com（对应的一级域名也是baidu.com）是不同的域名，他们之间相互请求cookie是请求不到的。如果想要跨域请求cookie，需要将这两个设置成相同域名。即在存储cookie时使用domain设置域名即可，如下：
+
+```js
+//设置cookie，使之能跨域获取
+function setCookie(name, value) {
+    var Days = 30;
+    var exp = new Date();
+    exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+    document.cookie = name + "=" + value + ";expires=" 
+        + exp.toGMTString() + "; path=/" + ";domain=.baidu.com";
+}
+```
+
 
 
 ## 没有Cookie，session还能进行身份验证吗
@@ -379,7 +394,7 @@ session复制
 
 # JWT
 
-## 简介
+## [简介](https://blog.csdn.net/weixin_45070175/article/details/118559272)
 
 JWT 就是一种生成 token 的规则。
 
@@ -396,6 +411,15 @@ JWT 最大的优势是**服务器不再需要存储 Session**，使得服务器�
 最后由这三者组合进行 base64 编码得到 JWT。
 
 JWT 通常是这样的：`xxxxx.yyyyy.zzzzz`。
+
+```
+JWTString = 
+Base64(Header)
+.Base64(Payload)
+.HMACSHA256(base64UrlEncode(header)+"."+base64UrlEncode(payload),secret)
+```
+
+> base64编码，**并不是加密**，只是把明文信息变成了不可见的字符串。但是其实只要用一些工具就可以把base64编码解成明文，所以不要在JWT中放入涉及私密的信息。
 
 ### 1、Header 
 
@@ -447,7 +471,14 @@ HMACSHA256(
   secret)
 ```
 
-base64编码，**并不是加密**，只是把明文信息变成了不可见的字符串。但是其实只要用一些工具就可以把base64编码解成明文，所以不要在JWT中放入涉及私密的信息。
+> HMACSHA256是通过不可逆的加密算法。
+
+### 重点：JWT每部分的作用
+
+注意JWT每部分的作用，在服务端接收到客户端发送过来的JWT token之后：
+
+- header和payload可以直接利用base64解码出原文，从header中获取哈希签名的算法，从payload中获取有效数据。
+- signature由于使用了**不可逆的加密算法**，**无法解码出原文**，它的作用是校验token有没有被篡改。服务端获取header中的加密算法之后，利用该算法加上secretKey对header、payload进行加密，比对加密后的数据和客户端发送过来的是否一致。注意secretKey只能保存在服务端，而且对于不同的加密算法其含义有所不同，一般对于MD5类型的摘要加密算法，secretKey实际上代表的是盐值。
 
 ## JWT 如何防止 Token 被篡改？
 

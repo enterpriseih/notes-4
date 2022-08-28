@@ -10,6 +10,21 @@
 
 [数学](./数学.md)
 
+### 素数
+
+```java
+public boolean isPrime(int N) {
+    if (N < 2) return false;
+    int R = (int) Math.sqrt(N);
+    for (int d = 2; d <= R; ++d)
+        if (N % d == 0) return false;
+    return true;
+}
+// sqrt是因为因数是成对出现的，一个在根号前，一个在根号后
+```
+
+
+
 ## 位运算原理
 
 [位运算题解](./位运算.md)

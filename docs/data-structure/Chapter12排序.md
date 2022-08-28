@@ -66,6 +66,72 @@ public String largestNumber(int[] nums) {
 
 
 
+## 补充：上下车/会议室问题
+
+### 题目
+
+给你一个会议时间安排的数组 intervals ，每个会议时间都会包括开始和结束的时间 intervals[i] = [starti, endi] ，返回 所需会议室的最小数量 。
+
+```
+输入：intervals = [[0,30],[5,10],[15,20]]
+输出：2
+```
+
+### 题解
+
+```
+开会可以理解为上下车
+intervals = [[0,30],[5,10],[15,20]]
+第一个人从0上车，从30下车；
+第二个人从5上车，10下车。。。
+
+问题转化为最多车上有几个人（也就是同时间最多有多少会议室在用）。
+显然：上车，车上人数+1；下车，车上人数-1
+
+拆解intervals
+上车：[0, 1], [5, 1], [15, 1]
+下车：[10, -1], [20, -1], [30, -1]
+
+按照第一个数排序
+人数 1    2     1     2     1      0
+     0----5----10----15----20-----30
+变化 +1   +1    -1    +1    -1    -1
+
+```
+
+
+
+```java
+public int minMeetingRooms(int[][] intervals) {
+    int n = intervals.length;
+    int[][] times = new int[2 * n][2];
+
+    int i = 0;
+    for (int[] inter : intervals) {
+        times[i++] = new int[]{inter[0], 1};
+        times[i++] = new int[]{inter[1], -1};
+    }
+
+    // 如果上车时间和下车时间一样，要保证先下车
+    // 说明这两场会可以连着开，不需要额外的会议室
+    Arrays.sort(times, (a, b) -> {
+        return (a[0] - b[0]) == 0 ? a[1] - b[1] : a[0] - b[0];
+    });
+
+    int cur = 0;
+    int max = 0;
+    for(int[] time : times) {
+        cur += time[1];
+        max = Math.max(max, cur);
+    }
+
+    return max;
+
+}
+```
+
+
+
 
 
 ## 面试题74：合并区间
@@ -94,8 +160,7 @@ public int[][] merge(int[][] intervals) {
         i = j;
     }
 
-    int[][] result = new int[merged.size()][];
-    return merged.toArray(result);
+    return merged.toArray(new int[merged.size()][]);
 }
 ```
 
@@ -407,7 +472,7 @@ private void mergeSort(int[] src, int[] dst, int start, int nnextStart) {
 
 ## 面试题77：链表排序
 
-### 题目
+### [题目](https://leetcode.cn/problems/sort-list/)
 
 输入一个链表的头节点，请将该链表排序。例如，输入图12.4（a）中的链表，该链表排序后如图12.4（b）所示。
 
@@ -547,7 +612,7 @@ private ListNode merge(ListNode head1, ListNode head2) {
 
 ## 面试题78：合并排序链表
 
-### 题目
+### [题目](https://leetcode.cn/problems/merge-k-sorted-lists/)
 
 输入k个排序的链表，请将它们合并成一个排序的链表。例如，输入三个排序的链表如图12.5（a）所示，将它们合并之后得到的排序的链表如图12.5（b）所示。
 
@@ -588,6 +653,8 @@ public ListNode mergeKLists(ListNode[] lists) {
 ```
 
 #### 解法二：归并排序
+
+两个两个合并
 
 ``` java
 /*

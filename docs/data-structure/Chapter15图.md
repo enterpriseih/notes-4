@@ -568,6 +568,7 @@ private void dfs(int source, int[][] graph, List<Integer> path, List<List<Intege
 
     path.remove(path.size() - 1);
 }    
+
 ```
 
 ## 面试题111：计算除法
@@ -1258,6 +1259,7 @@ set 中存放每个元素，遍历 set，
 
 ```java
 public int longestConsecutive(int[] nums) {
+    // set，因为需要连续的，所以重复的数就不考虑了
     Set<Integer> all = new HashSet<>();
     int maxLen = 0;
     for (int num : nums) {
@@ -1265,6 +1267,7 @@ public int longestConsecutive(int[] nums) {
     } 
 
     for (int num : all) {
+        // 不包含num-1，说明这是个新的序列
         if (!all.contains(num - 1)) {
             int len = 1;
             while(all.contains(num + 1)) {
@@ -1372,3 +1375,171 @@ private void union(Map<Integer, Integer> fathers, Map<Integer, Integer> counts, 
 
 ```
 
+
+
+## [连接所有点的最小费用](https://leetcode.cn/problems/min-cost-to-connect-all-points/)
+
+### 题目
+
+给你一个points 数组，表示 2D 平面上的一些点，其中 points[i] = [xi, yi] 。
+
+连接点 [xi, yi] 和点 [xj, yj] 的费用为它们之间的 曼哈顿距离 ：|xi - xj| + |yi - yj| ，其中 |val| 表示 val 的绝对值。
+
+请你返回将所有点连接的最小总费用。只有任意两点之间 有且仅有 一条简单路径时，才认为所有点都已连接。
+
+```
+输入：points = [[0,0],[2,2],[3,10],[5,2],[7,0]]
+输出：20
+```
+
+![img](https://assets.leetcode.com/uploads/2020/08/26/c.png)
+
+- Prim算法是以**点**为对象，挑选与点相连的最短边来构成最小生成树。
+- Kruskal算法是以**边**为对象，不断地加入新的不构成环路的最短边来构成最小生成树。
+
+### 题解一：Prim算法
+
+Prim算法，该算法以顶点为单元，与图中边数无关，比较适合于稠密图
+
+```
+1）以某一个点开始，寻找当前该点可以访问的所有的边；
+2）在已经寻找的边中发现最小边，这个边必须有一个点还没有访问过，
+   将还没有访问的点加入我们的集合，记录添加的边；
+3）寻找当前集合可以访问的所有边，重复2的过程，直到没有新的点可以加入；
+4）此时由所有边构成的树即为最小生成树。
+```
+
+```java
+private int n;
+private int[][] points;
+// 记录已经在最小生成树中的节点
+private boolean[] inMST;
+private Queue<Edge> pq;
+
+public int minCostConnectPoints(int[][] points) {
+    int minCost = 0;
+    this.n = points.length;
+    this.points = points;
+    // n个节点
+    this.inMST = new boolean[n];
+    this.pq = new PriorityQueue<>((o1, o2) -> o1.len - o2.len);
+
+    inMST[0] = true;
+    intoQueue(0);
+    while (!pq.isEmpty()) {
+        Edge cur = pq.poll();
+        // 如果起点x的终点y在mst中了，就换下一个
+        if (inMST[cur.y]) continue;
+        inMST[cur.y] = true;
+        minCost += cur.len;
+        // 将y作为下一次的起点，加入
+        intoQueue(cur.y);
+    }
+
+    return minCost;
+}
+
+// 将x的邻边加入队列
+private void intoQueue(int x) {
+    // 邻接表的话，直接for(int point : points[x])
+    for (int i = 0; i < n; i++) {
+        // 当前点或者已经在mst中的话就跳过
+        if (i == x || inMST[i]) continue;
+        int dist = Math.abs(points[x][0] - points[i][0]) + Math.abs(points[x][1] - points[i][1]);
+        pq.offer(new Edge(x, i, dist));
+    }
+}
+```
+
+空间复杂度`O(n^2)`
+
+时间复杂度`O(n^2)`
+
+### 题解二：Kruskal算法/并查集
+
+Kruskal算法，该算法以边为单元，时间主要取决于边数，比较适合于稀疏图
+
+```
+Kruskal算法是以 边 为基础，
+1）每次从 边 集合中寻找最小的边（不管两个顶点属于V还是Vnew），
+然后判断该边的两个顶点是否同源（属于同一个连通分量）。
+
+2）Kruskal需要对所有的边进行排序，然后从小到大，依次遍历每条边，
+3）同时判断每条边是否同源，如果同源，跳过；
+如果不同源，将两个连通分量合并，直到所有顶点属于同一个连通分量，算法结束。
+
+```
+
+构造边点对象，点-边式
+```java
+class Edge {
+    int len, x, y;
+    // 点x, 点y
+    public Edge(int x, int y, int len) {
+        this.len = len;
+        this.x = x;
+        this.y = y;
+    }
+}
+```
+
+![image.png](https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/202208271834524.png)
+
+
+
+```java
+// 已经连上的边数
+public int size = 0;
+public int minCostConnectPoints(int[][] points) {
+    int n = points.length;
+    int[] fathers = new int[points.length];
+    // 初始化边
+    Queue<Edge> queue = new PriorityQueue<>((o1, o2) -> o1.len - o2.len);
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            int dist = Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1]);
+            queue.offer(new Edge(i, j, dist));
+        }
+    }
+
+    // 初始化并查集
+    for (int i = 0; i < n; i++) {
+        fathers[i] = i;
+    }
+
+    int ans = 0;
+    while (!queue.isEmpty()) {
+        Edge cur = queue.poll();
+        // 如果本来就是连通的，不进行如下操作了，换下一个边
+        if (union(cur.x, cur.y, fathers)) continue;
+        ans += cur.len;
+        // n个点相连，至少需要n-1条边
+        // 只要连够了，就可以了，
+        // 相当于剪枝，余下的边的两端肯定都在图中了
+        if (size == n-1) break;
+    }
+    return ans;
+}
+
+public int find(int[] fathers, int i) {
+    if (i != fathers[i]) fathers[i] = find(fathers, fathers[i]);
+    return fathers[i];
+}
+
+public boolean union(int i, int j, int[] fathers) {
+    int rootI = find(fathers, i);
+    int rootJ = find(fathers, j);
+    if (rootI != rootJ) {
+        fathers[rootI] = rootJ;
+        size++;
+        // 没有连通的，连通后返回false
+        return false;
+    }
+    // 如果已经连通，返回true
+    return true;
+}
+```
+
+空间复杂度`O(n^2)`，并查集`O(n)`，边集`O(n^2)`。
+
+时间复杂度`O(mlogm)`，m是边数

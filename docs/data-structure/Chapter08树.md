@@ -206,7 +206,7 @@ public List<Integer> inorderTraversal(TreeNode root) {
 
 
 
-### 后序遍历
+### [后序遍历](https://leetcode.cn/problems/binary-tree-postorder-traversal/)
 
 4，5，2，6，7，3，1
 
@@ -243,13 +243,13 @@ public List<Integer> inorderTraversal(TreeNode root) {
             cur = cur.left;
         }
         cur = stack.peek();
-        if(cur.right != null && cur.right != prev){
-            cur = cur.right;
-        }else {
-            stack.pop();
-            nodes.add(cur.val);
+        if (cur.right == null || cur.right == prev) {
+            st.pop();
+            res.add(cur.val);
             prev = cur;
             cur = null;
+        } else {
+            cur = cur.right;
         }
     }
     return nodes;

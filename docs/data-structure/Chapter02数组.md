@@ -1,5 +1,15 @@
 # 第二章：数组
 
+## String[] => int[]
+
+```java
+String[] numsStr = new String[]{.......};
+int[] nums = Arrays.asList(numsStr)
+    .stream().mapToInt(Integer::parseInt).toArray();
+```
+
+
+
 ## 交换swap
 
 - 中间值tmp
@@ -384,7 +394,102 @@ public int numSubarrayProductLessThanK(int[] nums, int k) {
 }
 ```
 
-## 2.2 累加数组数字求子数组之和
+
+
+## 补充：盛水容器
+
+### [题目](https://leetcode.cn/problems/container-with-most-water/)
+
+给定一个长度为 n 的整数数组 height 。有 n 条垂线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i]) 。
+
+找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+返回容器可以储存的最大水量。
+
+要求：时间复杂度`O(n)`，空间复杂度`O(1)`
+
+<img src="https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/25/question_11.jpg" alt="img" style="zoom:50%;" />
+
+```
+输入：[1,8,6,2,5,4,8,3,7]
+输出：49 
+解释：
+图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。
+在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
+
+```
+
+### 题解
+
+```
+双指针，一左一右，移动矮柱子。
+因为高柱子移动的话面积一定变小
+(1)距离变小(2)而且还有可能移动之后的柱子比矮柱子还矮，面积取决于短板
+移动矮柱子，面积才可能会变大
+
+area = min(h[l], h[r]) * (l - r);
+
+```
+
+
+
+```java
+public int maxArea(int[] height) {
+    int ans = 0;
+    int l = 0, r = height.length - 1;
+    while (l < r) {
+        int w = r - l;
+        int h = Math.min(height[l], height[r]);
+        ans = Math.max(w * h, ans);
+        if (height[l] < height[r]) {
+            l++;
+        } else {
+            r--;
+        }
+
+    }
+    return ans;
+}
+```
+
+
+
+## 补：合并两个排序数组O(m+n)
+
+### 题目
+
+```
+输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+输出：[1,2,2,3,5,6]
+解释：需要合并 [1,2,3] 和 [2,5,6] 。
+合并结果是 [1,2,2,3,5,6]。
+
+不使用额外空间，nums1后面预留了2的位置
+```
+
+
+
+### 题解
+
+```java
+// 	从后往前比较
+// 大的塞到数组最后面，把nums1当作一个新数组就可以了
+public void merge(int[] nums1, int m, int[] nums2, int n) {
+    int index = m + n - 1;
+    m--;n--;
+    while(index >=0) {
+        if (n < 0 || (m >= 0 && nums1[m] > nums2[n])) {
+            nums1[index--] = nums1[m--];
+        } else {
+            nums1[index--] = nums2[n--];
+        }
+    }
+}
+```
+
+
+
+## 2.2 前缀和
 
 > - 如果数组中的数字有正、负、零，则双指针不适用
 > - **预处理**：下标 0 到下标 0 的子数组和为S~0~，下标 0 到下标 i 的子数组和为S~i~，下标 0 到下标 j 的子数组和为S~j~
@@ -751,6 +856,8 @@ public int solution(int[] nums) {
     return res;
 }
 ```
+
+
 
 
 

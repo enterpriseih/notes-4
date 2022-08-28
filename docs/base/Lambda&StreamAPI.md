@@ -329,7 +329,11 @@ public void test4(){
  “集合讲的是数据，Stream讲的是计算!”
 
 ```java
-return stack.stream().mapToInt(i->i).toArray();
+stack.stream().mapToInt(i->i).toArray();
+// or
+String[] numsStr = new String[]{...};
+int[] nums = Arrays.asList(numsStr)
+    .stream().mapToInt(Integer::parseInt).toArray();
 ```
 
 

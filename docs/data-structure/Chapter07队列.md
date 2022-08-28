@@ -1,4 +1,4 @@
-# 第七章：队列
+# B第七章：队列
 
 接口Queue，常用LinkedList、ArrayDeque
 
@@ -11,8 +11,10 @@ Queue是FIFO的单端队列，[Deque](https://blog.csdn.net/onedegree/article/de
 ```java
 // 队列和栈都用ArrayDeque最方便
 // 自己控制从哪个口出就可以
-pollLast();
 pollFirst();
+pollLast();
+offerFirst();
+offerLast();
 ...
 // ArrayDeque的pop和push都是往队头进行操作
 ```
@@ -196,45 +198,35 @@ class CBTInserter {
 ### 参考代码
 
 ``` java
-// 一个队列，需要标记位记录该层是否读完
+// 一个队列，for队列的长度
 public List<Integer> largestValues(TreeNode root) {
-    int current = 0;
-    int next = 0;
     Queue<TreeNode> queue = new LinkedList<>();
     if (root != null) {
         queue.offer(root);
-        current = 1;
     }
-
     List<Integer> result = new LinkedList<>();
     int max = Integer.MIN_VALUE;
     while (!queue.isEmpty()) {
-        TreeNode node = queue.poll();
-        current--;
-        max = Math.max(max, node.val);
-
-        if (node.left != null) {
-            queue.offer(node.left);
-            next++;
+        int size = queue.size();
+        for (int i = 0; i < size; i++) {
+            TreeNode node = queue.poll();
+            max = Math.max(max, node.val);
+            if (node.left != null) {
+                queue.offer(node.left);
+            }
+            if (node.right != null) {
+                queue.offer(node.right);
+            }
         }
-
-        if (node.right != null) {
-            queue.offer(node.right);
-            next++;
-        }
-
-        if (current == 0) {
-            result.add(max);
-            max = Integer.MIN_VALUE;
-            current = next;
-            next = 0;
-        }
+        result.add(max);
+        max = Integer.MIN_VALUE;
     }
     return result;
 }
 ```
 
 ```java
+// 两个队列 
 public int findBottomLeftValue(TreeNode root) {
     Queue<TreeNode> queue1 = new LinkedList<>();
     Queue<TreeNode> queue2 = new LinkedList<>();

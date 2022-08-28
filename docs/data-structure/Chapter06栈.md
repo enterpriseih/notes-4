@@ -4,11 +4,21 @@ Stack
 
 push(e)，pop，peek
 
-建议使用ArrayDeque
+
 
 ```java
 Deque<?> stack = new ArrayDeque<>();
+Deque<?> stack = new LinkedList<>();
+pollFirst();
+pollLast();
+offerFirst();
+offerLast();
 
+// LinkedList实现了List和Deque接口，但是创建的时候，注意多态
+List<?> stack = new LinkedList<>();
+addFirst();
+removeFirst();
+getFirst();
 ```
 
 
