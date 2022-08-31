@@ -67,6 +67,36 @@ RabbitMQ 使用信道的方式来传输数据。
 
 信道是建立在真实的 TCP 连接内的**虚拟连接**，且每条 TCP 连接上的信道数量没有限制。
 
+# RabbitMQ的消息模式
+
+**基本消息模式/点对点**：就是说一个「消息生产者」一个「消息队列」一个「消息消费者」，但消息过多，消费不过来，可能会导致消息堆积。
+
+**工作模式**：当一个消费者消费不过来的时候我们就可以用多个消息消费者进行消费从而解决这个问题。
+
+**发布订阅模式**：生产者和消息队列之间有一个交换机，生产者发送消息给交换机，交换机负责传递给对应的消息队列。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642577.png" alt="发布订阅模式"  />
+
+以下都是发布订阅的模式的分类：
+
+**广播Fanout**：生产者和消息队列之间有一个交换机，生产者发送消息给交换机，交换机负责传递给所有绑定该交换机的消息队列。
+
+**定向Direct**：也称路由模式，不同的消息根据路由键进行分配。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642954.png" alt="direct"/>
+
+P：生产者，向Exchange发送消息，发送消息时，会指定一个routing key。
+
+X：Exchange（交换机），接收生产者的消息，然后把消息递交给 与routing key完全匹配的队列
+
+C1：消费者，其所在队列指定了需要routing key 为 error 的消息
+
+C2：消费者，其所在队列指定了需要routing key 为 info、error、warning 的消息。
+
+**通配符/主题Topic**：路由键可以使用通配符进行绑定
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642805.png" alt="topic"/>
+
 # 应答机制
 
 ### 1、自动应答
@@ -103,6 +133,8 @@ Exchange属性：
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642805.png" alt="topic"/>
 
+比如要传送item的增删改查信息，创建四个队列复杂，使用通配符，item.*就可以传递
+
 > 模糊匹配可以使用通配符
 >
 > - **符号 "#" 匹配0个或多个词。**
@@ -111,6 +143,7 @@ Exchange属性：
 
 ## Fanout Exchange
 
+- Fanout广播
 - Fanout Exchange不处理Routing Key，只需要简单的将Queue绑定到Exchange上。
 - 发送到Exchange的消息都会被转发到与该Exchange绑定的所有Queue上。
 - Fanout Exchange转发消息是最快的。
