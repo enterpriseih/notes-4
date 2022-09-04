@@ -942,9 +942,9 @@ auto-aof-rewrite-percentage：设置重写的基准值，文件达到 100%时开
 
 
 
-（1）AOF持久化开启且存在AOF文件时，优先加载AOF文件。
+（1）AOF持久化开启且存在AOF文件时，**优先加载AOF文件**。
 
-（2）AOF关闭或者AOF文件不存在时，加载RDB文件。
+（2）**AOF关闭或者AOF文件不存在时**，**加载RDB文件**。
 
 （3）加载AOF/RDB文件成功后，Redis启动成功。
 
@@ -1511,6 +1511,8 @@ SET key value [EX seconds][PX milliseconds] [NX|XX]
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204251551755.png" alt="image-20220425155136639" style="zoom:80%;" />
 
+删除的时候判断一下当前锁是不是自身使用的锁。
+
 ## 优化3:Lua脚本实现解锁(删除锁)操作的原子性
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204251543066.png" alt="image-20220425154339324" style="zoom: 33%;" />
@@ -1530,6 +1532,8 @@ public void testLockLua() {
     String locKey = "lock"; 
 
     // 3 获取锁
+    // 获取锁其实就是一个设定锁的过程
+    // 如果已经存在，则说明有线程在用这个锁
     Boolean lock = redisTemplate.opsForValue().setIfAbsent(locKey, uuid, 3, TimeUnit.SECONDS);
 
     // 第一种： lock 与过期时间中间不写任何的代码。

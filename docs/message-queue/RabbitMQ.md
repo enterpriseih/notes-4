@@ -241,6 +241,7 @@ RabbitMQ 可以对消息和队列设置TTL，目前有两种方式可以设置�
 > - 消息TTL过期。
 > - 队列达到最大长度。
 
+如果队列设置了Dead Letter Exchange（DLX），那么这些Dead Letter就会被重新publish到Dead Letter Exchange，通过Dead Letter Exchange路由到其他队列。
 
 
 ## 三、延迟队列
@@ -285,3 +286,12 @@ RabbitMQ 有三种模式：单机模式、普通集群模式、镜像集群模�
 
 1. 所有机器之间进行数据同步，增加性能开销，网络带宽压力大。
 2. 可扩展性差，如果某个queue负载很重，新增的机器也会包含了这个queue的所有数据。
+
+
+
+# 使用
+
+通过@RabbitListener和@RabbitHandler
+
+RabbitListener是监听队列，只要有消息就去执行
+

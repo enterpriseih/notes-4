@@ -1020,7 +1020,7 @@ B+Tree
 
 	```sql
 	# 失效
-	select * fromuserwhere age-1 =10;
+	select * from user where age-1 =10;
 	```
 
 	
@@ -1535,7 +1535,7 @@ select id, name from employee order by id limit 10000, 10
 
 # 方案四：limit id 子查询
 select id, name from employee 
-where id>(select id from employee limit 2000,1) limit 20
+where id > (select id from employee limit 2000,1) limit 20
 # 由于id是主键，拥有主键索引，所以对一个主键id进行limit范围查询，
 # 相比于select * from areas limit 2000,20;速度会快很多。
 
@@ -1596,5 +1596,32 @@ insert into user(name,age) values
 <foreach collection="list" item="item" index="index" separator=",">
     (#{item.name},#{item.age})
 </foreach>
+```
+
+
+
+# 数据库连接池
+
+对数据库连接池进行基本管理的基本信息
+
+```properties
+# 当数据库连接池中的连接数不够时，一次性向数据库服务器申请的连接数
+acquireIncrement = 5
+
+# 数据库连接池中初始化时的连接数
+initialPoolSize = 10
+
+# 数据库连接池维护的最少连接数
+minPoolSize = 10
+
+# 数据库连接池维护的最多的连接数
+maxPoolSize = 100
+
+# 数据库连接池最多维护的Statement的个数
+maxStatements = 50
+
+# 每个连接中可以最多使用的Statement的个数
+maxStatementsPerConnection = 2
+
 ```
 
