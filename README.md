@@ -13,6 +13,7 @@
 - [设计模式](./docs/design-pattern/设计模式目录.md)
 - [Lambda&StreamAPI](./docs/base/Lambda&StreamAPI.md)
 - [序列化与反序列化](./docs/base/序列化和反序列化.md)
+- [哈希冲突](./docs/base/哈希冲突.md)
 
 ### JVM
 
@@ -27,6 +28,7 @@
 - [多线程中的锁](./docs/thread/多线程中的锁.md)
 - [ThreadLocal](./docs/thread/ThreadLocal本地线程变量.md)
 - [CAS和AQS](./docs/thread/CAS和AQS.md)
+- [多线程交替打印](./docs/thread/多线程交替打印.md)
 
 ### :floppy_disk: 数据库
 
@@ -74,7 +76,7 @@
 - [哈希](./docs/data-structure/哈希.md)
 - [笔试](./docs/data-structure/笔试题.md)
 
-### 前端  
+### 前端
 
 - [前端大致](./docs/front-end/前端大致.md)
 - [Vue](./docs/front-end/Vue.md)
@@ -111,4 +113,4 @@
 
 ### 面试
 
-- [框架](./docs/interview/框架.md)
+- [框架](./docs/interview/框架.md) 

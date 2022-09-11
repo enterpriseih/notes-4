@@ -63,7 +63,7 @@ public int minDepth(TreeNode root) {
 }
 ```
 
-### 根据中序遍历和后序遍历还原二叉树
+### [根据中序遍历和后序遍历还原二叉树](https://leetcode.cn/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/code/iShot2022-04-19_17.21.46.png" alt="在这里插入图片描述" style="zoom: 40%;" />
 
@@ -94,11 +94,47 @@ private TreeNode helper(int inleft, int inright) {
     int index = mapId.get(postorder[postId]);
     postId--;
 	
-    // 根是右侧的先
+    // 后序遍历：左右根，所以根减一是右子树的根
+    // 所以这里先还原右子树
+    // 若是前序，根左右，根加一是左节点
     root.right = helper(index + 1, inright);
     root.left = helper(inleft, index - 1);
 
     return root; 
+}
+```
+
+### 前后序构造二叉树
+
+不唯一
+
+```
+首先pre[0]是根，pre[1]是左子树的根
+记左子树的长度为L，pre[1] = post[L-1] // 下标问题
+得出左子树的长度，左子树通过左子树的前后序得出
+右子树同样
+
+```
+
+```java
+public TreeNode constructFromPrePost(int[] pre, int[] post) {
+    int N = pre.length;
+    if (N == 0) return null;
+    TreeNode root = new TreeNode(pre[0]);
+    if (N == 1) return root;
+
+    int L = 0;
+    // 得出左子树的长度
+    for (int i = 0; i < N; ++i)
+        if (post[i] == pre[1])
+            L = i+1;
+	// preLeft[] = pre[1,L], copy和substring类似，要往下标后一位
+    // postLeft[] = post[0,L-1]
+    root.left = constructFromPrePost(Arrays.copyOfRange(pre, 1, L+1),
+                                     Arrays.copyOfRange(post, 0, L));
+    root.right = constructFromPrePost(Arrays.copyOfRange(pre, L+1, N),
+                                      Arrays.copyOfRange(post, L, N-1));
+    return root;
 }
 ```
 
@@ -170,7 +206,7 @@ public List<Integer> inorderTraversal(TreeNode root) {
 
 ```java
 // 递归
-public List<Integer> inorderTraversal(TreeNode root) {
+public List<Integer> preorderTraversal(TreeNode root) {
     List<Integer> nodes = new LinkedList<>();
     dfs(root, nodes);
     return nodes;
@@ -187,7 +223,7 @@ private void dfs(TreeNode root, List<Integer> nodes) {
 
 ```java
 // 迭代
-public List<Integer> inorderTraversal(TreeNode root) {
+public List<Integer> preorderTraversal(TreeNode root) {
     List<Integer> nodes = new LinkedList<>();
     Stack<TreeNode> stack = new Stack<>();
     TreeNode cur = root;
@@ -212,7 +248,7 @@ public List<Integer> inorderTraversal(TreeNode root) {
 
 ```java
 // 递归
-public List<Integer> inorderTraversal(TreeNode root) {
+public List<Integer> postorderTraversal(TreeNode root) {
     List<Integer> nodes = new LinkedList<>();
     dfs(root, nodes);
     return nodes;
@@ -232,7 +268,7 @@ private void dfs(TreeNode root, List<Integer> nodes) {
 
 ```java
 // 迭代
-public List<Integer> inorderTraversal(TreeNode root) {
+public List<Integer> postorderTraversal(TreeNode root) {
     List<Integer> nodes = new LinkedList<>();
     Stack<TreeNode> stack = new Stack<>();
     TreeNode cur = root;

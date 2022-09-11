@@ -198,6 +198,32 @@ public int minCostClimbingStairs(int[] cost) {
 }
 ```
 
+## 跳楼梯
+
+### 题目
+
+假设一共有n阶，同样共有f(n)种跳法，那么这种情况就比较多，最后一步超级蛙可以从n-1阶往上跳，也可以n-2阶，也可以n-3…等等等
+
+### 题解
+
+```
+f(n) = f(n-1) + f(n-2) + ... + f(2) + f(1)
+f(n-1) = f(n-2) + f(n-3) + ... + f(2) + f(1)
+=> f(n) = f(n-1) + f(n-1) = 2 * f(n-1) = 2^(n-1)
+
+```
+
+
+
+```java
+public int solution(int n) {
+    if (n == 1) return 1;
+    return 2 * solution(n-1);
+}
+```
+
+
+
 ## 14.1 单序列问题
 
 ## 面试题89：房屋偷盗
@@ -656,7 +682,7 @@ public int minCut(String s) {
 }
 ```
 
-## 补：股票买卖问题
+## 补：股票买卖问题Ⅰ
 
 ### 题目
 
@@ -732,10 +758,63 @@ public int maxProfit(int[] prices) {
     dp[0][0] = -prices[0];
     dp[0][1] = 0;
     for (int i = 1; i < length; i++) {
+        
         dp[i][0] = Math.max(dp[i - 1][0], -prices[i]);
         dp[i][1] = Math.max(dp[i - 1][0] + prices[i], dp[i - 1][1]);
     }
     return dp[length - 1][1];
+}
+```
+
+## 补：股票买卖Ⅱ
+
+```java
+// 如果可以购买多次，且同一时间只能持有一张，则
+dp[i][0] = max(dp[i - 1][0], dp[i - 1][1] - prices[i]);
+// 因为一只股票可以买卖多次，所以当第i天买入股票的时候，
+// 所持有的现金可能有之前买卖过的利润。
+```
+
+
+
+## 补：股票买卖Ⅲ
+
+**在一的基础上最多买两次**
+
+一共五个状态
+
+1、没有操作
+
+2、第一次买入
+
+3、第一次卖出
+
+4、第二次买入
+
+5、第二次卖出
+
+```
+dp[i][j]中 i表示第i天，j为 [0 - 4] 五个状态，
+dp[i][j]表示第i天状态j所剩最大现金。
+```
+
+
+
+```java
+public int maxProfit(int[] prices) {
+    int len = prices.length;
+    int[] dp = new int[5];
+    dp[1] = -prices[0]; // 第一天买入
+    dp[3] = -prices[0]; // 第一次卖出后是0，然后再买入即-prices[0]
+
+    for (int i = 1; i < len; i++) {
+        dp[1] = Math.max(dp[1], dp[0] - prices[i]);
+        dp[2] = Math.max(dp[2], dp[1] + prices[i]);
+        dp[3] = Math.max(dp[3], dp[2] - prices[i]);
+        dp[4] = Math.max(dp[4], dp[3] + prices[i]);
+    }
+
+    return dp[4];
 }
 ```
 
@@ -745,7 +824,7 @@ public int maxProfit(int[] prices) {
 
 ## 14.2 双序列问题
 
-## 面试题95：最长公共子序列
+## 面试题95：最长公共子序列/不相交的线
 
 ### [题目](https://leetcode.cn/problems/longest-common-subsequence/)
 
@@ -1027,6 +1106,88 @@ public int numDistinct(String s, String t) {
     return dp[t.length()];
 }
 ```
+
+
+
+## 补：编辑距离
+
+### 题目
+
+给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数。
+
+你可以对一个单词进行如下三种操作：
+
+- 插入一个字符
+
+- 删除一个字符
+- 替换一个字符
+
+```
+输入：word1 = "horse", word2 = "ros"
+输出：3
+解释：
+horse -> rorse (将 'h' 替换为 'r')
+rorse -> rose (删除 'r')
+rose -> ros (删除 'e')
+```
+
+
+
+### 题解
+
+```
+dp[i][j]表示以下标i-1为结尾的字符串word1，和以下标j-1为结尾的字符串word2，
+最近编辑距离为dp[i][j]。
+
+if (word1[i - 1] == word2[j - 1])
+    不操作
+    dp[i][j] = dp[i-1][j-1]
+if (word1[i - 1] != word2[j - 1])
+    1、增
+    说明word1[0:i-1]与word2[0:j-2]刚好匹配，
+    此时加上一个word2[j-1]，就是word1[0:i-1]与word2[0:j-1]匹配了
+    dp[i][j] = dp[i][j-1] + 1;
+    
+    2、删
+    word1删除一个，相当于，不考虑word1[i-1]
+    拿word1[0:i-2](dp[i-1][?])与word2[0:j-1](dp[?][j])匹配
+    dp[i][j] = dp[i-1][j] + 1;
+    
+    3、换
+    dp[i][j] = dp[i-1][j-1] + 1;
+
+```
+
+
+
+```java
+public int minDistance(String word1, String word2) {
+    int m = word1.length();
+    int n = word2.length();
+    int[][] dp = new int[m + 1][n + 1];
+    // 初始化
+    for (int i = 1; i <= m; i++) {
+        dp[i][0] =  i;
+    }
+    for (int j = 1; j <= n; j++) {
+        dp[0][j] = j;
+    }
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            // 因为dp数组有效位从1开始
+            // 所以当前遍历到的字符串的位置为i-1 | j-1
+            if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = Math.min(Math.min(dp[i - 1][j - 1], dp[i][j - 1]), dp[i - 1][j]) + 1;
+            }
+        }
+    }
+    return dp[m][n];
+}
+```
+
+
 
 
 
@@ -1792,4 +1953,125 @@ public void testMultiPack2(){
 ```
 
 
+
+## 区间DP
+
+模板
+
+```java
+// 区间总长n
+for (int len = 1; len <= n; len++) {
+    // 区间右侧不能超出数组范围
+    // 枚举左端点
+    for (int left = 1; left + len - 1 <= n; left++) {
+        int right = left + len - 1;
+        // 断点将区间分为了[left, k-1], k, [k+1, right]
+        for (int k = left; k <= right; k++) {
+        
+        }
+    }
+}
+```
+
+
+
+
+
+## 加分二叉树
+
+### 题目
+
+设一个 n 个节点的二叉树 tree 的中序遍历为（1,2,3,…,n），其中数字 1,2,3,…,n 为节点编号。
+
+每个节点都有一个分数（均为正整数），记第 i 个节点的分数为 di，tree 及它的每个子树都有一个加分，任一棵子树 subtree（也包含 tree 本身）的加分计算方法如下：
+
+subtree的左子树的加分 × subtree的右子树的加分 ＋ subtree的根的分数
+
+若某个子树为空，规定其加分为 1。
+
+叶子的加分就是叶节点本身的分数，不考虑它的空子树。
+
+试求一棵符合中序遍历为（1,2,3,…,n）且加分最高的二叉树 tree。
+
+要求输出：
+
+（1）tree的最高加分
+
+（2）tree的前序遍历
+
+```
+输入：中序遍历
+5 
+5 7 1 2 10
+
+输出：
+145
+3 1 2 4 5
+```
+
+### 题解
+
+```
+因为是中序遍历，从一个断点开始，左右刚好就是左子树和右子树
+求max(左子树*右子树+root) => 求左max、右max
+dp[l][r]: 区间[l,r]的max
+```
+
+
+
+```java
+int total;
+List<Integer> preorderTraversal = new ArrayList<>();
+
+public void scoreTree(int[] scores, int n) {
+    int[][] dp = new int[n + 1][n + 1];
+    // root存放的是区间[left, right]的最大值对应的根结点
+    int[][] root = new int[n + 1][n + 1];
+    // 区间dp，三层for，外层区间长度，中层左端点，内层断点取最优
+    // len是区间长度
+    for (int len = 1; len <= n; len++) {
+        // 区间右侧不能超出数组范围
+        // 枚举左端点
+        for (int left = 1; left + len - 1 <= n; left++) {
+            int right = left + len - 1;
+            int max = 0;
+            // 断点将区间分为了[left, k-1], k, [k+1, right]
+            for (int k = left; k <= right; k++) {
+                int sum;
+                // 断点为左端点，说明没有左子树，则左子树的值为1
+                // 否则为[left, k-1]的最大值，即为dp
+                int leftValue = (k == left) ? 1 : dp[left][k - 1];
+                int rightValue = (k == right) ? 1 : dp[k + 1][right];
+
+                // 长度为1，分值总和就是当前断点自身的分值
+                if (len == 1) {
+                    sum = scores[k - 1];
+                } else {
+                    // scores[k-1]是因为k从1开始，scores从0开始
+                    sum = scores[k - 1] + leftValue * rightValue;
+                }
+                // 更新根结点和dp
+                if (sum > max) {
+                    root[left][right] = k;
+                    max = sum;
+                    dp[left][right] = max;
+                }
+            }
+        }
+    }
+    preorderDfs(root, 1, n);
+    total = dp[1][n];
+}
+// 中序节点号为1，2，3，4，5
+// 假设3为当前的根，则左子树就是[1,3-1]范围的点
+public void preorderDfs(int[][] root, int left, int right) {
+    if (left > right) return;
+    preorderTraversal.add(root[left][right]);
+    // 左子树
+    preorderDfs(root, left, root[left][right] - 1);
+    // 右子树
+    preorderDfs(root, root[left][right] + 1, right);
+}
+
+```
 

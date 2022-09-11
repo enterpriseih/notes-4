@@ -23,6 +23,50 @@ public boolean isPrime(int N) {
 // sqrt是因为因数是成对出现的，一个在根号前，一个在根号后
 ```
 
+### 素数分解
+
+每一个数都可以分解成素数的乘积，例如 84 = 2<sup>2</sup> \* 3<sup>1</sup> \* 5<sup>0</sup> \* 7<sup>1</sup> \* 11<sup>0</sup> \* 13<sup>0</sup> \* 17<sup>0</sup> \* …
+
+1. 通过素数筛法得到素数集合
+2. 对于需要分解的数，不断除以素数，得到可以分解的素数及其次数
+3. **如果数字很大，将所有素数都尝试分解过一遍后，发现该数字仍然没有分解为1，那么说明存在一个大于目前所有素数集合的素数，这里直接将该剩余数字作为素数。**
+
+```java
+public List<Integer> primeDiv(int num) {
+    // 判断1~num里哪些是素数
+    int[] notPrimes = countPrimes(int num);
+    List<Integer> res = new ArrayList<>();
+    for (int i = 2; i * i <= num; i++) {
+        // 是素数
+        if (notPrimes[i] == false) {
+            while (num % i == 0) {
+                num /= i;
+                res.add(i);
+            }
+        }
+    }
+    return res;
+    
+}
+public int[] countPrimes(int n) {
+    boolean[] notPrimes = new boolean[n + 1];
+    for (int i = 2; i < n; i++) {
+        if (notPrimes[i]) {
+            continue;
+        }
+        // 从 i * i 开始，因为如果 k < i，那么 k * i 在之前就已经被去除过了
+        for (long j = (long) (i) * i; j < n; j += i) {
+            notPrimes[(int) j] = true;
+        }
+    }
+    return notPrimes;
+}
+```
+
+
+
+
+
 
 
 ## 位运算原理
@@ -225,6 +269,26 @@ public double myPow(double x, int n) {
     }
     return res;
 }
+```
+
+## 补：2^k mod n
+
+`2^k mod n = {2^(k-1) mod n}^2 mod n `
+
+```java
+public static int fastModPow(int base, int power, int number) {
+    int x = base % number;
+    int ans = 1;
+    while (power > 0) {
+        if ((power & 1) == 1) {
+            ans = (ans * x) % number;
+        }
+        x = (x * x) % number;
+        power = power >> 1;
+    }
+    return ans;
+}
+
 ```
 
 

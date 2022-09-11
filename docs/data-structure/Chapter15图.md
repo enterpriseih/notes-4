@@ -764,7 +764,7 @@ public boolean exist(char[][] board, int m, int n, boolean[][] track, String wor
     1、每次从有向无环图中取一个入度为0的节点添加到拓扑排序序列之中，
     2、删除该节点及所有以它为起点的边;
 	重复以上步骤，直至图为空或不存在入度为0的节点;
-如果图为空，则图是有向无环图,切找到了该图的一个拓扑序列,即删除的顺序;
+如果图为空,则图是有向无环图,切找到了该图的一个拓扑序列,即删除的顺序;
 如果图非空且已经不存在入度为0的节点,那么该图一定有环;
 ```
 
@@ -1377,7 +1377,7 @@ private void union(Map<Integer, Integer> fathers, Map<Integer, Integer> counts, 
 
 
 
-## [连接所有点的最小费用](https://leetcode.cn/problems/min-cost-to-connect-all-points/)
+## 补充：[连接所有点的最小费用](https://leetcode.cn/problems/min-cost-to-connect-all-points/)
 
 ### 题目
 
@@ -1426,6 +1426,7 @@ public int minCostConnectPoints(int[][] points) {
 
     inMST[0] = true;
     intoQueue(0);
+    int count = 0;
     while (!pq.isEmpty()) {
         Edge cur = pq.poll();
         // 如果起点x的终点y在mst中了，就换下一个
@@ -1434,6 +1435,7 @@ public int minCostConnectPoints(int[][] points) {
         minCost += cur.len;
         // 将y作为下一次的起点，加入
         intoQueue(cur.y);
+        if (++count == n-1) break;
     }
 
     return minCost;
@@ -1516,7 +1518,7 @@ public int minCostConnectPoints(int[][] points) {
         // n个点相连，至少需要n-1条边
         // 只要连够了，就可以了，
         // 相当于剪枝，余下的边的两端肯定都在图中了
-        if (size == n-1) break;
+        if (++size == n-1) break;
     }
     return ans;
 }
@@ -1531,7 +1533,7 @@ public boolean union(int i, int j, int[] fathers) {
     int rootJ = find(fathers, j);
     if (rootI != rootJ) {
         fathers[rootI] = rootJ;
-        size++;
+        // size++;
         // 没有连通的，连通后返回false
         return false;
     }

@@ -131,6 +131,8 @@ Spring的单例是用单例注册表实现的。
 
 ### 2、Bean的生命周期***
 
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202209071107125.png" alt="图片" style="zoom:67%;" />
+
 1. **实例化**一个bean，new
 2. **依赖注入**，根据Spring上下文对实例化的bean进行配置、**填充属性**
 3. 处理Aware回调（可选）
@@ -433,7 +435,7 @@ spring事务的原理是AOP，进行了切面增强，失效的原因就是aop�
 
 5. **异常被吃掉**（被try...catch了），事务不会回滚
 
-6. 抛出的**异常没有被定义**，默认为RuntimeException；使用rollbakcFor指定非运行时异常。
+6. 抛出的**异常没有被定义**，**默认为RuntimeException及其子类与Error**；使用rollbakcFor指定非运行时异常。
 
 ### 补充：
 
@@ -797,7 +799,7 @@ starter 就是定义了一个 starter 的 jar 包，写一个 @Configuration 配
 
 
 
-## 五、配置文件的加载顺序
+## 五、配置文件的加载
 
 **bootstrap.yml** (bootstrap.properties) **先加载** 
 
@@ -812,6 +814,18 @@ starter 就是定义了一个 starter 的 jar 包，写一个 @Configuration 配
 
 - 如果application里写了`spring.profiles.active=dev`，还回去加载application-dev.properties
 - 其中定义应用级别的配置
+
+### 优先级从高到低
+
+1、命令行参数。所有的配置都可以在命令行上进行指定。
+
+2、Java系统属性（`System.getProperties()`）
+
+3、操作系统环境变量。
+
+4、properties和yml
+
+5、@configuration注解类上的@PropertySource
 
 
 

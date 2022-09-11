@@ -577,7 +577,7 @@ i++, j++;
 p   : a a a b b a b
 pp  :   a a a b b a b
             𐌣
-while(p[i] != pp[j]) j = next[j - 1]
+while(p[i] != pp[j]) j = next[j - 1] = 2,1,0
 until j == 0 or p[i] == pp[j];
 next[i] = j;
 next: 0 1 2 0
