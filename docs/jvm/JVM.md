@@ -670,7 +670,7 @@ Java8中默认
 
 ### 4、CMS回收器：低延迟（响应速度优先）、并发
 
-Concurrent-Mark-Sweep、强交互应用、标记清除、尽可能缩短停顿时间、也会有STW时间
+Concurrent-Mark-Sweep、强交互应用、标记清除、尽**可能缩短停顿时间**、也会有STW时间
 
 HotSpot中第一款真正意义上的**并发收集器**
 

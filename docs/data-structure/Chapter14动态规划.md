@@ -1,5 +1,7 @@
 # 第十四章：动态规划
 
+当前状态与前状态相关
+
 1. 确定dp数组（dp table）以及下标的含义
 2. 确定递推公式
 3. dp数组如何初始化
@@ -2316,7 +2318,8 @@ public class TreeDP {
         int n = sc.nextInt();
         for (int i = 0; i < n-1; i++) {
             int x = sc.nextInt(),y = sc.nextInt();
-            // 双向建树，因为不知道谁是根
+            // 双向建树，如果没有明确1是顶点的话，需要双向
+            // 然后遍历的时候判断有没有遍历过就可以了
             buildTree(x, y);
             buildTree(y, x);
         }
@@ -2333,7 +2336,7 @@ public class TreeDP {
         // 父节点满了，但是子节点还不够
         res += root-parent;
         for (Integer integer : list) {
-            // 
+            // 判断是否遍历过了，如果只是单向建树的就不需要
             if(flag[integer])continue;
             dfs(integer,flag,root);
         }
@@ -2350,59 +2353,101 @@ public class TreeDP {
 
 
 
-## Zero Tree
+## 圣诞树
 
 ### 题目
 
-# Zero Tree
+圣诞树由n个节点组成，每个节点上为一个整数（可为负数），节点从1到n编号。每次操作需选择一个包含1号节点的子图，并将子图中所有节点的值+1或者-1，请问至少需要操作多少次，才能让所有节点的值都是0？
 
-## 题面翻译
-
-题目描述
-
-一棵树是一个有n个节点与正好n-1条边的图；并且符合以下条件：对于任意两个节点之间有且只有一条简单路径。
-
-我们定义树T的子树为一棵所有节点是树T节点的子集，所有边是T边的子集的树。
-
-给定一颗有n个节点的树，假设它的节点被编号为1到n。每个节点有一个权值，$v_i$表示编号为i的节点的权值。你需要进行一些操作，每次操作符合以下规定：
-
-    - 在给定的这棵树中选择一棵子树，并保证子树中含有节点1
-    - 把这棵子树中的所有节点加上或减去1
-
-你需要计算至少需要多少次操作来让所有的节点的权值归零。
-输入数据
-
-第一行包含一个整数n，表示树中节点的数量
-
-接下来的n-1行，一行两个整数u,v，表示u和v之间有一条边(u!=v)。
-
-最后一行包含n个整数$v_i$，用空格隔开，表示每个节点的权值
-输出数据
-
-一行一个整数，输出最小需要的操作次数。
-输入样例
 ```
+输入包含三行
+第一行是节点个数n
+第二行是n-1个数据表示节点（i = 2, 3, 4 ...）的父亲节点
+第三行是n个数据表示（i = 1, 2, 3, ...）节点的初始值
+
+输出最少操作次数
+
+输入：
 3
-1 2
-1 3
+1 1
 1 -1 1
-```
-输出样例
-```
+
+输出：
 3
 ```
-数据规模
-对于$30\%$的数据，$n\leq100,|vi|\leq1000$
-
-对于$50\%$的数据，$n\leq10^4$
-
-对于$100\%$的数据，$n\leq10^5,|vi|\leq10^9$
 
 
 
 ### 题解
 
+```
+dp[u][0] 对节点u进行-操作的次数
+dp[u][1] 对节点u进行+操作的次数
 
+因为需要节点1，所以将1作为根节点
+如果节点x，有w[x]=y，需要对x节点进行y次操作，将y向上传递
+
+max是因为比如u的节点有abc，a操作了2次，b操作了3次，c操作了1次，
+这样u就必须操作3次，因为可以同时操作uabc，也可以uba这样，
+但是u是必须参与的，因为需要根结点的参与
+
+dp[u][0] = max(dp[s][0], dp[u][0])
+dp[u][1] = max(dp[s][1], dp[u][1])
+最后再加上操作完之后本身要进行操作的数量
+```
+
+
+
+```java
+public class TreeDP {
+    static int[][] dp;
+    static int[] w;
+    static Map<Integer, List<Integer>> tree = new HashMap<>();
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int N = in.nextInt();
+        dp = new int[N + 1][2];
+        w = new int[N + 1];
+
+        for (int i = 2; i <= N; i++) {
+            int p = in.nextInt();
+            buildTree(p, i);
+        }
+
+        for (int i = 1; i <= N; i++) {
+            w[i] = in.nextInt();
+        }
+        
+        dfs(1);
+
+        System.out.println(dp[1][0] + dp[1][1]);
+    }
+
+    private static void dfs(int cur) {
+        dp[cur][0] = dp[cur][1] = 0;
+        List<Integer> children = tree.get(cur);
+        if (children != null) {
+            for (int child : children) {
+                dfs(child);
+                dp[cur][0] = Math.max(dp[child][0], dp[cur][0]);
+                dp[cur][1] = Math.max(dp[child][1], dp[cur][1]);
+            }
+        }
+
+        // 子树加了几次，减了几次对差就是
+        w[cur] += dp[cur][1] - dp[cur][0];
+        if (w[cur] > 0) dp[cur][0] += w[cur];
+        else dp[cur][1] += Math.abs(w[cur]);
+    }
+
+    private static void buildTree(int p, int s) {
+        List<Integer> list = tree.get(p);
+        if (list == null) list = new ArrayList<>();
+        list.add(s);
+        tree.put(p, list);
+    }
+}
+```
 
 
 

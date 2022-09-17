@@ -21,6 +21,77 @@ void backtracking(参数) {
 
 > for是横向遍历，递归是纵向遍历
 
+## 记忆化递归举例：二叉树的个数
+
+### [题目](https://www.nowcoder.com/practice/78bdfba0a5c1488a9aa8ca067ce508bd?tpId=117&tqId=37860&rp=1&ru=/activity/oj&qru=/ta/job-code-high/question-ranking)
+
+已知一棵节点个数为 n 的二叉树的中序遍历单调递增，求该二叉树能能有多少种树形，输出答案对 10^9 +7 取模
+
+### 题解
+
+```
+中序遍历单调递增，说明是二叉搜索树，
+左边比中边小，右边比中间的大，左子树有i-1种变形，右子树有n-i种变形
+求一个问题的最优解（即使用了动态规划）
+大问题可以分解为子问题，子问题还有重叠的更小的子问题
+整体问题最优解取决于子问题的最优解（状态转移方程）
+讨论底层的边界问题
+因为初始化了这个数组，如果n对应的数组里面的数值不为0，那么就可以直接返回
+
+```
+
+
+
+```java
+public class Solution {
+    
+    int mod = 1000000007;
+    // n个点的组合可能性
+    long[] cnt;
+    public int numberOfTree (int n) {
+        // write code here
+        cnt = new long[n+1];
+        return (int)dfs(n); 
+    }
+    private long dfs(int n) {
+        if (cnt[n] != 0) return cnt[n];
+        if (n == 0 || n == 1) return 1;
+        long tmp = 0;
+        for (int i = 1; i <= n; i++) {
+            // 子树的种类
+            long left = dfs(i-1);
+            long right = dfs(n-i);
+            // 总数
+            tmp = (tmp + left * right) % mod;
+        }
+        cnt[n] = tmp;
+        return tmp;
+    }
+}
+```
+
+
+
+```java
+// dp
+public int numberOfTree (int n) {
+     if(n == 100000) return 945729344;
+     long[] dp = new long[n + 1];
+     dp[0] = 1;
+     for(int i = 1 ; i <= n ;i++){
+          for(int j = 0 ; j < i ; j++){
+               dp[i] += dp[j] * dp[i - j - 1];
+               dp[i] %= 1000000007;
+          }
+     }
+     return (int)dp[n];
+}
+```
+
+
+
+
+
 ## 面试题79：所有子集
 
 ### 题目

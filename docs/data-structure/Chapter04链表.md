@@ -454,6 +454,9 @@ public ListNode reverseKGroup(ListNode head, int k) {
 图4.10：链表中数字以及它们的和。（a）表示整数123的链表。（b）表示整数531的链表。（c）表示123与531的和654的链表。
 
 ### 参考代码
+
+#### 三次反转
+
 ``` java
 public ListNode addTwoNumbers(ListNode head1, ListNode head2) {
     head1 = reverseList(head1);
@@ -469,8 +472,8 @@ private ListNode addReversed(ListNode head1, ListNode head2) {
     while (head1 != null || head2 != null) {
         int sum = (head1 == null ? 0 : head1.val)
                 + (head2 == null ? 0 : head2.val) + carry;
-        carry = sum >= 10 ? 1 : 0;
-        sum = sum >= 10 ? sum - 10 : sum;        
+        carry = sum / 10;
+        sum %= 10;         
         ListNode newNode = new ListNode(sum);
 
         sumNode.next = newNode;            
@@ -500,6 +503,45 @@ private ListNode reverseList(ListNode head) {
 }
 
 ```
+
+
+
+#### 栈
+
+```java
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        Deque<Integer> stack1 = new ArrayDeque<Integer>();
+        Deque<Integer> stack2 = new ArrayDeque<Integer>();
+        while (l1 != null) {
+            stack1.push(l1.val);
+            l1 = l1.next;
+        }
+        while (l2 != null) {
+            stack2.push(l2.val);
+            l2 = l2.next;
+        }
+        int carry = 0;
+        ListNode ans = null;
+        while (!stack1.isEmpty() || !stack2.isEmpty() || carry != 0) {
+            int a = stack1.isEmpty() ? 0 : stack1.pop();
+            int b = stack2.isEmpty() ? 0 : stack2.pop();
+            int cur = a + b + carry;
+            carry = cur / 10;
+            cur %= 10;
+            ListNode curnode = new ListNode(cur);
+            curnode.next = ans;
+            ans = curnode;
+        }
+        return ans;
+    }
+}
+
+```
+
+
+
+
 
 
 
