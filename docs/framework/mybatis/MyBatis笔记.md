@@ -1217,7 +1217,77 @@ public void insertMoreByList() {
 ```
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204161543263.png" style="zoom:67%;" />
 
+#### 或ExecutorType.BATCH
+
+Mybatis内置的ExecutorType有3种，默认为simple，该模式下它为每个语句的执行创建一个新的预处理语句，单条提交sql；而batch模式重复使用已经预处理的语句，并且批量执行所有更新语句，显然batch性能将更优；但batch模式也有自己的问题，比如在Insert操作时，在事务没有提交之前，是没有办法获取到自增的id，在某些情况下不符合业务的需求。
+
+```java
+//批量保存方法测试
+@Test  
+public void testBatch() throws IOException{
+    SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
+    //可以执行批量操作的sqlSession
+    SqlSession openSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
+
+    //批量保存执行前时间
+    long start = System.currentTimeMillis();
+    try {
+        EmployeeMapper mapper = openSession.getMapper(EmployeeMapper.class);
+        for (int i = 0; i < 1000; i++) {
+            mapper.addEmp(new Employee(UUID.randomUUID().toString().substring(0, 5), "b", "1"));
+        }
+
+        openSession.commit();
+        long end = System.currentTimeMillis();
+        //批量保存执行后的时间
+        System.out.println("执行时长" + (end - start));
+        //批量 预编译sql一次==》设置参数==》10000次==》执行1次   677
+        //非批量  （预编译=设置参数=执行 ）==》10000次   1121
+
+    } finally {
+        openSession.close();
+    }
+}
+
+```
+
+mapper
+
+```java
+public interface EmployeeMapper {   
+    //批量保存员工
+    Long addEmp(Employee employee);
+}
+```
+
+
+
+```xml
+<mapper namespace="com.jourwon.mapper.EmployeeMapper"
+     <!--批量保存员工 -->
+    <insert id="addEmp">
+        insert into employee(lastName,email,gender)
+        values(#{lastName},#{email},#{gender})
+    </insert>
+</mapper>
+```
+
+## Mybatis都有哪些Executor
+
+MyBatis 有三种基本的 Executor 执行器， `SimpleExecutor` 、 `ReuseExecutor` 、 `BatchExecutor` 。
+
+`SimpleExecutor` ：每执行一次 update 或 select，就开启一个 Statement 对象，用完立刻关闭 Statement 对象。
+
+`ReuseExecutor` ：执行 update 或 select，以 sql 作为 key 查找 Statement 对象，存在就使用，不存在就创建，用完后，不关闭 Statement 对象，而是放置于 Map<String, Statement>内，供下一次使用。简言之，就是重复使用 Statement 对象。
+
+`BatchExecutor` ：执行 update（没有 select，JDBC 批处理不支持 select），将所有 sql 都添加到批处理中（addBatch()），等待统一执行（executeBatch()），它缓存了多个 Statement 对象，每个 Statement 对象都是 addBatch()完毕后，等待逐一执行 executeBatch()批处理。与 JDBC 批处理相同。
+
+在 MyBatis 配置文件中，可以指定默认的 ExecutorType 执行器类型，也可以手动给 `DefaultSqlSessionFactory` 的创建 SqlSession 的方法传递 ExecutorType 类型参数。
+
+作用范围：Executor 的这些特点，都严格限制在 SqlSession 生命周期范围内。
+
 ## SQL片段
+
 - sql片段，可以记录一段公共sql片段，在使用的地方通过include标签进行引入
 - 声明sql片段：`<sql>`标签
 ```xml
@@ -1286,7 +1356,7 @@ public void insertMoreByList() {
 
 1. mybatis一级缓存作用域是session，session在commit之后缓存就消失了。
 2. mybatis二级缓存作用域是sessionFactory，该缓存是以nameSpace为单位的（也就是一个Mapper.xml文件），不同nameSpace下操作互不影响。
-3. 所有对数据表的改变操作都会刷新缓存，但是一般不用二级缓存。例如，在UserMapper.xml中有大多数针对User表的操作，但是在另外一个XXXMapper.xml中，还有针对user单表的操作，这会导致user在两个命名空间下的数据不一致。
+3. 所有**对数据表的改变操作都会刷新缓存**，但是一般不用二级缓存。例如，在UserMapper.xml中有大多数针对User表的操作，但是在另外一个XXXMapper.xml中，还有针对user单表的操作，这会导致user在两个命名空间下的数据不一致。
 4. 如果UserMapper.xml中做了刷新缓存的操作，在XXXMapper.xml中缓存依然有效，如果针对user单表查询，使用缓存的结果可能会不正确，读到脏数据。
 5. redis很好的解决了这个问题，而且比之一、二级缓存的更好，redis可以搭建在其他服务器上，缓存容量可扩展，redis可以灵活的使用在需要的缓存数据上。
 

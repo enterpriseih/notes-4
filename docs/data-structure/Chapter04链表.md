@@ -267,8 +267,8 @@ public ListNode reverseList(ListNode head) {
     while (cur != null) {
         ListNode next = cur.next;
         cur.next = pre;
-        pre = cur;// 下一个prev即k的j
-        cur = next;// 下一个cur即当前的k
+        pre = cur;
+        cur = next;
     }
     return pre;
 }
@@ -318,6 +318,129 @@ public ListNode reverseList(ListNode head) {
     return newHead;
 }
 ```
+
+
+
+## [翻转链表2](https://leetcode.cn/problems/reverse-linked-list-ii/)
+
+### 题目
+
+翻转区间[left, right]的链表
+
+```
+输入：head = [1,2,3,4,5], left = 2, right = 4
+输出：[1,4,3,2,5]
+```
+
+
+
+### 题解
+
+![image.png](https://pic.leetcode-cn.com/1615105296-bmiPxl-image.png)
+
+- curr：指向待反转区域的**第一个节点 left**；
+
+- next：永远指向 curr 的下一个节点，循环过程中，curr 变化以后 next 会变化；
+
+- pre：永远指向待反转区域的第一个节点 **left 的前一个节点**，在循环过程中不变。
+
+```java
+public ListNode reverseBetween(ListNode head, int left, int right) {
+    ListNode dummyNode = new ListNode(-1);
+    dummyNode.next = head;
+    ListNode pre = dummyNode;
+    for (int i = 0; i < left - 1; i++) {
+        pre = pre.next;
+    }
+    ListNode cur = pre.next;
+    ListNode next;
+    for (int i = 0; i < right - left; i++) {
+        next = cur.next;
+        cur.next = next.next;
+        next.next = pre.next;
+        pre.next = next;
+    }
+    return dummyNode.next;
+}
+
+```
+
+
+
+## [K个翻转链表](https://leetcode.cn/problems/reverse-nodes-in-k-group/)
+
+用栈，把 k 个数压入栈中，然后弹出来的顺序就是翻转的！
+
+这里要注意几个问题：
+
+第一，剩下的链表个数够不够 k 个（因为不够 k 个不用翻转）；
+
+第二，已经翻转的部分要与剩下链表连接起来。
+
+```java
+public ListNode reverseKGroup(ListNode head, int k) {
+    Stack<ListNode> st = new Stack<>();
+    ListNode dummy = new ListNode(0);
+    // pre是翻转好的前一组的尾节点
+    ListNode pre = dummy;
+    while (true) {
+        int count = 0;
+        // head指向的是还没翻转的k个一组的头节点
+        ListNode tmp = head;
+        while (tmp != null && count != k) {
+            st.add(tmp);
+            tmp = tmp.next;
+            count++;
+        } 
+        // 此时tmp是下一组的头节点
+        if (count != k) {
+            pre.next = head;
+            break;
+        }
+        while (!st.isEmpty()) {
+            pre.next = st.pop();
+            pre = pre.next;
+        }
+        // head变成下一组的头节点
+        head = tmp;
+        // pre.next = tmp; 
+    }
+    return dummy.next;
+}
+```
+
+方法二
+
+```java
+public ListNode reverse(ListNode a,ListNode b){
+    ListNode pre,cur,nxt;
+    pre=null;cur=a;
+    while(cur!=b){
+        nxt=cur.next;
+        cur.next=pre;
+        pre=cur;
+        cur=nxt;
+    }
+    return pre;
+}
+public ListNode reverseKGroup(ListNode head, int k) {
+    if(head==null) return null;
+    ListNode a,b;
+    a=b=head;
+    for(int i=0;i<k;i++){
+        if(b==null) return head;
+        b=b.next;
+    }
+    // 此时b是下一组的头节点
+    ListNode newhead=reverse(a,b);
+    // a已经变成了ab区间链表的尾部
+    a.next=reverseKGroup(b,k);
+    return newhead;
+
+}
+```
+
+
 
 
 

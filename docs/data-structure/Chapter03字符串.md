@@ -758,3 +758,133 @@ public int minFlipsMonoIncr(String s) {
 }
 ```
 
+
+
+
+
+
+
+## 补充：字符转换（十进制转二进制）
+
+### 题目
+
+小红每次可以把一个字符变成两个字母表中比它小一位的字符。例如，可以把'b'变成两个a，可以把’z变成两个y。小红希望最终可以生成2个'日，你能帮小红求出初始的宇符串吗？请你输出长度最短的合法字符串，有多解时输出任意即可。
+
+```
+输入: 5
+输出: ca 或 ac
+ca -> bba -> aaaaa
+```
+
+
+
+### 题解
+
+```
+ca -> 101 -> 5
+c = 4a, b = 2a, a = 1a
+d = 8a, ...
+二进制位上有，就算上那个数字
+```
+
+
+
+```java
+public find(int x) {
+    // 转换二进制，几就是几进制
+    String str = Integer.toString(x, 2);
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < str.length(); i++) {
+        char ch = str.charAt(i);
+        if (ch == '1') {
+            int pow = str.length() - 1 - i;
+            char c = (char)('a' + pow);
+            sb.append(c);
+        }
+    }
+    System.out.println(sb.toString());
+}
+```
+
+
+
+## [最美子字符串](https://leetcode.cn/problems/number-of-wonderful-substrings/)
+
+### 题目
+
+如果某个字符串中 **至多一个** 字母出现 **奇数** 次，则称其为 **最美** 字符串。
+
+- 例如，`"ccjjc"` 和 `"abab"` 都是最美字符串，但 `"ab"` 不是。
+- 只有 a - j 小写的10个字母
+
+```
+输入：word = "aabb"
+输出：9
+解释：9 个最美子字符串如下所示：
+- "aabb" -> "a"
+- "aabb" -> "aa"
+- "aabb" -> "aab"
+- "aabb" -> "aabb"
+- "aabb" -> "a"
+- "aabb" -> "abb"
+- "aabb" -> "b"
+- "aabb" -> "bb"
+- "aabb" -> "b"
+
+```
+
+
+
+### 题解
+
+如果字符串 word 的某个子串 word[i, j] 是最美字符串，那么其中最多只有一个字符出现奇数次，这说明：
+
+> 对于任意一次字符 c 而言，word 的 i−1 前缀 word[0, i−1] 与 j 前缀 word[0, j] 中字符 c 的出现次数必须同奇偶。
+>
+> - 奇数 - 奇数 = 偶数 - 偶数 = 偶数
+>
+> 同时，我们最多允许有一个字符 c，它**在两个前缀中出现次数的奇偶性不同**。
+>
+> - 奇数 - 偶数 = 奇数
+
+```
+使用一个二进制数bit记录原字符串的每个前缀中各个字母的奇偶性
+bit的第i位为1说明第i个字母出现了奇数次，0表示偶数次。
+
+记word[0, k]对应的二进制数为bit_k
+则word[i, j]是最美字符，当且仅当bit_{i-1}和bit_j最多只有一位不同
+
+如果i = 0, bit_{-1}表示所有字母均未出现
+
+```
+
+
+
+```java
+public long wonderfulSubstrings(String word) {
+    int n = word.length();
+    int bit = 0;
+    Map<Integer, Integer> map = new HashMap<>();
+    // 存(0, 1), 所有字符都具有空前缀
+    map.put(bit, 1);
+    long res = 0;
+    for(int i = 0; i < n; i++){
+        // 翻转，当前位从0变1，从1变0，其余位不变 
+        bit ^= 1 << (word.charAt(i) - 'a');
+        // 10个字母就是10，26个字母就是26，超过32就存不下了
+        for(int j = 0; j < 10; j++){
+            // 查找前缀有没有和当前bit只有一个字母出现的奇偶性不同的字符二进制
+            // 有几个就能组成几组字符
+            // bit ^ (1 << j)只是是第j个字母的奇偶性不同
+            res += map.getOrDefault(bit ^ (1 << j), 0);
+        }
+        // 前缀中有和当前bit一样的奇偶性的
+        // 如果这题是有且只有一个是奇数次，则该句删除
+        res += map.getOrDefault(bit, 0);
+        // 将该bit放入
+        map.put(bit, map.getOrDefault(bit, 0) + 1);
+    }
+    return res;
+}
+```
+

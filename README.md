@@ -59,6 +59,7 @@
 ### 框架
 
 - [Spring](./docs/framework/spring/Spring.md)
+- [动态代理](./docs/framework/spring/动态代理.md)
 - [SpringMVC笔记](./docs/framework/spring/SpringMVC笔记.md)
 - [MyBatis笔记](./docs/framework/mybatis/MyBatis笔记.md)
 - [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)

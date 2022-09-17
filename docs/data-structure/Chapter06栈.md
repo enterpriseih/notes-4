@@ -389,7 +389,7 @@ public int trap(int[] height) {
 
 ### 解法二：单调栈
 
-1、按照行方向计算雨水
+1、**按照行方向计算雨水**
 
 2、从栈头（元素从栈头弹出）到栈底的顺序应该是从小到大的顺序，存的依旧是下标
 
@@ -416,6 +416,9 @@ public int trap(int[] height) {
         if (!st.isEmpty() && height[i] == height[st.peek()]) {
             st.pop();
         }
+        // 如果mid和peek高度一样，取min的时候肯定是取peek了，
+        // 这样计算的高度是0，存不了水，
+        // while继续往下算
         while (!st.isEmpty() && height[i] > height[st.peek()]) {
             int mid = st.pop();
             if(!st.isEmpty()) {
@@ -432,6 +435,39 @@ public int trap(int[] height) {
 // 时间复杂度O(n)
 // 空间复杂度O(n)
 ```
+
+
+
+### 解法三：双指针
+
+按照列求雨水
+
+求每一列的水，我们只需要关注当前列，以及左边最高的墙，右边最高的墙就够了。
+
+```java
+public int trap(int[] height) {
+    int sum = 0;
+    for (int i = 0; i < height.length; i++) {
+        // 第一个柱子和最后一个柱子不接雨水
+        if (i==0 || i== height.length - 1) continue;
+
+        int rHeight = height[i]; // 记录右边柱子的最高高度
+        int lHeight = height[i]; // 记录左边柱子的最高高度
+        for (int r = i+1; r < height.length; r++) {
+            if (height[r] > rHeight) rHeight = height[r];
+        }
+        for (int l = i-1; l >= 0; l--) {
+            if(height[l] > lHeight) lHeight = height[l];
+        }
+        int h = Math.min(lHeight, rHeight) - height[i];
+        if (h > 0) sum += h;
+    }
+    return sum;
+
+}
+```
+
+
 
 
 

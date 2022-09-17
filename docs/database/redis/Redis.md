@@ -101,6 +101,74 @@ Redis 基于 Reactor 模式开发了网络事件处理器、**文件事件处理
 
 https://mp.weixin.qq.com/s/FZu3acwK6zrCBZQ_3HoUgw
 
+# redis的扩容
+
+Redis的扩容机制，指的就是字典中哈希表的rehash（重新散列）操作。
+
+- 字典结构如下
+
+```c++
+typedef struct dict {
+    // 类型特定函数
+    dictType *type;
+    // 私有数据
+    void *privedata;
+    // 哈希表
+    dictht  ht[2];
+    // rehash 索引
+    in trehashidx;
+}
+
+typedef struct dictht {
+  //哈希表数组
+  dictEntry **table;
+  //哈希表大小
+  unsigned long size;
+  //哈希表大小掩码，用于计算索引值
+  unsigned long sizemask;
+  //该哈希表已有节点的数量
+  unsigned long used;
+}
+ 
+typeof struct dictEntry{
+  //键
+  void *key;
+  //值
+  union{
+      void *val;
+      uint64_tu64;
+      int64_ts64;
+  }
+  struct dictEntry *next;
+}
+```
+
+### rehash步骤
+
+1）为字典的ht[1]哈希表**分配空间**。
+
+- 如果执行的是扩展操作，那么ht[1] 的大小为第一个大于等于ht[0] .used*2的2的n次幂
+
+- 如果执行的是收缩操作，那么ht[1] 的大小为第一个大于等于ht[0].used 的2的n次幂
+
+2）将ht[0]中的数据**转移**到ht[1]中，在转移的过程中，**重新计算键的哈希值和索引值**，然后将键值对放置到ht[1]的指定位置。
+
+3）当ht[0]的所有键值对都迁移到了ht[1]之后（ht[0]变为空表），**将ht[0]释放**，然后将ht[1]设置成ht[0]，最后为ht[1]分配一个空白哈希表
+
+### 渐进式rehash
+
+在进行拓展或者压缩的时候，可以直接将所有的键值对rehash 到ht[1]中，这是因为数据量比较小。在实际开发过程中，这个rehash 操作并不是一次性、集中式完成的，而是分多次、渐进式地完成的。
+
+1、为ht[1] 分配空间，让字典同时持有ht[0]和ht[1]两个哈希表
+
+2、在字典中维持一个索引计数器变量rehashidx，并将它的值设置为0，表示rehash 开始
+
+3、在rehash 进行期间，每次对字典执行CRUD操作时，程序除了执行指定的操作以外，还会将ht[0]中的数据rehash 到ht[1]表中，并且将rehashidx加一
+
+4、当ht[0]中所有数据转移到ht[1]中时，将rehashidx 设置成-1，表示rehash 结束
+
+采用渐进式rehash 的好处在于它采取分而治之的方式，避免了集中式rehash 带来的庞大计算量。
+
 # 为什么要用缓存/Redis
 
 高并发:

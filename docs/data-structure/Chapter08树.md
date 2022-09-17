@@ -294,6 +294,127 @@ public List<Integer> postorderTraversal(TreeNode root) {
 
 
 
+## 补充：[二叉搜索树转双向链表](https://leetcode.cn/problems/convert-binary-search-tree-to-sorted-doubly-linked-list/)
+
+### 题目
+
+将一个 二叉搜索树 就地转化为一个 已排序的双向循环链表 。
+
+对于双向循环列表，你可以将左右孩子指针作为双向循环链表的前驱和后继指针，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
+
+```java
+class Node {
+    public int val;
+    public Node left;
+    public Node right;
+
+    public Node() {}
+
+    public Node(int _val) {
+        val = _val;
+    }
+
+    public Node(int _val,Node _left,Node _right) {
+        val = _val;
+        left = _left;
+        right = _right;
+    }
+}
+// left相当于pre
+// right相当于nxt
+```
+
+
+
+### 题解
+
+中序遍历
+
+- fristVisit：记录我们第一次遇到的节点。
+	- 用于连接链表的头结点和尾节点，使双向链表变成双向循环链表。
+
+- lastVisit：记录上一次遇到的节点。
+	- 在遍历的过程中，对lastVisit节点和当前节点(root)的左右指针进行连接。
+
+#### 递归
+
+```java
+class Solution {
+    Node fristVisit = null;
+    Node lastVisit = null;
+    public Node treeToDoublyList(Node root) {
+        if (root == null) {
+            return null;
+        }
+        // 将root转换成双向链表，进行中序遍历
+        toDoublyList(root);
+        // 将头尾连接
+        fristVisit.left = lastVisit;
+        lastVisit.right = fristVisit;
+        return fristVisit;
+    }
+    public void toDoublyList(Node root) {
+        if (root == null) {
+            return;
+        }
+        Node left = root.left, right = root.right;
+        toDoublyList(left);
+        // 这个必须放在这，因为要的是最小的那个节点
+        // 在第一次开始读中序的时候的那个节点最小
+        if (fristVisit == null) { // 记录头结点
+            fristVisit = root;
+        }
+        if (lastVisit != null) { // 当前节点和上一个节点进行连接
+            root.left = lastVisit; 
+            lastVisit.right = root;
+        }
+        lastVisit = root; // 当前节点记录为上一节点
+
+        toDoublyList(right);
+    }
+}
+
+
+```
+
+
+
+#### 迭代
+
+```java
+public Node treeToDoublyList(Node root) {
+    if(root == null) return root;
+    Stack<Node> stack = new Stack<>();
+    Node lastNode, firstNode;
+    lastNode = firstNode = null;
+    Node cur = root;
+    while (cur != null || !stack.isEmpty()) {
+        while(cur != null) {
+            stack.push(cur);
+            cur = cur.left;
+        }
+
+        cur = stack.pop();
+        if (firstNode == null) firstNode = cur;
+        if (lastNode != null) {
+            lastNode.right = cur;
+            cur.left = lastNode;
+        }
+        lastNode = cur;
+        cur = cur.right;
+
+
+    }
+    lastNode.right = firstNode;
+    firstNode.left = lastNode;    
+    return firstNode; 
+}
+```
+
+
+
+
+
 ## 补充：最近的公共祖先
 
 ### 题目

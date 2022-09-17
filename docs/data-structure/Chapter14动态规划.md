@@ -525,7 +525,7 @@ public int minFlipsMonoIncr(String s) {
 ### 解法一：dp - O(N^2)
 
 ```
-dp[i]: 0~i的最长子序列长
+dp[i]: 以nums[i]结尾的最长子序列长
 dp[i]和dp[j]有关系，j < i
 
 dp[i] = max(dp[i], dp[j] + 1) for j in [0, i)
@@ -1473,6 +1473,7 @@ dp[j - weight[i]] + value[i] 表示
 
 
 ```java
+int[] dp = new int[bagWeight + 1];
 // 一维，物品从0开始就可以，数组遍历只和 j 有关
 for(int i = 0; i < weight.size(); i++) { // 遍历物品
     // >=是为了确保可以放进去
@@ -2074,4 +2075,338 @@ public void preorderDfs(int[][] root, int left, int right) {
 }
 
 ```
+
+
+
+## 状态压缩dp
+
+状压 DP，就是专指状态压缩 DP，这一类 DP 的状态一般都特别复杂，所以常常直接用多进制的方式把复杂的状态直接变成一个正整数的形式，达到状态压缩的目的。
+
+常用的位运算
+
+```
+x&(1<<(i-1))!=0 查询第i位上的元素是否为1
+ 
+x|=(1<<(i-1)) 把第i位上的数修改为1
+
+x&=~(1<<(i-1)) 把第i位上的数修改为0
+
+x^=(1<<(i-1)) 翻转第i位上的数，0变1，1变0
+```
+
+
+
+## [最美子字符串](https://leetcode.cn/problems/number-of-wonderful-substrings/)
+
+### 题目
+
+如果某个字符串中 **至多一个** 字母出现 **奇数** 次，则称其为 **最美** 字符串。
+
+- 例如，`"ccjjc"` 和 `"abab"` 都是最美字符串，但 `"ab"` 不是。
+- 只有 a - j 小写的10个字母
+
+```
+输入：word = "aabb"
+输出：9
+解释：9 个最美子字符串如下所示：
+- "aabb" -> "a"
+- "aabb" -> "aa"
+- "aabb" -> "aab"
+- "aabb" -> "aabb"
+- "aabb" -> "a"
+- "aabb" -> "abb"
+- "aabb" -> "b"
+- "aabb" -> "bb"
+- "aabb" -> "b"
+
+```
+
+
+
+### 题解
+
+如果字符串 word 的某个子串 word[i, j] 是最美字符串，那么其中最多只有一个字符出现奇数次，这说明：
+
+> 对于任意一次字符 c 而言，word 的 i−1 前缀 word[0, i−1] 与 j 前缀 word[0, j] 中字符 c 的出现次数必须同奇偶。
+>
+> - 奇数 - 奇数 = 偶数 - 偶数 = 偶数
+>
+> 同时，我们最多允许有一个字符 c，它**在两个前缀中出现次数的奇偶性不同**。
+>
+> - 奇数 - 偶数 = 奇数
+
+```
+使用一个二进制数bit记录原字符串的每个前缀中各个字母的奇偶性
+bit的第i位为1说明第i个字母出现了奇数次，0表示偶数次。
+
+记word[0, k]对应的二进制数为bit_k
+则word[i, j]是最美字符，当且仅当bit_{i-1}和bit_j最多只有一位不同
+
+如果i = 0, bit_{-1}表示所有字母均未出现
+
+```
+
+
+
+```java
+public long wonderfulSubstrings(String word) {
+    int n = word.length();
+    int bit = 0;
+    Map<Integer, Integer> map = new HashMap<>();
+    // 存(0, 1), 所有字符都具有空前缀
+    map.put(bit, 1);
+    long res = 0;
+    for(int i = 0; i < n; i++){
+        // 翻转，当前位从0变1，从1变0，其余位不变 
+        bit ^= 1 << (word.charAt(i) - 'a');
+        // 10个字母就是10，26个字母就是26，超过32就存不下了
+        for(int j = 0; j < 10; j++){
+            // 查找前缀有没有和当前bit只有一个字母出现的奇偶性不同的字符二进制
+            // 有几个就能组成几组字符
+            // bit ^ (1 << j)只是是第j个字母的奇偶性不同
+            res += map.getOrDefault(bit ^ (1 << j), 0);
+        }
+        // 前缀中有和当前bit一样的奇偶性的
+        // 如果这题是有且只有一个是奇数次，则该句删除
+        res += map.getOrDefault(bit, 0);
+        // 将该bit放入
+        map.put(bit, map.getOrDefault(bit, 0) + 1);
+    }
+    return res;
+}
+```
+
+
+
+
+
+## 树形dp
+
+https://www.cnblogs.com/wujianxiang/p/15103725.html
+
+## 没有上司的舞会
+
+### 题目
+
+有个公司要举行一场晚会。
+为了能玩得开心，公司领导决定：如果邀请了某个人，那么一定不会邀请他的上司
+（上司的上司，上司的上司的上司……都可以邀请）。
+
+每个参加晚会的人都能为晚会增添一些气氛，求一个邀请方案，使气氛值的和最大。
+
+```
+输入: 
+第1行一个整数N（1<=N<=6000）表示公司的人数。
+接下来N行每行一个整数。第i行的数表示第i个人的气氛值x(-128<=x<=127)。
+接下来每行两个整数L，K。表示第K个人是第L个人的上司。
+
+输出: 气氛最大值
+
+例如
+输入: 
+7
+1
+1
+1
+1
+1
+1
+1
+1 3
+2 3
+6 4
+7 4
+4 5
+3 5
+
+输出: 5
+```
+
+
+
+### 题解
+
+```
+f[p][0/1]: 从p的子节点中选的方案的max，0表示不选p，1表示选p
+
+1- 不选父，则既可以选子，也可以不选子
+f[p][0] = sum(max{f[s][0], f[s][1]}
+
+2- 选父，则只能不选子
+f[p][1] = w[p] + sum(f[s][0])
+```
+
+
+
+```java
+public class TreeDP {
+    static int[][] dp;
+    static int[] happy;
+    static Map<Integer, List<Integer>> tree = new HashMap<>();
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int N = in.nextInt();
+        dp = new int[N][2];
+        happy = new int[N];
+        boolean[] hasFather = new boolean[N];
+        for (int i = 0; i < N; i++) {
+            happy[i] = in.nextInt();
+            // dp[i][1] = happy[i];
+        }
+        for (int i = 0; i < N - 1; i++) {
+            // - 1 是为了从0开始算节点
+            int s = in.nextInt() - 1;
+            int p = in.nextInt() - 1;
+            buildTree(p, s);
+            hasFather[s] = true;
+        }
+
+        int root = 0;
+        while (root < N) {
+            if (!hasFather[root]) break;
+            root++;
+        }
+        // System.out.println(root);
+        dfs(root);
+
+        System.out.println(Math.max(dp[root][0], dp[root][1]));
+    }
+
+    private static void dfs(int cur) {
+        dp[cur][1] = happy[cur];
+        List<Integer> children = tree.get(cur);
+        if (children == null) return;
+        for (int child : children) {
+            dfs(child);
+            dp[cur][0] += Math.max(dp[child][0], dp[child][1]);
+            dp[cur][1] += dp[child][0];
+        }
+    }
+
+    private static void buildTree(int p, int s) {
+        List<Integer> list = tree.get(p);
+        if (list == null) list = new ArrayList<>();
+        list.add(s);
+        tree.put(p, list);
+    }
+}
+```
+
+
+
+
+
+## 操作子树的节点值
+
+### 题目
+
+n个图顶点，初始值均为1， n-1条边，以1为根顶点，构造一棵树，对一个顶点的操作可以使其子树所有的顶点值加1，问多少次操作可以使所有顶点的值均等于其id
+
+### 题解
+
+
+
+```java
+public class TreeDP {
+    // k: 根结点, v: 子节点的集合
+    static Map<Integer, List<Integer>> tree = new HashMap<>();
+    static long res = 0;
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        for (int i = 0; i < n-1; i++) {
+            int x = sc.nextInt(),y = sc.nextInt();
+            // 双向建树，因为不知道谁是根
+            buildTree(x, y);
+            buildTree(y, x);
+        }
+        // 用于辨识是否遍历过，可以在不知道谁是根的情况下就dfs
+        boolean[] flag = new boolean[n + 1];
+        dfs(1, flag, 1);
+        System.out.println(res);
+    }
+
+    private static void dfs(int root, boolean[] flag,int parent) {
+        flag[root] = true;
+        List<Integer> list = tree.get(root);
+        // 计算该节点与其父节点的数值之差
+        // 父节点满了，但是子节点还不够
+        res += root-parent;
+        for (Integer integer : list) {
+            // 
+            if(flag[integer])continue;
+            dfs(integer,flag,root);
+        }
+    }
+    // 建树
+    private static void buildTree(int x, int y) {
+        List<Integer> list = tree.get(x);
+        if(list==null)list = new ArrayList<>();
+        list.add(y);
+        tree.put(x,list);
+    }
+}
+```
+
+
+
+## Zero Tree
+
+### 题目
+
+# Zero Tree
+
+## 题面翻译
+
+题目描述
+
+一棵树是一个有n个节点与正好n-1条边的图；并且符合以下条件：对于任意两个节点之间有且只有一条简单路径。
+
+我们定义树T的子树为一棵所有节点是树T节点的子集，所有边是T边的子集的树。
+
+给定一颗有n个节点的树，假设它的节点被编号为1到n。每个节点有一个权值，$v_i$表示编号为i的节点的权值。你需要进行一些操作，每次操作符合以下规定：
+
+    - 在给定的这棵树中选择一棵子树，并保证子树中含有节点1
+    - 把这棵子树中的所有节点加上或减去1
+
+你需要计算至少需要多少次操作来让所有的节点的权值归零。
+输入数据
+
+第一行包含一个整数n，表示树中节点的数量
+
+接下来的n-1行，一行两个整数u,v，表示u和v之间有一条边(u!=v)。
+
+最后一行包含n个整数$v_i$，用空格隔开，表示每个节点的权值
+输出数据
+
+一行一个整数，输出最小需要的操作次数。
+输入样例
+```
+3
+1 2
+1 3
+1 -1 1
+```
+输出样例
+```
+3
+```
+数据规模
+对于$30\%$的数据，$n\leq100,|vi|\leq1000$
+
+对于$50\%$的数据，$n\leq10^4$
+
+对于$100\%$的数据，$n\leq10^5,|vi|\leq10^9$
+
+
+
+### 题解
+
+
+
+
+
+
+
+
 
