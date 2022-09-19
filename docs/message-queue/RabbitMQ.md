@@ -35,9 +35,11 @@
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207181619273.png" alt="RabbitMQ-00000007" style="zoom:75%;" />
 
-> ①生产者将消息(msg)和路由键(routekey)发送指定的交换机(exchange)上
-> ②交换机(exchange)根据路由键(routekey)找到绑定自己的队列(queue)并把消息给它
-> ③队列(queue)再把消息发送给监听它的consumer
+> ① 生产者将消息(msg)和路由键(routekey)发送指定的交换机(exchange)上
+>
+> ② 交换机(exchange)根据路由键(routekey)找到绑定自己的队列(queue)并把消息给它
+>
+> ③ 队列(queue)再把消息发送给监听它的consumer
 
 **Broker**：rabbitmq的服务节点
 
@@ -198,6 +200,50 @@ ReturnCallback接口：消息失败返回时回调
 在消息生产时，MQ 内部针对每条生产者发送的消息生成一个 **inner-msg-id**，作为去重的依据(消息投递失败并重传)，避免重复的消息进入队列；
 
 在消息消费时，要求消息体中必须要有一个 **bizId**(对于同一业务全局唯一，如支付 ID、订单 ID、帖子 ID 等)作为去重的依据，避免同一条消息被重复消费。
+
+
+
+# 消费者消费消息失败(确认模式)
+
+RabbitMQ 中，消息消费确认模式有如下3种：
+
+- AcknowledgeMode.NONE：不确认
+- AcknowledgeMode.AUTO：自动确认
+- AcknowledgeMode.MANUAL：手动确认
+
+手动确认模式中，如果消息消费失败，可以选择是否将消息重新放入队列。
+
+默认的确认模式为自动确认，如果消息消费的方法执行完成而未抛出异常，则会自动确认该消息消费成功；若抛出异常，则会自动确认**消费失败**，此时消息会**重新回到队列**中（按默认配置）。
+
+消息消费失败后如果重新放入队列，RabbitMQ会立刻将消息重新推送给消费者，而没有延迟推送的机制。
+
+此时很可能会出现一直失败并抛出异常的情况，浪费了资源，并导致日志爆满，并淹没最初几条有用的异常日志信息（Java中如果多次抛出同样的异常，打印日志时会省略部分异常堆栈）。
+
+因此为了方便查看完整的异常堆栈，进程错误排查，建议在RabbitMQ消息消费失败时，不要无限次的放回队列。此时有以下两种场景：
+
+#### 手动确认模式下
+
+消费失败时，不将其重新放入队列（确认重试也不会成功的情形），打印错误信息后，通知相关人员，人工介入处理。
+
+#### 自动确认模式下
+
+在Spring Boot RabbitMQ中，可以通过以下几个配置参数，来调节消息消费失败时，消息重新投递的策略：
+
+```properties
+# 是否开启消费者重试（为false时关闭消费者重试）
+spring.rabbitmq.listener.simple.retry.enabled=true
+# 最大重试重新投递消息次数
+spring.rabbitmq.listener.simple.retry.max-attempts=3
+# 重试重新投递消息的间隔时间（单位毫秒）
+spring.rabbitmq.listener.simple.retry.initial-interval=5000ms
+# 重试次数超过上面的设置之后，是否丢弃(消费者listener抛出异常，是否重回队列（默认true：重回队列，false：不重回队列（可结合死信交换机））
+spring.rabbitmq.listener.simple.default-requeue-rejected=false
+
+```
+
+
+
+
 
 # 高级特性
 

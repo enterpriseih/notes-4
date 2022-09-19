@@ -269,6 +269,36 @@ public int[] twoSum(int[] nums, int target) {
 
 `空间复杂度`O(n)
 
+## 合并排序数组
+
+### [题目](https://leetcode.cn/problems/merge-sorted-array/)
+
+两个有序数组，合并后的结果存在nums1中，nums1已经预留了空间。
+
+```
+输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+输出：[1,2,2,3,5,6]
+```
+
+
+
+### 题解
+
+```java
+// 双指针，从后往前
+public void merge(int[] nums1, int m, int[] nums2, int n) {
+    int index = m + n - 1;
+    m--; n--;
+    while (index >= 0) {
+        if (n < 0 || (m >= 0 && nums1[m] >= nums2[n])) {
+            nums1[index--] = nums1[m--];
+        } else {
+            nums1[index--] = nums2[n--];
+        }
+    }
+}
+```
+
 
 
 ## 面试题7：数组中和为0的三个数字

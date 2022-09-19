@@ -212,7 +212,12 @@ public class UserService {
 private String name;
 ```
 
-
+> @Autowired底层原理
+>
+> 1. 默认优先按照类型去容器中找对应的组件：applicationContext.getBean()
+> 2. 如果找到多个相同类型的组件，再将属性的名称作为组件的ID去容器中查找
+>
+> https://blog.csdn.net/X18406432083/article/details/125967348
 
 #### 3.2.3、配置类
 
@@ -238,6 +243,10 @@ public class SpringConfig {
 > 无状态：bean一旦实例化就被加进会话池中，各个用户都可以共用。singleton
 >
 > 有状态：每个用户有自己特有的一个实例。prototype
+
+> “ DAO对象必须包含一个数据库的连接Connection，而这个Connection不是线程安全的，所以每个DAO都要包含一个不同的Connection对象实例，这样一来DAO对象就不能是单实例的了。”
+>
+> 上述观点对了一半。对的是“每个DAO都要包含一个不同的Connection对象实例”这句话，错的是“DAO对象就不能是单实例”。其实Spring在实现Service和DAO对象时，使用了**ThreadLocal**这个类，这个是一切的核心！
 
 # AOP
 

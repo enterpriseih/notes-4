@@ -891,7 +891,7 @@ for(Map.Entry<Integer,String> node : set){
 - 两个对象相等，equals 方法返回 true
 - 两个对象拥有相同的 hashcode，也不一定相等
 - equals() 重写，hashCode() 也一定要重写
-- hashCode() 的默认⾏为是对堆上的对象产⽣独特值。如果没有重写hashCode()，则该class的两个对象⽆论如何都不会相等（即使这两个对象指向相同的数据）
+- hashCode() 的**默认**⾏为是对堆上的对象的**地址**产⽣独特值。如果没有重写hashCode()，则该class的两个对象⽆论如何都不会相等（即使这两个对象指向相同的数据）
 
 
 

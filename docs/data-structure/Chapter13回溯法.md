@@ -49,14 +49,15 @@ public class Solution {
     // n个点的组合可能性
     long[] cnt;
     public int numberOfTree (int n) {
-        // write code here
         cnt = new long[n+1];
         return (int)dfs(n); 
     }
     private long dfs(int n) {
+        // 记忆化数组
         if (cnt[n] != 0) return cnt[n];
         if (n == 0 || n == 1) return 1;
         long tmp = 0;
+        // i为当前的根，左边有i-1个节点，右边有n-i个
         for (int i = 1; i <= n; i++) {
             // 子树的种类
             long left = dfs(i-1);
