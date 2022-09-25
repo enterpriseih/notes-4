@@ -167,7 +167,9 @@ private static final Map<Character,Character> map = new HashMap<Character,Charac
 // 加?是为了pop不报错
 public boolean isValid(String s) {
     if(s.length() > 0 && !map.containsKey(s.charAt(0))) return false;
-    LinkedList<Character> stack = new LinkedList<Character>() {{ add('?'); }};
+    LinkedList<Character> stack = new LinkedList<Character>() {{ 
+        add('?'); 
+    }};
     for(Character c : s.toCharArray()){
         // 如果是左括号直接放进去
         if(map.containsKey(c)) stack.addLast(c);

@@ -838,6 +838,86 @@ starter 就是定义了一个 starter 的 jar 包，写一个 @Configuration 配
 
 
 
+## 六、读取配置文件的方法
+
+```properties
+profile.name=Spring Boot Profile
+profile.desc=Spring Boot Profile Desc.
+```
+
+#### 1、@Value读取单个配置项
+
+```java
+@Value("${profile.name}")
+private String name;
+
+```
+
+#### 2、@ConfigurationProperties 加实体类读取一组配置项
+
+prefix 表示读取一组配置项的根 name，相当于 Java 中的类名，最后再把此配置类，注入到某一个类中就可以使用了
+
+```java
+@ConfigurationProperties(prefix = "profile")
+@Data
+public class Profile {
+    private String name;
+    private String desc;
+}
+```
+
+#### 3、@PropertySource 注解可以用来指定读取某个配置文件
+
+比如指定读取 application.properties 配置文件的配置内容
+
+```java
+@SpringBootApplication
+@PropertySource("classpath:application.properties")
+public class DemoApplication implements InitializingBean {
+    @Value("${profile.name}")
+    private String name;
+ 
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+ 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("Name：" + name);
+    }
+}
+```
+
+#### 4、原生方式
+
+```java
+@SpringBootApplication
+public class DemoApplication implements InitializingBean {
+ 
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+ 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Properties props = new Properties();
+        try {
+            InputStreamReader inputStreamReader = new InputStreamReader(
+                    this.getClass().getClassLoader().getResourceAsStream("application.properties"),
+                    StandardCharsets.UTF_8);
+            props.load(inputStreamReader);
+        } catch (IOException e1) {
+            System.out.println(e1);
+        }
+        System.out.println("Properties Name：" + props.getProperty("profile.name"));
+    }
+}
+```
+
+
+
+
+
 # 替换Spring容器中已经存在的Bean
 
 https://blog.csdn.net/fu_huo_1993/article/details/124313557

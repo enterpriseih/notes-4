@@ -169,7 +169,7 @@ public List<Integer> inorderTraversal(TreeNode root) {
 private void dfs(TreeNode root, List<Integer> nodes) {
     if(root != null) {
         dfs(root.left, nodes);
-        nodes.add(root,val);
+        nodes.add(root.val);
         dfs(root.right, nodes);
     }
 }
@@ -214,7 +214,7 @@ public List<Integer> preorderTraversal(TreeNode root) {
 
 private void dfs(TreeNode root, List<Integer> nodes) {
     if(root != null) {
-        nodes.add(root,val);
+        nodes.add(root.val);
         dfs(root.left, nodes);
         dfs(root.right, nodes);
     }
@@ -258,7 +258,7 @@ private void dfs(TreeNode root, List<Integer> nodes) {
     if(root != null) {
         dfs(root.left, nodes);
         dfs(root.right, nodes);
-        nodes.add(root,val);
+        nodes.add(root.val);
     }
 }
 ````

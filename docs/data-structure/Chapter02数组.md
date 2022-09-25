@@ -924,3 +924,143 @@ public int minMoves(int[] nums) {
 
 
 
+## 两个有序数组的中位数
+
+### [题目](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/)
+
+
+
+### 题解
+
+#### 法1: O(log(m+n))
+
+```
+主要思路：要找到第 k (k>1) 小的元素，
+那么就取 pivot1 = nums1[k/2-1] 和 pivot2 = nums2[k/2-1] 进行比较
+这里的 "/" 表示整除
+nums1 中小于等于 pivot1 的元素有 nums1[0 .. k/2-2] 共计 k/2-1 个
+nums2 中小于等于 pivot2 的元素有 nums2[0 .. k/2-2] 共计 k/2-1 个
+
+取 pivot = min(pivot1, pivot2)，
+两个数组中小于等于 pivot 的元素共计不会超过 (k/2-1) + (k/2-1) <= k-2 个
+这样 pivot 本身最大也只能是第 k-1 小的元素
+
+如果 pivot = pivot1，那么 nums1[0 .. k/2-1] 都不可能是第 k 小的元素。
+把这些元素全部 "删除"，剩下的作为新的 nums1 数组
+如果 pivot = pivot2，那么 nums2[0 .. k/2-1] 都不可能是第 k 小的元素。
+把这些元素全部 "删除"，剩下的作为新的 nums2 数组
+
+由于我们 "删除" 了一些元素（这些元素都比第 k 小的元素要小），
+因此需要修改 k 的值，减去删除的数的个数
+
+```
+
+
+
+```java
+class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int len1 = nums1.length;
+        int len2 = nums2.length;
+        int lens = len1 + len2;
+        if (lens % 2 == 1) {
+            return getKthElement(nums1, nums2, lens/2 + 1) * 1.0;
+        } else {
+            return (getKthElement(nums1, nums2, lens/2) 
+                    + getKthElement(nums1, nums2, lens/2 + 1)) * 0.5;
+        }
+    }
+
+    private int getKthElement(int[] nums1, int[] nums2, int k) {
+        // 下标起点，相当于删除了前面那些
+        // 比如抛弃了0 1 2下标的nums1.那么下标为3的实际就是新的首位数组元素。
+        int index1 = 0;
+        int index2 = 0;
+        int len1 = nums1.length;
+        int len2 = nums2.length;
+        while (true) {
+            // nums1删没了，那就从nums2中找当前的第k小，就是第k个
+            if (index1 == len1) {
+                return nums2[index2 + k - 1];
+            }
+            if (index2 == len2) {
+                return nums1[index1 + k - 1];
+            }
+            if (k == 1) {
+                return Math.min(nums1[index1], nums2[index2]);
+            }
+            
+            int half = k / 2;
+            int newIndex1 = Math.min(index1 + half, len1) - 1;
+            int newIndex2 = Math.min(index2 + half, len2) - 1;
+            if (nums1[newIndex1] <= nums2[newIndex2]) {
+                k -= (newIndex1 - index1 + 1);
+                index1 = newIndex1 + 1;
+            } else {
+                k -= (newIndex2 - index2 + 1);
+                index2 = newIndex2 + 1;
+            }
+        }
+    }
+}
+```
+
+
+
+#### 法2: O(m+n)
+
+```
+nums1[m], nums2[n] => nums[m+n]
+mid = (m+n)/2
+设总长为len=m+n
+若len奇, res = nums3[mid]
+else res = (nums[mid] + nums[mid-1]) / 2.0
+
+即找到下标mid
+```
+
+
+
+```java
+public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+    int i = 0, j = 0, index = 0, m1 = 0, m2 = 0;
+    int len1 = nums1.length, len2 = nums2.length;
+    int mid = (len1 + len2) / 2;
+    while (index <= mid) {
+        // 保留前一个数，用于nums[mid-1]
+        m1 = m2;
+        if (i == len1 || (j < len2 && nums2[j] < nums1[i])) {
+            m2 = nums2[j++];
+        } else {
+            m2 = nums1[i++];
+        }
+        index++;
+    }
+    return (len1+len2)%2 == 1 ? m2 * 1.0 : (m1 + m2)/2.0;
+}
+```
+
+
+
+#### 法3: [参考](https://leetcode.cn/problems/median-of-two-sorted-arrays/solution/shuang-zhi-zhen-by-powcai/)
+
+```
+用两个指针分别指向两个数组，比较指针下的元素大小，
+一共移动次数为 (m+n+1)/2，便是中位数。
+
+有两个数组：
+nums1: [a1,a2,a3,...an]
+nums2: [b1,b2,b3,...bn]
+
+[nums1[:pivot1], nums2[:pivot2] | nums1[pivot1:], nums2[pivot2:]]
+只要保证左右两边 个数 相同，中位数就在 | 这个边界旁边产生。
+
+如何找边界值，我们可以用二分法，我们先确定 num1 取 m1 个数的左半边，
+那么 num2 取 m2 = (m+n+1)/2 - m1 的左半边，找到合适的 m1，就用二分法找。
+
+```
+
+
+
+
+

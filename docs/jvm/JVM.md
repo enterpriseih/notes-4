@@ -120,7 +120,7 @@ public static void main(String[] args) {
 
 ### 对象头
 
-- 运行时元数据（MarkWord）
+- **运行时元数据**（MarkWord）：8字节
 
 	- 哈希值
 	- GC分代年龄
@@ -129,13 +129,15 @@ public static void main(String[] args) {
 	- 偏向线程ID
 	- 偏向时间戳
 
-- 类型指针
+- **类型指针**：开启了指针压缩则4字节，否则8字节
 
 	指向类元数据InstanceKlass，确定该对象所属的类型
 	
-- 数组长度
+	`-XX:+UseCompressedOops`，默认是开启的
+	
+- **数组长度**：
 
-  如果有的话，32bit
+  如果是数组的话才有，32bit
 
 > 对象头中的Mark Word（标记字）主要用来**表示对象的线程锁状态**，另外还可以用来配合GC、存放该对象的hashCode；
 
@@ -156,6 +158,72 @@ public static void main(String[] args) {
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207161501955.jpg" alt="img" style="zoom:67%;" />
 
 3、重量级锁中，对象头中的markwod，和轻量级锁中的处理类似， 被存入objectMonitor对象的header字段中。
+
+## 对象占有内存大小
+
+由四个部分组成
+
+- mark word
+
+	固定8字节
+
+- klass pointer（类指针，指向Xxx.class 的）
+
+	开启了指针压缩则4字节，否则8字节
+
+- Instance data
+
+	原始类型和引用分别占用
+
+- padding：填充，即上面的加起来之后如果不是8的倍数，会填充成8的倍数。
+
+> boolean -> 1字节；byte -> 1字节；short -> 2字节；
+>
+> char -> 2字节；int -> 4字节；float -> 4字节；
+>
+> long -> 8字节；double -> 8字节；
+>
+> Reference（引用类型）-> 开启了指针压缩则4字节，否则8字节
+
+数组的话除了上面之外还包括数组长度，4个字节
+
+#### 1、普通对象
+
+```java
+public class Student {
+  private String name;
+  private int age;
+  private boolean married;
+  private Course[] courses;
+}
+假设开启了压缩，name和courses都是引用类型，各占用4字节，
+age是int占用4字节，married占用1字节，所以instance data是13字节
+8（mark word）+4（klass pointer）+13（instance data）=25字节，
+必须凑成8的整数，即padding=7字节，故最后算出对象占用32字节。
+
+```
+
+#### 2、数组对象
+
+```java
+Integer[] arr = new Integer[0];
+arr占用多少？
+mark word 8字节；klass pointer 4字节（开启了压缩）；
+数组长度 4字节（固定的）;由于数组长度是0，instance data是0。
+上述加起来是16字节，不需要padding，所以最终是16字节。
+  
+Integer[] arr = new Integer[3];
+mark word 8字节；klass pointer 4字节（开启了压缩）；数组长度 4字节（固定的）;
+数组长度是3，Integer是引用类型，
+开启压缩的情况下1个Integer的引用占用4字节，所以3个的话是12字节；
+上述加起来是28字节，需要padding为4字节，最终凑成32字节。
+
+
+```
+
+
+
+
 
 ## 对象的访问定位
 
@@ -933,3 +1001,23 @@ jdk11开始支持
 FullGC频繁，那么会触发STW，导致系统停顿，这个可能是TP99耗时上升的主要原因。由于并发很高，YoungGC频繁。
 
 由于并发高，YoungGC频繁，那么可能造成，有些本该在YoungGC回收的对象，没有回收成功，直接进入了老年代，导致老年代出发FullGC。
+
+
+
+### 1、垃圾收集器的组合
+
+JDK8默认 -> 年轻代Parallel Scavenge + 老年代Parallel Old
+
+这两款并行收集器提高了吞吐量，但不是低延迟配比。
+
+可以改为低延迟的组合如 ParNew + CMS 或 直接G1
+
+### 2、更改年轻代E区和S区的比例
+
+提高E区占比，默认是8
+
+E区小的时候，如果并发亮过大，会导致E区对象直接晋升老年代
+
+### 3、元数据区
+
+提高元数据区的大小，默认是21m，但是业务里动态代理过多的话，会导致进行FullGC

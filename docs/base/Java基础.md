@@ -1,5 +1,11 @@
 # 基础的基础
 
+*JRE 是 java 运行时环境而 JDK 是 java 开发工具包，JDK 包含 JRE。*
+
+## 优先级
+
+! > 算术运算符 > 关系运算符 > 位与或 > 逻辑与或 > 赋值运算符
+
 ## Java的三大特性
 
 1. 封装：是指隐藏对象的属性和实现细节，仅对外提供公共访问方式；
@@ -71,6 +77,13 @@ System.out.println(3 * 0.1 / 3); // 0.10000000000000002
 => 父类的（变量、初始化块、构造器）=> 子类的（变量、初始化块、构造器）。
 
 > 静态先执行，再执行其他的
+
+## 类加载
+
+Class.forName() 得到的 Class 是经过 加载、连接 和 初始化 三个阶段。**执行类中的static块**，**给静态变量 和 静态代码块 赋值**。
+
+Classloder.loaderClass() 得到的 Class 是**只进行 加载** ，并没有进行 连接 和 初始化。**不会执行类中的 静态变量 和 静态代码块 的赋值**。
+
 
 ## 一、变量类型
 
@@ -231,7 +244,7 @@ indexOf(String, int)
 
 > 注：如果方法的返回类型是**void和基本数据类型**，则返回值重写时**不可修改**。但是如果方法的返回值是**引用类型**， 重写时是可以返回该引用类型的**子类**的。
 
-@Override可以不写
+**@Override可以不写**
 
 - 编译器可以给你验证@Override下面的方法名是否是你父类中所有的，如果没有则报错。
 - 你如果没写@Override，而你下面的方法名又写错了，这时你的编译器是可以编译通过的，因为编译器以为这个方法是你的子类中自己增加的方法，而不是重写的父类方法。
@@ -352,8 +365,6 @@ StackOverflowError（栈溢出）
 
 ## 二、exception
 
-*try是必须的，catch、finally必须有一个或都有*
-
 **设计或实现上的问题**，代码编写或逻辑上的，**可以进行异常处理**
 
 - 编译时异常(checked)：编译器会提示trycatch或者向上抛出
@@ -368,6 +379,54 @@ StackOverflowError（栈溢出）
 	- InputMismatchException
 	- ArithmeticException（数学运算异常）
 	- IllegalArgumentException（方法的参数错误）
+
+## 三、try、catch、finally
+
+*try是必须的，catch、finally必须有一个或都有*
+
+finally一定会执行，catch或try中有return也会执行finally
+
+```java
+public class ExceptionInterviewTest {
+    public static void main(String[] args) {
+        int result = m();
+        System.out.println(result); //100
+    }
+
+    /*
+    java语法规则（有一些规则是不能破坏的，一旦这么说了，就必须这么做！）：
+        java中有一条这样的规则：
+            方法体中的代码必须遵循自上而下顺序依次逐行执行（亘古不变的语法！）
+        java中海油一条语法规则：
+            return语句一旦执行，整个方法必须结束（亘古不变的语法！）
+     */
+    public static int m(){
+        int i = 100;
+        try {
+            // 这行代码出现在int i = 100;的下面，所以最终结果必须是返回100
+            // return语句还必须保证是最后执行的。一旦执行，整个方法结束。
+            return i;
+        } finally {
+            i++;
+        }
+    }
+}
+
+/*
+反编译之后的效果
+public static int m(){
+    int i = 100;
+    int j = i;
+    i++;
+    return j;
+}
+ */
+
+```
+
+
+
+
 
 # String
 
@@ -1145,8 +1204,8 @@ synchronized则是JVM直接支持的，JVM能够在运行时作出相应的优�
 
 ### 泛型中entends和super的区别
 
-1. <? extends T>表示包括T在内的任何T的⼦类`(无穷小, T] `
-2. <? super T>表示包括T在内的任何T的⽗类`[T, 无穷大]` 
+1. 上限<? extends T>表示包括T在内的任何T的⼦类`(无穷小, T] `
+2. 下限<? super T>表示包括T在内的任何T的⽗类`[T, 无穷大]` 
 
 ### 通配符
 
@@ -1181,6 +1240,10 @@ List strs = new ArraysList();
 
 **范型擦除后**，**所有范型会被替换成他的第一个上界**；没有边界时，就会被替换成顶层父类Object。
 
+- 若范型类型没有指定具体类型，用`Object`作为原始类型。
+- 若有限定类型`<T extends XClass>`，会将边界XClass作为原始类型。
+- 若有多个限定类型`<T extends XClass1 & XClass2>`，会将第一个边界`XClass1`作为原始类型。
+
 ```java
 public class NumberHandler<T extends Number> {
     public final T number;
@@ -1199,7 +1262,7 @@ public class NumberHandler {
 
 ```
 
-> 泛型擦除后的代码和JDK1.5之前的代码是一致的，因为类型擦除的目的就是**向低版本兼容**。
+> 泛型擦除后的代码和JDK1.5之前的代码是一致的，因为**类型擦除的目的**就是**向低版本兼容**。
 
 
 
@@ -1238,4 +1301,5 @@ public static void main(String[] args) {
 
 ### 细节
 
-泛型擦除只是运行时对于JVM而言，泛型参数被擦除掉了，但泛型信息还是会被保留在.class字节码文件中，即可以通过反射机制去恢复范型信息。
+泛型擦除只是运行时对于JVM而言，泛型参数被擦除掉了，但**泛型信息还是会被保留在.class字节码文件中**，即可以通过反射机制去恢复范型信息。
+

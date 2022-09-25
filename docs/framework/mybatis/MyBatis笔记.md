@@ -1152,6 +1152,10 @@ public void getEmpByChoose() {
 - 相当于`if a else if b else if c else d`，只会执行其中一个
 
 ## foreach批量
+
+> - `Mysql` 对语句的长度有限制，默认是 4M。
+> - `Mybatis` 对动态语句没有数量上的限制。
+
 属性：  
  - collection：设置要循环的数组或集合  
 

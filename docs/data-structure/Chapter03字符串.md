@@ -516,7 +516,7 @@ int ViolentMatch(String s, String p){
 next数组是对于模式串而言的。**每次失配之后，移很多位**，**跳过那些不可能匹配成功的位置**。**前缀表是用来回退的，它记录了模式串与主串(文本串)不匹配的时候，模式串应该从哪里开始重新匹配。**
 
 - 定义 “k-前缀” 为一个字符串的前 k 个字符； “k-后缀” 为一个字符串的后 k 个字符。
-- **next[i]** 定义为： P[0]~P[i] 这一段字符串，使得**k-前缀恰等于k-后缀**的最大的k.
+- **next[i]** 定义为： P[0]~P[i] 这一段字符串，使得**k-前缀恰等于k-后缀**的最大的k（最长相等前后缀到长度）。
 
 > 特别地，k 必须小于字符串长度。因为这个子串一共才 i+1 个字符，自己肯定与自己相等，就没有意义了。
 >
@@ -665,6 +665,7 @@ public String longestDupSubstring(String s) {
     int ansMax = 0;
     String res = "";
     for (int i = 0; i < s.length(); i++) {
+        // 只有一个参数，是指从i开始一直到末尾
         String p = s.substring(i);
         int subLen = buildNext(p);
         if (subLen > ansMax) {
@@ -693,7 +694,7 @@ private int buildNext(String p) {
 }
 ```
 
-## 重复的子串
+## 重复的子串：KMP
 
 ### [题目](https://leetcode.cn/problems/repeated-substring-pattern/)
 
@@ -707,7 +708,24 @@ private int buildNext(String p) {
 
 ### 题解
 
-数组长度减去最长相同前后缀的长度相当于是第一个周期的长度，也就是一个周期的长度，如果这个周期可以被整除，就说明整个数组就是这个周期的循环。
+**重复子串的最小单位**：最长相等前后缀不包含的那部分子串。即字符串减去最长相同前后缀
+
+```
+s: abababab
+   012345
+t: ababab
+f:   ababab
+     012345
+下标t0=f0, t1=f1 => t01=f01 => 原字符串s01=s23     
+
+对齐的部分f0=t2, f1=t3 => f01=t23
+下标t2=f2, t3=f3 => t23=f23 
+t23对应s23, f23对应s45 => s23=s45
+
+=> s01=s23=s45=...
+```
+
+
 
 ```java
 public boolean repeatedSubstringPattern(String s) {
@@ -715,6 +733,15 @@ public boolean repeatedSubstringPattern(String s) {
     int len = s.length() - next[s.length() - 1];
     if (s.length() % len == 0 && len != s.length()) return true;
     return false;
+}
+private int[] buildNext(String s) {
+    int[] next = new int[s.length()];
+    for (int i = 1, j = 0; i < s.length(); i++) {
+        while (j > 0 && s.charAt(i) != s.charAt(j)) j = next[j - 1];
+        if (s.charAt(i) == s.charAt(j)) j++;
+        next[i] = j;
+    }
+    return next;
 }
 ```
 
@@ -885,6 +912,80 @@ public long wonderfulSubstrings(String word) {
         map.put(bit, map.getOrDefault(bit, 0) + 1);
     }
     return res;
+}
+```
+
+
+
+## 字符串拼接
+
+### 题目
+
+给出一个非空的字符串，判断这个字符串是否是由它的一个子串进行多次首尾拼接构成的。
+
+```
+例如，"abcabcabc"满足条件，因为它是由"abc"首尾拼接而成的，而"abcab"则不满足条件。
+
+输入: 非空字符串
+输出描述: 如果字符串满足上述条件，则输出最长的满足条件的的子串；
+		 如果不满足条件，则输出false。
+
+输入例子: abcabc
+输出例子: abc
+```
+
+### 题解
+
+> 也可以用KMP，见题：重复的子串
+
+```java
+public class StringIsMakeUpSubstring {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String str = scanner.nextLine();
+        int length = str.length();
+        String result = "";
+        // 如果能拼接，至少是两个，所以单个的长度最多是总长度/2
+        for (int i = 1; i <= length / 2; i++) {
+            if (length % i == 0) {
+                String sub = str.substring(0, i);
+                String temp = "";
+                for (int j = 1; j <= length / i; j++) {
+                    temp += sub;
+                }
+                if (temp.equals(str)) {
+                    result = sub;
+                }
+            }
+        }
+        System.out.println(result.equals("") ? false : result);
+    }
+}
+```
+
+
+
+#### 法2: KMP
+
+```java
+public String StringIsMakeUpSubstring(String s) {
+    int[] next = buildNext(s);
+    int sLen = s.length();
+    int lenSub = sLen - next[sLen-1];
+    if (lenSub != sLen && sLen % lenSub == 0) {
+        int count = sLen / lenSub;
+        if (count & 1 == 1) return s.substring(0, lenSub);
+        return s.substring(0, count/2 * lenSub);
+    }
+}
+private int[] buildNext(String s) {
+    int[] next = new int[s.length()];
+    for (int i = 1, j = 0; i < s.length(); i++) {
+        while (j > 0 && s.charAt(i) != s.charAt(j)) j = next[j - 1];
+        if (s.charAt(i) == s.charAt(j)) j++;
+        next[i] = j;
+    }
+    return next;
 }
 ```
 
