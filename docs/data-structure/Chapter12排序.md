@@ -1091,3 +1091,51 @@ public class HeapSort {
 }
 ```
 
+
+
+## 12.9 桶排序
+
+桶排序算法的实现思路是：将待排序序列中的元素根据规则分组，每一组采用快排、插入排序等算法进行排序，然后再按照次序将所有元素合并，就可以得到一个有序序列。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/ba82ac2aa0b34a3185da966d3aad52e4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA552_56eR55-l6K-G5LqR,size_18,color_FFFFFF,t_70,g_se,x_16)
+
+```java
+
+public class BucketSort {
+    public static void bucketSort(float[] arr) {
+        int n = arr.length;
+        if (n <= 0)
+            return;
+        @SuppressWarnings("unchecked")
+        ArrayList<Float>[] bucket = new ArrayList[n];
+        // 创建空桶
+        for (int i = 0; i < n; i++)
+            bucket[i] = new ArrayList<Float>();
+        // 根据规则将序列中元素分散到桶中
+        for (int i = 0; i < n; i++) {
+            int bucketIndex = (int) arr[i] * n;
+            bucket[bucketIndex].add(arr[i]);
+        }
+        // 对各个桶内的元素进行排序
+        for (int i = 0; i < n; i++) {
+            Collections.sort((bucket[i]));
+        }
+        // 合并所有桶内的元素
+        int index = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0, size = bucket[i].size(); j < size; j++) {
+                arr[index++] = bucket[i].get(j);
+            }
+        }
+    }
+    public static void main(String[] args) {
+        float[] arr = { (float) 0.42, (float) 0.32, (float) 0.23, (float) 0.52, (float) 0.25, (float) 0.47,
+                (float) 0.51 };
+        bucketSort(arr);
+        for (float i : arr)
+            System.out.print(i + " ");
+    }
+}
+
+```
+

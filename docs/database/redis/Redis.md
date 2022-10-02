@@ -101,6 +101,40 @@ Redis 基于 Reactor 模式开发了网络事件处理器、**文件事件处理
 
 https://mp.weixin.qq.com/s/FZu3acwK6zrCBZQ_3HoUgw
 
+# redis管道
+
+Redis 客户端与 Redis 服务器之间使用 TCP 协议进行连接，一个客户端可以通过一个 socket 连接发起多个请求命令。每个请求命令发出后 client 通常会阻塞并等待 redis 服务器处理，redis 处理完请求命令后会将结果通过响应报文返回给 client，因此当执行多条命令的时候都需要等待上一条命令执行完毕才能执行。
+
+```shell
+> get keya
+"a"
+> get keyb
+"b"
+> get keyc
+"c"
+```
+
+依次执行，由于通信会有网络延迟，假如 client 和 server 之间的包传输时间需要0.125秒。那么上面的三个命令6个报文至少需要0.75秒才能完成。这样即使 redis 每秒能处理100个命令，而我们的 client 也只能一秒钟发出四个命令。这显然没有充分利用 redis 的处理能力。
+
+而管道（pipeline）可以**一次性发送多条命令并在执行完后一次性将结果返回**，pipeline 通过减少客户端与 redis 的通信次数来实现降低往返时间（RTT），而且 Pipeline 实现的原理是**队列**，而队列的原理是先进先出，这样就**保证数据的顺序性**。 Pipeline 的默认的同步的个数为53个，也就是说 arges 中累加到53条数据时会把数据提交。其过程如下图所示：client 可以将三个命令放到一个 tcp 报文一起发送，server 则可以将三条命令的处理结果放到一个 tcp 报文返回。
+
+```java
+private void setCache(List<String> names, String key) {
+    Pipeline pipeline = redis.pipelined();
+    for (String name : names) {
+        pipeline.zadd(key, name, score);
+    }
+    pipeline.expire(key, CACHE_EXPIRE_SECONDS);
+    pipeline.sync();
+}
+```
+
+pipelined.sync()表示我一次性的异步发送到redis，不关注执行结果。
+
+pipeline.syncAndReturnAll ();将返回执行过的命令返回的List列表结果
+
+
+
 # redis的扩容
 
 Redis的扩容机制，指的就是字典中哈希表的rehash（重新散列）操作。
@@ -448,7 +482,7 @@ Redis 将多个 ziplist 用链表结合起来组成了 quicklist。
 
 ### 使用场景
 
-1. 消息队列：通过push和pop 命令实现消息队列，  blpop和brpop可以实现阻塞式的先进先出 
+1. 消息队列：通过push和pop 命令实现消息队列，  **blpop和brpop可以实现阻塞式的先进先出** (高并发情况下，只允许一个线程进行操作弹出)
 
 2. 特定组合的场景，比如淘宝店铺中最新上架新品，可以用List来实现。 key为店铺名， value是最新上架的新品
 
@@ -558,6 +592,11 @@ zcount <key><min><max>
 
 zrank <key><value>
 返回该值在集合中的排名，从 0 开始。
+
+// 正向获取
+zrank key member
+// 反转获取
+zrevrank key member
 
 ```
 
@@ -830,7 +869,7 @@ Redis官方提供了不同级别的持久化方式：
 
 这么多持久化方式我们应该怎么选？在选择之前我们需要搞清楚每种持久化方式的区别以及各自的优劣势。
 
-## RDB持久化
+## RDB持久化（默认开启）
 
 RDB(Redis Database)
 
@@ -907,7 +946,7 @@ Fork 的作用是复制一个与当前进程一样的进程。新进程的所有
 
 
 
-## AOF持久化
+## AOF持久化（需手动开启）
 
 AOF（append only file）
 

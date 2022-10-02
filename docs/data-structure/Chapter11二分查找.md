@@ -127,10 +127,54 @@ public int peakIndexInMountainArray(int[] nums) {
             right = mid - 1;
         }
     }
-
     return -1;
 }
 ```
+
+
+
+## 补充：先升后降到数组找目标值的索引
+
+### 题目
+
+```
+输入：arr = [1,2,3,4,5,3,1], target = 3
+输出：2
+```
+
+### 题解
+
+三次二分，找顶峰，然后前半段和后半段分别二分
+
+```java
+// 找peak
+
+// true就是升序查找，false就是降序查找
+public int binarySearch(int[] arr, int target, int l, int r, boolean flag) {
+    if (!flag) {
+        target *= -1;
+    }
+    while (l <= r) {
+        int mid = (l + r) / 2;
+        int cur = arr[mid] * (flag ? 1 : -1);
+        if (cur == target) {
+            return mid;
+        } else if (cur < target) {
+            l = mid + 1;
+        } else {
+            r = mid - 1;
+        }
+    }
+    return -1;
+}
+
+```
+
+
+
+
+
+
 
 ## 面试题70：排序数组中只出现一次的数字
 

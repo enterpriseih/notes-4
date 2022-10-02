@@ -16,7 +16,7 @@ MongoDB 将数据存储为一个文档，数据结构由键值(key=>value)对组
 
 用于对象及 JSON数据的存储：Mongo的**BSON** (二进制的JSON) 数据格式非常适合文档化格式的存储 及查询。
 
-## 对比
+## 对比Redis和MongoDB
 
 优势在于查询功能比较强大，擅长查询 JSON 数据，能存储海量数据，但是**不支持事务**。
 
@@ -43,6 +43,12 @@ mongodb从1.8开始采用和mysql一样的binlog方式进行持久化，增强�
 reids只能保证事务内的每个操作连续执行。
 
 mongodb不支持事务。
+
+
+
+## 对比MySQL和MongoDB
+
+https://blog.csdn.net/weixin_41882200/article/details/116789613
 
 
 

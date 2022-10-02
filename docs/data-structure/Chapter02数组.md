@@ -8,6 +8,25 @@ int[] nums = Arrays.asList(numsStr)
     .stream().mapToInt(Integer::parseInt).toArray();
 ```
 
+## List<int[]> => int\[][]
+
+```java
+List<int[]> list = new ArrayList<int[]>();
+list.toArray(new int[list.size()][]); 
+list.toArray(new int[0][]);
+// 0和size都可
+```
+
+## List\<List> => int\[][]
+
+错误
+
+```java
+List<List<Integer>> list = new ArrayList<>();
+int[][] listArr = list.stream()
+    .map(i -> new int[i.size()]).toArray(int[][]::new);
+```
+
 
 
 ## 交换swap

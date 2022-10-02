@@ -161,9 +161,10 @@ public int[] asteroidCollision(int[] asteroids) {
 - "([)]"：false
 
 ```java
-private static final Map<Character,Character> map = new HashMap<Character,Character>(){{
-    put('{','}'); put('[',']'); put('(',')'); put('?','?');
-}};
+private static final Map<Character,Character> map = 
+    new HashMap<Character,Character>(){{
+    	put('{','}'); put('[',']'); put('(',')'); put('?','?');
+	}};
 // 加?是为了pop不报错
 public boolean isValid(String s) {
     if(s.length() > 0 && !map.containsKey(s.charAt(0))) return false;
