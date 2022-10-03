@@ -97,6 +97,7 @@
 ### :wrench: 工具
 
 - [git教程](./docs/tools/git/git教程.md)
+- [正则表达式](./docs/tools/正则表达式.md)
 - [JUnit5](./docs/tools/JUnit5Test.md)
 - [Linux](./docs/tools/linux.md)
 - [Shell](./docs/tools/shell.md)

@@ -1178,7 +1178,7 @@ private boolean union(int[] fathers, int i, int j) {
 }
 ```
 
-## 面试题118：多余的边
+## 面试题118：多余的边/图中是否存在环
 
 ### 题目
 
