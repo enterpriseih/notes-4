@@ -76,6 +76,7 @@
 - [跳表和B+树](./docs/data-structure/跳表和B+树.md)
 - [哈希](./docs/data-structure/哈希.md)
 - [笔试](./docs/data-structure/笔试题.md)
+- [前中后缀转换](./docs/others/前中后缀转换.md)
 
 ### 前端
 
@@ -99,7 +100,7 @@
 - [git教程](./docs/tools/git/git教程.md)
 - [正则表达式](./docs/tools/正则表达式.md)
 - [JUnit5](./docs/tools/JUnit5Test.md)
-- [Linux](./docs/tools/linux.md)
+- [Linux](./docs/tools/Linux.md)
 - [Shell](./docs/tools/shell.md)
 - [Maven](./docs/maven/Maven.md)
 - [Docker](./docs/Docker.md)

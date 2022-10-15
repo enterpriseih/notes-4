@@ -538,6 +538,89 @@ public void merge(int[] nums1, int m, int[] nums2, int n) {
 
 
 
+## 补：两个数组的交集
+
+### 题解1: 排序后双指针
+
+```java
+//排好序后比较移动指针
+public int[] findUnion(int[] nums1, int[] nums2) {
+    Arrays.sort(nums1);
+    Arrays.sort(nums2);
+    int len1=nums1.length;
+    int len2=nums2.length;
+    ArrayList<Integer> al = new ArrayList<>();
+    for(int i=0,j=0;i<len1 && j<len2;) {
+        if(nums1[i] == nums2[j]) {
+            al.add(nums1[i]);
+            i++;
+            j++;
+        }
+        else if(nums1[i] > nums2[j]) {
+            j++;
+        }
+        else {
+            i++;
+        }	
+    }
+    
+    return al.stream().mapToInt(i->i).toArray();
+}
+
+```
+
+
+
+### 题解2: 并查集DSU（类似标记位）
+
+条件：需要查询小范围的数据集合，不包含特殊数字。同时数字>=1。
+
+```java
+class DSU {
+    int[] parent;
+    // 初始化大小
+    public DSU() {
+        parent = new int[10001];
+        for (int i = 0; i <= 10000; ++i)
+            parent[i] = i;
+    }
+    public int find(int x) {
+        if (parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+    }
+    public void union(int x, int y) {
+        parent[find(x)] = find(y);
+    }
+}
+
+public int[] findUnion(int[] nums1, int[] nums2) {
+    DSU dsu = new DSU();
+    for (int i = 0; i < nums1.length; i++) {
+        // 将nums1中的数的父节点都为0
+        dsu.union(nums1[i], 0);
+    }
+    ArrayList<Integer> al = new ArrayList<>();
+    for (int i = 0; i < nums2.length; i++) {
+        if (dsu.find(nums2[i]) == 0) {
+            // 如果nums2中的数的父节点也为0，说明是并集
+            al.add(nums2[i]);
+        }
+    }
+    return al.stream().mapToInt(i->i).toArray();
+}
+
+```
+
+
+
+### 题解3: Hash计数
+
+先遍历nums1，存入hashmap，然后遍历nums2
+
+用个value，
+
+
+
 ## 2.2 前缀和
 
 > - 如果数组中的数字有正、负、零，则双指针不适用

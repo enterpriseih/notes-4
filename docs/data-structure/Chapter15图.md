@@ -1545,3 +1545,6 @@ public boolean union(int i, int j, int[] fathers) {
 空间复杂度`O(n^2)`，并查集`O(n)`，边集`O(n^2)`。
 
 时间复杂度`O(mlogm)`，m是边数
+
+
+

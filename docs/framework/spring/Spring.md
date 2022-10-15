@@ -30,6 +30,16 @@
 - **框架**
 	- Spring可以将简单的组件配置、组合成复杂的应用
 
+# Spring的三大核心
+
+beans、context、core
+
+1、**beans**：beans 又是核心中最重要的一个，因为其它两个都是围绕它的。Spring通过IOC管理的就是Beans，没有beans，Spring就没有存在的必要了。
+
+2、**context**：上下文，这里术语 “上下文” 中的文，其实就是 Spring 管理的 bean。我们将 Spring 容器看成是一片文章，而 bean 就是每个段落或者每句文字，而 “上下” 我们可以理解成 Java 中 bean 与 bean 之间的依赖（引用）。context 作用就是负责管理 Spring 中 bean 与 bean 之间关系的。
+
+3、**core**：作用主要是为 context 在管理 Spring 中 bean 与 bean 之间关系时为其服务的。其实直白一点就是为 Spring 管理 bean 提交工具的一个工具(类)。
+
 # Spring的启动流程
 
 https://blog.csdn.net/a745233700/article/details/113761271
@@ -138,6 +148,8 @@ System.out.println(person1 == person2);
 Spring的单例是用单例注册表实现的。
 
 ### 2、Bean的生命周期***
+
+> 构造函数 --> 依赖注入 --> init-method
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202209071107125.png" alt="图片" style="zoom:67%;" />
 
@@ -983,3 +995,19 @@ https://blog.csdn.net/fu_huo_1993/article/details/124313557
 在系统中根据 @Bean或通过 @Component 定义的Bean对象在Spring中都会转换成一个个的BeanDefinition对象，如果我们在Spring创建这些对象加入到Spring容器之前，将不想要的BeanDefinition对象删除，而加入我们自己想要的BeanDefinition对象是不是就可以实现了？而Spring提供的BeanDefinitionRegistryPostProcessor接口正好可以帮助我们实现这个功能。
 
 BeanDefinitionRegistryPostProcessor 是在系统加载完所有的BeanDefinition对象来进行回调。
+
+
+
+# 拦截器和过滤器
+
+https://zhuanlan.zhihu.com/p/157715642
+
+1. **实现原理**：拦截器是基于java的反射机制（动态代理）的，而过滤器是基于函数回调。　
+2. **使用范围**：过滤器实现的是 javax.servlet.Filter 接口，而这个接口是在Servlet规范中定义的，也就是说**过滤器Filter的使用要依赖于Tomcat等容器**，导致它只能在web程序中使用。而**拦截器**(Interceptor) 它是一个Spring组件，并由Spring容器管理，**并不依赖Tomcat等容器，是可以单独使用的**。不仅能应用在web程序中，也可以用于Application、Swing等程序中。　　
+3. 拦截器只能对action请求起作用，而过滤器则可以对几乎所有的请求起作用。
+4. 拦截器可以访问action上下文、值栈里的对象，而过滤器不能访问。　
+5. **在action的生命周期中，拦截器可以多次被调用，而过滤器只能在容器初始化时被调用一次。**
+6. 拦截器可以获取IOC容器中的各个bean，而过滤器就不行，这点很重要，在拦截器里注入一个service，可以调用业务逻辑。
+7. **触发时机**：过滤器Filter是在请求进入容器后，但在进入servlet之前进行预处理，请求结束是在servlet处理完以后。拦截器 Interceptor 是在请求进入servlet后，在进入Controller之前进行预处理的，Controller 中渲染了对应的视图之后请求结束。
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202210121114024.webp" alt="img" style="zoom:67%;" />

@@ -352,6 +352,8 @@ String str =  "My name" + " is " + " xuwei"
 
 ### 3、内存泄漏
 
+https://blog.csdn.net/qq_40664458/article/details/125471559
+
 内存泄露是指一个不再被程序使用的对象或变量一直被占据在内存中。
 
 内存泄漏的堆积会导致内存溢出。
@@ -360,5 +362,6 @@ String str =  "My name" + " is " + " xuwei"
 
 - 缓存系统，加载了一个对象放在缓存中（例如一个全局map对象中），然后一直不再使用它，但是仍被map对象引用。
 - 一个外部类的实例对象返回一个内部类的实例对象，外部类不再使用，但是内部类仍在使用，此时外部类实例对象仍不能回收。
+- 在对数据库进行操作的过程中，首先需要建立与数据库的连接，当不再使用时，需要调用close等方法来释放与数据库的连接。只有连接被关闭后，GC才会回收对应的对象。否则，如果对Connection、Statement、ResultSet、HttpURLConnection、BufferedReader、InputStream等等实例或者通道，不显性地关闭，将会造成大量的对象无法被回收，从而引起内存泄漏。
 
 <br>
