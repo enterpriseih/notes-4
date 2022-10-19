@@ -874,6 +874,14 @@ B+Tree
 
 <br>
 
+### 联合索引的数据结构
+
+https://blog.csdn.net/qq_48219653/article/details/121946067
+
+用c1,c2,c3创建索引，数据结构如下
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202210171759148.jpeg" alt="36030b5f72eb4303ad0d2cb590125576" style="zoom:67%;" />
+
 ## 思考题
 
 ### 1、为了减少IO，索引树会一次性加载吗

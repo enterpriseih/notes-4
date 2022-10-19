@@ -1234,7 +1234,6 @@ private boolean union(int[] fathers, int i, int j) {
         fathers[fatherOfI] = fatherOfJ;
         return true;
     }
-
     return false;
 }
 ```

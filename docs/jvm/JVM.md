@@ -318,6 +318,49 @@ mark word 8字节；klass pointer 4字节（开启了压缩）；数组长度 4�
 
 ### 打破双亲委派机制
 
+#### 一、Thread.contextClassLoader
+
+- 当高层提供了统一的接口让低层去实现，同时又要在高层加载（或者实例化）低层的类时，就必须要通过线程上下文类加载器来帮助高层的ClassLoader找到并加载该类。
+- 父加载器访问不到子加载器的类。但是可以**设置当前线程的上下文类加载器，把当前线程上下文类加载器加载的类一并纳入可视范围**
+
+当我们需要加载一个类，从自定义ClassLoader，到AppClassLoader，再到ExtClassLoader，最后到Bootstrap ClassLoader。没问题， 很顺利。这是从下到上加载。**但是反过来，当从上到下加载的时候，这个变得是一个不可能完成的任务。为了弥补这个缺陷， 特定设计的ContextClassLoader。**
+
+**为什么会出现从上到下加载的情况**？比如一个类是由Bootstrap ClassLoader加载，该类**引用了一个我们自己开发的类**（该类需要被AppClassLoader加载）
+
+> **一个类由类加载器A加载，那么这个类的依赖类也是由相同的类加载器加载**：默认情况下我们自己开发的类会被Bootstrap ClassLoader尝试加载，最终会由于无法加载到类而抛出异常
+
+如：SPI（Service Provider Interface，服务提供者接口，指的是JDK提供标准接口，具体实现由厂商决定。例如JDBC等）
+
+> 对于SPI来说，有些接口是JAVA核心库提供的，而JAVA核心库是由启动类加载器来加载的，而这些接口的实现却来自于不同的jar包（厂商提供），JAVA的启动类加载器是不会加载其他来源的jar包，这样传统的双亲委托模型就无法满足SPI的要求。而通过给当前线程设置上下文类加载器，就可以设置的上下文类加载器来实现对于接口实现类的加载。
+
+SPI核心类ServiceLoader源码如下：
+
+```java
+public final class ServiceLoader<S> implements Iterable<S> {
+  	...
+    public static <S> ServiceLoader<S> load(Class<S> service) {
+      	// 线程上下文类加载器,在Launcher类的构造器中被赋值为AppClassLoader,
+        // 它可以读到ClassPath下的自定义类
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return ServiceLoader.load(service, cl);
+    }     
+	...
+}
+```
+
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202210181413805.png" alt="在这里插入图片描述" style="zoom:50%;" />
+
+如果我们对业务进行划分，不同的业务使用不同的线程池，线程池内部共享同一个 contextClassLoader，线程池之间使用不同的 contextClassLoader，就可以很好的起到隔离保护的作用，避免类版本冲突。
+
+- ContextClassLoader默认为AppClassLoader
+- 子线程ContextClassLoader默认为父线程的ContextClassLoader
+
+> 线程的 contextClassLoader 默认是从父线程那里继承过来的，所谓父线程就是创建了当前线程的线程。程序启动时的 main 线程的 contextClassLoader 就是 AppClassLoader。这意味着如果没有人工去设置，那么所有的线程的 contextClassLoader 都是 AppClassLoader。
+
+
+
+#### 二、Tomcat打破双亲委派机制
+
 问题：同一个web容器中可能有多个web程序，不同的web程序中可能会用到同个第三方类库的不同版本。
 
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207221554315.png" alt="img" style="zoom:80%;" />
