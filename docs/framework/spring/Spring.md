@@ -862,6 +862,12 @@ starter 就是定义了一个 starter 的 jar 包，写一个 @Configuration 配
 
 
 
+stater其实你就可以理解成一个「连接包」，它首先是一个包，一个集合，它把需要用的其他功能组件囊括进来，放到自己的 pom 文件中。然后它是一个连接，把它引入的组件和我们的项目做一个连接，并且在中间帮我们省去复杂的配置，力图做到使用最简单。
+
+你可以一站式的获取你所需要的spring和相关技术，而不需要依赖描述符的通过示例代码搜索和复制黏贴的负载，比如如果你想使用sping和JPA访问数据库，你只需要在项目里引入spring-boot-starter-data-jpa依赖项你就可以完美进行。实际上 starter 并不会包含多少功能代码。
+
+常用的stater官方都帮我们封装好了，开箱即用，只需要引入相关stater即可。但是并不是所有的 starter 都是由 Spring Boot 官方提供的，也有部分 starter 是第三方技术厂商提供的，例如 druid-spring-boot-starter 和 mybatis-spring-boot-starter 等等。当然也存在个别第三方技术，Spring Boot 官方没提供 starter，第三方技术厂商也没有提供 starter。
+
 ## 三、嵌入式服务器
 
 不需要下载 tomcat，springboot 已经内置了 tomcat.jar，运行 main 方法时会去启动 tomcat，并利用 tomcat 的 spi 机制加载 springmvc

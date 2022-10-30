@@ -436,7 +436,7 @@ public int minCost(int[][] costs) {
 }
 ```
 
-## 面试题92：翻转字符
+## 面试题92：翻转字符01
 
 ### [题目](https://leetcode.cn/problems/flip-string-to-monotone-increasing/)
 
