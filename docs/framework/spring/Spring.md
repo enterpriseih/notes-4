@@ -67,17 +67,18 @@ Bean缓存池为HashMap实现
 - **BeanFactory**
 
 	- Bean工厂，生成bean，维护bean，BeanFactory是接口，**提供了IOC容器最基本的形式，给具体的IOC容器的实现提供了规范**
+- 加载配置文件的时候不会创建对象，在获取对象（使用）才去创建对象
 
-	- 加载配置文件的时候不会创建对象，在获取对象（使用）才去创建对象
+> FactoryBean是一种bean，在Spring内部广泛使用，这个Bean不是简单的Bean，而是一个能生产或者修饰对象生成的工厂Bean，它的实现与设计模式中的工厂模式和修饰器模式类似 
 
 - **ApplicatiContext**
 
-	- 继承了BeanFactory，面向使用Spring框架的开发者（几乎都是使用这个），提供更强大的功能
+  - 继承了BeanFactory，面向使用Spring框架的开发者（几乎都是使用这个），提供更强大的功能
 
-	- 加载配置文件的时候就会把在配置文件中的对象进行创建
-	- 实现类
-		- FileSystemXmlApplicationContext：绝对路径
-		- ClassPathXmlApplicationContext：相对路径
+  - 加载配置文件的时候就会把在配置文件中的对象进行创建
+  - 实现类
+  	- FileSystemXmlApplicationContext：绝对路径
+  	- ClassPathXmlApplicationContext：相对路径
 
 
 
@@ -657,7 +658,7 @@ spring容器进行扫描->反射后封装成beanDefinition对象->放入beanDefi
 
 # Spring中的设计模式
 
-- 工厂模式：BeanFactory、FactoryBean
+- 工厂模式：BeanFactory、[FactoryBean](https://blog.csdn.net/weixin_46034896/article/details/123813245)
 	- FactoryBean是一种bean，在Spring内部广泛使用，这个Bean不是简单的Bean，而是一个能生产或者修饰对象生成的工厂Bean，它的实现与设计模式中的工厂模式和修饰器模式类似 
 
 - 代理模式：AOP
