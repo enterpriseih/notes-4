@@ -127,6 +127,7 @@ private boolean areAllZero(int[] counts) {
 ### 参考代码
 
 ```java
+// 滑窗
 public int lengthOfLongestSubstring(String s) {
     int maxLen = 0;
     int l = 0, r = 0;
@@ -142,7 +143,37 @@ public int lengthOfLongestSubstring(String s) {
     }
     return maxLen;
 }
+
+
 ```
+
+### 解法二：双指针+哈希表
+
+```
+指针j遍历字符串s，哈希表dic统计字符s[j]最后一次出现的索引
+根据上轮左指针i和dic[s[j]]，每轮更新左边界i，保证区间[i+1,j]内无重复字符且最大
+i=max(dic[s[j]],i)
+
+```
+
+
+
+```java
+public int lengthOfLongestSubstring(String s) {
+    Map<Character, Integer> dic = new HashMap<>();
+    int i = -1, res = 0;
+    for(int j = 0; j < s.length(); j++) {
+        if(di-=c.containsKey(s.charAt(j)))
+            i = Math.max(i, dic.get(s.charAt(j))); // 更新左指针 i
+        dic.put(s.charAt(j), j); // 哈希表记录
+        res = Math.max(res, j - i); // 更新结果
+    }
+    return res;
+}
+
+```
+
+
 
 
 

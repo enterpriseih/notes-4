@@ -27,6 +27,14 @@ int[][] listArr = list.stream()
     .map(i -> new int[i.size()]).toArray(int[][]::new);
 ```
 
+## List\<String> => String[]
+
+```java
+//List转String
+String[] strs = list.toArray(new String[list.size()]);
+
+```
+
 
 
 ## 交换swap
