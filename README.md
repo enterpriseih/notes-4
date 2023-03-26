@@ -36,6 +36,7 @@
 - [MySQL基础](./docs/database/mysql/MySQL基础.md)
 - [MongoDB](./docs/database/MongoDB.md)
 - [Redis](./docs/database/redis/Redis.md)
+- [跳表和B+树](./docs/data-structure/跳表和B+树.md)
 - [数据字典&EasyExcel](./docs/database/数据字典.md)
 
 ### 测试
@@ -73,7 +74,6 @@
 - [数据结构与算法](./docs/data-structure/TOC.md)
 - [红黑树](./docs/data-structure/红黑树.md)
 - [跳表和B+树](./docs/data-structure/跳表和B+树.md)
-- [哈希](./docs/data-structure/哈希.md)
 - [笔试](./docs/data-structure/笔试题.md)
 - [前中后缀转换](./docs/others/前中后缀转换.md)
 

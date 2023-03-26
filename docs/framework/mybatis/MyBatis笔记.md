@@ -8,12 +8,12 @@
 
 # 一、Mybatis简介
 
-## 2、MyBatis特性
+## 1、MyBatis特性
 1. MyBatis 是支持定制化 SQL、存储过程以及高级映射的优秀的持久层框架
 2. MyBatis 避免了几乎所有的 JDBC 代码和手动设置参数以及获取结果集
 3. MyBatis可以使用简单的XML或注解用于配置和原始映射，将接口和Java的POJO（Plain Old Java Objects，普通的Java对象）映射成数据库中的记录
 4. MyBatis 是一个`半自动的ORM（Object Relation Mapping）`框架
-## 4、和其它持久化层技术对比
+## 2、和其它持久化层技术对比
 JDBC  
 
  - SQL 夹杂在Java代码中耦合度高，导致硬编码内伤 
@@ -42,12 +42,7 @@ MyBatis
   - 开发效率稍逊于HIbernate，但是完全能够接受
 
 # 二、搭建MyBatis
-## 1、开发环境
-- IDE：idea 2019.2  
-- 构建工具：maven 3.5.4  
-- MySQL版本：MySQL 5.7  
-- MyBatis版本：MyBatis 3.5.7
-## 2、创建maven工程
+## 1、创建maven工程
 - 打包方式：jar
 - 引入依赖
 
@@ -74,7 +69,7 @@ MyBatis
 	</dependency>
 </dependencies>
 ```
-## 3、创建MyBatis的核心配置文件
+## 2、创建MyBatis的核心配置文件
 >习惯上命名为`mybatis-config.xml`，这个文件名仅仅只是建议，并非强制要求。将来整合Spring之后，这个配置文件可以省略，所以大家操作时可以直接复制、粘贴。
 >核心配置文件主要用于配置连接数据库的环境以及MyBatis的全局配置信息
 >核心配置文件存放的位置是src/main/resources目录下
@@ -103,7 +98,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 </configuration>
 ```
 
-## 4、创建mapper接口
+## 3、创建mapper接口
 
 >MyBatis中的mapper接口相当于以前的dao。但是区别在于，mapper仅仅是接口，我们不需要提供实现类
 ```java
@@ -116,7 +111,7 @@ public interface UserMapper {
 	int insertUser();  
 }
 ```
-## 5、创建MyBatis的映射文件
+## 4、创建MyBatis的映射文件
 - 相关概念：ORM（Object Relationship Mapping）对象关系映射。  
 	- 对象：Java的实体类对象  
 	- 关系：关系型数据库  
@@ -149,7 +144,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</insert>  
 </mapper>
 ```
-## 6、通过junit测试功能
+## 5、通过junit测试功能
 - SqlSession：代表Java程序和数据库之间的会话。（HttpSession是Java程序和浏览器之间的会话）
 - SqlSessionFactory：是“生产”SqlSession的“工厂”
 - 工厂模式：如果创建某一个对象，使用的过程基本固定，那么我们就可以把创建这个对象的相关代码封装到一个“工厂类”中，以后都使用这个工厂类来“生产”我们需要的对象
@@ -196,7 +191,7 @@ SqlSession sqlSession = SqlSessionUtils.getSqlSession();
 SelectMapper mapper = sqlSession.getMapper(SelectMapper.class);
 ```
 - 此时需要手动提交事务，如果要自动提交事务，则在获取sqlSession对象时，使用`SqlSession sqlSession = sqlSessionFactory.openSession(true);`，传入一个Boolean类型的参数，值为true，这样就可以自动提交
-## 7、加入log4j日志功能
+## 6、加入log4j日志功能
 1. 加入依赖
 	```xml
 	<!-- log4j日志 -->
