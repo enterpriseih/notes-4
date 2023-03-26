@@ -11,7 +11,7 @@ noted by YiENx
 ### 第6章：[栈](./Chapter06栈.md)
 ### 第7章：[队列](./Chapter07队列.md)
 ### 第8章：[树](./Chapter08树.md)
-### 第9章：[堆](./Chapter09堆.md)
+### 第9章：[堆: 完全二叉树](./Chapter09堆.md)
 ### 第10章：[前缀树](./Chapter10前缀树.md)
 ### 第11章：[二分查找](./Chapter11二分查找.md)
 

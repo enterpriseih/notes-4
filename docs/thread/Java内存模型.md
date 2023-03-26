@@ -294,31 +294,3 @@ Java 语言在遵循内存模型的基础上推出了 JMM 规范，目的是解�
 为了更精准控制工作内存和主内存间的交互，JMM 还定义了八种操作：`lock`, `unlock`, `read`, `load`,` use`,` assign`, `store`, `write`。
 
 
-
-# volatile
-
-## 作用
-
-1. 保证线程间变量的可见性
-2. 禁止CPU进行指令重排序
-
-## 保持可见性的大致流程：
-
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204071337351.png" alt="image-20220407133715250" style="zoom:80%;" />
-
-## 禁止重排序的原理
-
-首先要讲一下内存屏障，内存屏障可以分为以下几类：
-
-- LoadLoad 屏障：对于这样的语句Load1，LoadLoad，Load2。在Load2及后续读取操作要读取的数据被访问前，保证Load1要读取的数据被读取完毕。
-- StoreStore屏障：对于这样的语句Store1， StoreStore， Store2，在Store2及后续写入操作执行前，保证Store1的写入操作对其它处理器可见。
-- LoadStore 屏障：对于这样的语句Load1， LoadStore，Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。
-- StoreLoad 屏障：对于这样的语句Store1， StoreLoad，Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见。
-
-在每个volatile读操作后插入LoadLoad屏障，在读操作后插入LoadStore屏障。
-
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204071343651.png" alt="image-20220407134352384" style="zoom:80%;" />
-
-在每个volatile写操作的前面插入一个StoreStore屏障，后面插入一个SotreLoad屏障。
-
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204071344997.png" alt="image-20220407134418567" style="zoom:80%;" />

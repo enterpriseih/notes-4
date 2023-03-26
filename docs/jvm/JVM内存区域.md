@@ -2,7 +2,7 @@
 
 > 栈管运行，堆管存储
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203301347028.png" alt="image-20220330134754626" style="zoom:40%;" />
+<img src="img/jvm内存区域.png" alt="image-20220330134754626" style="zoom:40%;" />
 
 **线程私有区**【程序计数器、虚拟机栈（Java栈）、本地方法栈】
 
@@ -39,7 +39,7 @@
 
 ## 一、程序计数器 PC寄存器
 
-- 当前线程所执行的字节码的行号（地址）指示器，方便线程切换后能恢复到正确的执行位置
+- 当前线程所执行的字节码的行号（地址）指示器，方便**线程切换**后能恢复到正确的执行位置
 - 唯一一个没有规定 OOM（OutOfMemoryError）的区域
 
 <br>

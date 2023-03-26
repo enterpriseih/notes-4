@@ -38,6 +38,26 @@ rootfs (root file system) ，在 bootfs 之上。包含 的就是典型 Linux �
 
 # 使用
 
+启动docker
+
+通过 launchctl 查看 docker server, 记住docker server 名
+
+```shell
+> launchctl list | grep docker
+111117   0       com.docker.docker.2388
+```
+
+然后关闭和启动它。
+
+```shell
+launchctl stop com.docker.docker.2388 
+launchctl start com.docker.docker.2388
+```
+
+// 上面这个不太好使
+
+
+
 ```shell
 # 查看Docker版本
 docker -v

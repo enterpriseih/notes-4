@@ -1356,13 +1356,25 @@ MyBatis 有三种基本的 Executor 执行器， `SimpleExecutor` 、 `ReuseExec
 - 如果二级缓存没有命中，再查询一级缓存  
 - 如果一级缓存也没有命中，则查询数据库  
 - SqlSession关闭之后，一级缓存中的数据会写入二级缓存
-### 为什么还要用redis
+## MyBatis缓存存在的问题
 
 1. mybatis一级缓存作用域是session，session在commit之后缓存就消失了。
 2. mybatis二级缓存作用域是sessionFactory，该缓存是以nameSpace为单位的（也就是一个Mapper.xml文件），不同nameSpace下操作互不影响。
 3. 所有**对数据表的改变操作都会刷新缓存**，但是一般不用二级缓存。例如，在UserMapper.xml中有大多数针对User表的操作，但是在另外一个XXXMapper.xml中，还有针对user单表的操作，这会导致user在两个命名空间下的数据不一致。
 4. 如果UserMapper.xml中做了刷新缓存的操作，在XXXMapper.xml中缓存依然有效，如果针对user单表查询，使用缓存的结果可能会不正确，读到脏数据。
 5. redis很好的解决了这个问题，而且比之一、二级缓存的更好，redis可以搭建在其他服务器上，缓存容量可扩展，redis可以灵活的使用在需要的缓存数据上。
+
+## 为什么还要用redis
+
+Redis缓存和Mybatis自带的缓存有很大的区别，主要体现在以下几个方面：
+
+1. Redis缓存可以实现**分布式缓存**，而Mybatis自带的缓存只能实现**本地缓存**，无法跨JVM实现缓存共享。
+2. Redis缓存可以实现**缓存的持久化**，而Mybatis自带的缓存只能实现**缓存的内存存储**，无法实现缓存的持久化。
+3. Redis缓存可以实现**缓存的失效策略**，而Mybatis自带的缓存**只能实现基于时间的失效策略，无法实现基于LRU等其他策略的失效**。
+
+因此，Redis缓存相比Mybatis自带的缓存更加灵活、可靠、高效。
+
+
 
 ## 整合第三方缓存EHCache（了解）
 ### 添加依赖

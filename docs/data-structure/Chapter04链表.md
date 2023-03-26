@@ -321,7 +321,7 @@ public ListNode reverseList(ListNode head) {
 
 
 
-## [翻转链表2](https://leetcode.cn/problems/reverse-linked-list-ii/)
+## [翻转链表2](https://leetcode.cn/problems/reverse-linked-list-ii/)：指定区间翻转
 
 ### 题目
 

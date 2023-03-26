@@ -93,7 +93,7 @@ Redis 基于 Reactor 模式开发了网络事件处理器、**文件事件处理
 - 文件事件分派器(将 socket 关联到相应的事件处理器) 
 - 事件处理器(连接应答处理器、命令请求处理器、命令回复处理器)
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207171259735.png" alt="iShot_2022-07-17_12.58.13" style="zoom:50%;" />
+<img src="img/202207171259735.png" alt="iShot_2022-07-17_12.58.13" style="zoom:50%;" />
 
 ### Redis6.0后加入了多线程，默认关闭
 
@@ -105,7 +105,7 @@ https://mp.weixin.qq.com/s/FZu3acwK6zrCBZQ_3HoUgw
 
 Redis 客户端与 Redis 服务器之间使用 TCP 协议进行连接，一个客户端可以通过一个 socket 连接发起多个请求命令。每个请求命令发出后 client 通常会阻塞并等待 redis 服务器处理，redis 处理完请求命令后会将结果通过响应报文返回给 client，因此当执行多条命令的时候都需要等待上一条命令执行完毕才能执行。
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20181225164228900.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1OTIzNzQ5,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](img/pipline.png)
 
 ```shell
 > get keya
@@ -264,6 +264,16 @@ typeof struct dictEntry{
 
 > QPS(Query Per Second)：服务器每秒可以执行的查询次数
 
+# 为什么不用MyBatis自带的缓存
+
+Redis缓存和Mybatis自带的缓存有很大的区别，主要体现在以下几个方面：
+
+1. Redis缓存可以实现分布式缓存，而Mybatis自带的缓存只能实现本地缓存，无法跨JVM实现缓存共享。
+2. Redis缓存可以实现缓存的持久化，而Mybatis自带的缓存只能实现缓存的内存存储，无法实现缓存的持久化。
+3. Redis缓存可以实现缓存的失效策略，而Mybatis自带的缓存只能实现基于时间的失效策略，无法实现基于LRU等其他策略的失效。
+
+因此，Redis缓存相比Mybatis自带的缓存更加灵活、可靠、高效。
+
 # Redis数据结构和常用命令
 
 [常用命令](http://www.redis.cn/commands.html)
@@ -303,13 +313,13 @@ Redis是key-value数据库，key的类型只能是String，但是value的数据�
 * Set
 * Sorted Set
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204162042741.png" style="zoom: 33%;" />
+<img src="img/202204162042741.png" style="zoom: 33%;" />
 
 ### redisObject
 
 在Redis中有一个**核心的对象**叫做`redisObject` ，是用来表示所有的key和value的，用redisObject结构体来表示`String、Hash、List、Set、ZSet`五种数据类型。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207260938618.png" alt="640" style="zoom:67%;" />
+<img src="img/202207260938618.png" alt="640" style="zoom:67%;" />
 
 编码方式即该数据类型的存储方式。
 
@@ -665,7 +675,7 @@ zset 底层使用了两个数据结构
 
 （其中每个节点都有指向元素成员的指针和当前元素成员对应的分数）
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204241155884.png" alt="image-20220424115528332" style="zoom:50%;" />
+<img src="img/202204241155884.png" alt="image-20220424115528332" style="zoom:50%;" />
 
 ### 场景
 
@@ -2130,6 +2140,54 @@ mset name{user} lucy age{user} 20
 
 由于集群方案出现较晚，很多公司已经采用了其他的集群方案，而代理或者客户端分片的方案想要迁移至 redis cluster，需要整体迁移而不是逐步过渡，复杂度较大。
 
+# Redis阻塞
+
+### 1、命令阻塞
+
+使用不当的命令造成客户端阻塞：
+
+- `keys *` ：获取所有的 key 操作；
+- `Hgetall`：返回哈希表中所有的字段和；
+- `smembers`：返回集合中的所有成员；
+
+这些命令时间复杂度是 O(n)，有时候也会全表扫描，随着 n 的增大耗时也会越大从而导致客户端阻塞。
+
+### 2、SAVE阻塞
+
+Redis 在进行 RDB 快照的时候，会调用系统函数 fork() ，创建一个子线程来完成临时文件的写入，而触发条件正是配置文件中的 save 配置。
+
+当达到我们的配置时，就会触发 bgsave 命令创建快照，这种方式是不会阻塞主线程的，而手动执行 save 命令会在主线程中执行，**阻塞**主线程。
+
+### 3、同步持久化
+
+当 Redis 直接记录 AOF 日志时，如果有大量的写操作，并且配置为同步持久化
+
+```
+appendfsync always
+```
+
+即每次发生数据变更会被立即记录到磁盘，因为写磁盘比较耗时，性能较差，所以有时会阻塞主线程。
+
+### 4、AOF重写
+
+1. fork 出一条子线程来将文件重写，在执行 `BGREWRITEAOF` 命令时，Redis 服务器会维护一个 AOF 重写缓冲区，该缓冲区会在子线程创建新 AOF 文件期间，记录服务器执行的所有写命令。
+2. 当子线程完成创建新 AOF 文件的工作之后，服务器会将重写缓冲区中的所有内容追加到新 AOF 文件的末尾，使得新的 AOF 文件保存的数据库状态与现有的数据库状态一致。
+3. 最后，服务器用新的 AOF 文件替换旧的 AOF 文件，以此来完成 AOF 文件重写操作。
+
+阻塞就是出现在第 2 步的过程中，将缓冲区中新数据写到新文件的过程中会产生**阻塞**。
+
+### 5、大key
+
+大 key 造成的阻塞问题如下：
+
+- 客户端超时阻塞：由于 Redis 执行命令是单线程处理，然后在操作大 key 时会比较耗时，那么就会阻塞 Redis，从客户端这一视角看，就是很久很久都没有响应。
+- 引发网络阻塞：每次获取大 key 产生的网络流量较大，如果一个 key 的大小是 1 MB，每秒访问量为 1000，那么每秒会产生 1000MB 的流量，这对于普通千兆网卡的服务器来说是灾难性的。
+- 阻塞工作线程：如果使用 del 删除大 key 时，会阻塞工作线程，这样就没办法处理后续的命令。
+
+
+
+
+
 # 大key和热key
 
 ## 大key
@@ -2154,7 +2212,7 @@ AOF 重写机制和 RDB 快照（bgsave 命令）的过程，都会分别通过 
 
 #### 如何避免大 Key 呢？
 
-最好在设计阶段，就把大 key 拆分成一个一个小 key。从业务层面考虑是否需要这么大的key。
+最好在设计阶段，就把大 key 拆分成一个一个小 key。从业务层面考虑是否需要这么大的key。存储的时候拆分成小key。
 
 或者，定时检查 Redis 是否存在大 key ，如果该大 key 是可以删除的，不要使用 DEL 命令删除，因为该命令删除过程会阻塞主线程，而是用 unlink 命令（Redis 4.0+）删除大 key，因为该命令的删除过程是异步的，不会阻塞主线程。
 

@@ -36,7 +36,6 @@
 - [MySQL基础](./docs/database/mysql/MySQL基础.md)
 - [MongoDB](./docs/database/MongoDB.md)
 - [Redis](./docs/database/redis/Redis.md)
-- [Redis面试](./docs/database/redis/Redis面试.md)
 - [数据字典&EasyExcel](./docs/database/数据字典.md)
 
 ### 测试
@@ -60,13 +59,13 @@
 
 - [Spring](./docs/framework/spring/Spring.md)
 - [动态代理](./docs/framework/spring/动态代理.md)
-- [SpringMVC笔记](./docs/framework/spring/SpringMVC笔记.md)
+- [SpringMVC笔记](./docs/framework/spring/springmvc/SpringMVC笔记.md)
 - [MyBatis笔记](./docs/framework/mybatis/MyBatis笔记.md)
 - [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)
-- [SpringBoot笔记](./docs/framework/spring/SpringBoot笔记.md)
-- [SpringBoot常用注解](./docs/framework/spring/spring-common-annotations.md)
+- [SpringBoot笔记](./docs/framework/spring/springboot/SpringBoot笔记.md)
+- [SpringBoot常用注解](./docs/framework/spring/springboot/spring-common-annotations.md)
 - [SpringCloud笔记](./docs/framework/spring/springcloud/SpringCloud.md)
-- [SpringSecurity](./docs/framework/spring/SpringSecurity.md)
+- [SpringSecurity](./docs/framework/spring/springsecurity/SpringSecurity.md)
 
 ### :pencil2: 数据结构与算法
 
@@ -86,9 +85,9 @@
 
 ### 消息队列
 
-- [消息队列](./docs/message-queue/消息队列.md)
-- [RabbitMQ](./docs/message-queue/RabbitMQ.md)
-- [Kafka](./docs/message-queue/kafka/Kafka.md)
+- [消息队列](./docs/mq/消息队列.md)
+- [RabbitMQ](./docs/mq/rabbitmq/RabbitMQ.md)
+- [Kafka](./docs/mq/kafka/Kafka.md)
 
 ### 其他
 
@@ -117,3 +116,6 @@
 ### 面试
 
 - [框架](./docs/interview/框架.md) 
+
+### Golang基础
+

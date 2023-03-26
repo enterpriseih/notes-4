@@ -640,12 +640,12 @@ private void dfs(TreeNode node, int val){
 
 
 
-## 面试题50：向下的路径结点之和
+## 面试题50：向下的路径结点之和为某值的个数
 
 ### 题目
 给定一个二叉树和一个值sum，求二叉树里结点值之和等于sum的路径的数目。
 
-路径的定义为二叉树中沿着指向子结点的指针向下移动所经过的结点，但不一定从根结点开始，也不一定到叶结点结束。
+路径的定义为二叉树中沿着指向子结点的指针向下移动所经过的结点，但**不一定从根结点开始，也不一定到叶结点结束**。
 
 例如，在图中的二叉树里，有两个路径的结点值之和等于8，其中第一条路径从结点5开始经过结点2到达结点1，第二条路径从结点2开始到结点6。
 
@@ -698,7 +698,65 @@ private int dfs(TreeNode root, int sum,
 }
 ```
 
+## 补充：路径节点和为某值的所有路径
+
+> 与上题不同，改题必须从根节点到叶子结点
+
+[Leetcode](https://leetcode.cn/problems/er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof/)
+
+给定二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有**从根节点到叶子节点** 路径总和等于给定目标和的路径。
+
+叶子节点是指没有子节点的节点。
+
+<img src="https://assets.leetcode.com/uploads/2021/01/18/pathsumii1.jpg" alt="img" style="zoom:50%;" />
+
+
+
+- 先序遍历： 按照 “根、左、右” 的顺序，遍历树的所有节点。
+
+- 路径记录： 在先序遍历中，记录从根节点到当前节点的路径。当路径为 **根节点到叶节点形成的路径** 且 **各节点值的和等于目标值 sum** 时，将此路径加入结果列表。
+
+
+
+```java
+class Solution {
+    LinkedList<List<Integer>> res = new LinkedList<>();
+    LinkedList<Integer> path = new LinkedList<>(); 
+   	
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        recur(root, sum);
+        return res;
+    }
+    
+    void recur(TreeNode root, int tar) {
+        if(root == null) return;
+        // 将当前节点值加入path
+        path.add(root.val);
+        // 加入后，目标值减去当前节点值
+        tar -= root.val;
+        // 说明到了叶子结点且满足sum
+        if(tar == 0 && root.left == null && root.right == null) {
+            // 直接加入path的话之后的path会变的
+            res.add(new LinkedList(path));
+        }
+        // 递归左右节点
+        recur(root.left, tar);
+        recur(root.right, tar);
+        // 回溯，将当前接待你从path中删除
+        path.removeLast();
+    }
+}
+
+```
+
+
+
+
+
+
+
 ## 面试题51：结点之和最大的路径
+
 ### 题目
 在二叉树中定义路径为从沿着结点间的连接从任意一个结点开始到达任意一个结点所经过的所有结点。
 

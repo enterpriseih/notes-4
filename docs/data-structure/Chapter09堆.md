@@ -29,6 +29,51 @@
 
 
 
+### 判断是否为完全二叉树
+
+```java
+/**
+ * 判断一棵树是否为完全二叉树
+ * 完全二叉树的定义是：除了最后一层，其他层的节点数都是满的，
+ * 最后一层的节点都靠左排列。
+ * 我们可以用 BFS 遍历这棵树，如果遇到一个 null 节点，
+ * 那么后面的节点都必须是 null 节点，否则这棵树就不是完全二叉树。
+ */
+public boolean isCompleteTree(TreeNode root) {
+    // 如果根节点为空，那么这棵树是完全二叉树
+    if (root == null) { 
+        return true;
+    }
+    // 创建一个队列，用于 BFS 遍历
+    Queue<TreeNode> queue = new LinkedList<>();
+    // 将根节点加入队列
+    queue.offer(root); 
+    // 标记是否遇到了 null 节点
+    boolean end = false; 
+    // 只要队列不为空，就继续遍历
+    while (!queue.isEmpty()) { 
+        // 取出队列的头节点
+        TreeNode node = queue.poll(); 
+        // 如果当前节点是 null，那么后面的节点都必须是 null，
+        // 否则这棵树就不是完全二叉树
+        if (node == null) { 
+            end = true;
+        // 如果当前节点不是 null，那么就将它的左右子节点加入队列
+        } else { 
+            // 如果已经遇到了 null 节点，那么这棵树就不是完全二叉树
+            if (end) { 
+                return false;
+            }
+            queue.offer(node.left);
+            queue.offer(node.right);
+        }
+    }
+    return true; // 如果遍历完了整棵树，那么这棵树就是完全二叉树
+}
+```
+
+
+
 ## 堆
 
 堆是一种完全二叉树：除了最底层，每层都填满

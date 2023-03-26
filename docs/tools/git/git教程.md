@@ -126,6 +126,9 @@ git branch -d daily/0.0.1
 
 ```
 git checkout daily/0.0.1
+
+# 在checkout命令指定 -b选项执行，可以创建分支并进行切换。
+git checkout -b <branch>
 ```
 
 切换到 `daily/0.0.1` 分支，后续的操作将在这个分支上进行

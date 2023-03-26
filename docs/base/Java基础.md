@@ -800,7 +800,7 @@ comparator是个比较器接口，实现该接口的类是个比较器，其中�
 
 ### HashMap 和 HashSet 区别
 
-如果你看过 `HashSet` 源码的话就应该知道：`HashSet` 底层就是基于 `HashMap` 实现的。（`HashSet` 的源码非常非常少，因为除了 `clone()`、`writeObject()`、`readObject()`是 `HashSet` 自己不得不实现之外，其他方法都是直接调用 `HashMap` 中的方法。
+`HashSet` 底层就是基于 `HashMap` 实现的。（`HashSet` 的源码非常非常少，因为除了 `clone()`、`writeObject()`、`readObject()`是 `HashSet` 自己不得不实现之外，其他方法都是直接调用 `HashMap` 中的方法。
 
 |               `HashMap`                |                          `HashSet`                           |
 | :------------------------------------: | :----------------------------------------------------------: |
@@ -1016,7 +1016,7 @@ Collections.synchronizedList(list);
 
 这个方法可以动态的生成一个线程安全的集合。
 
-## 一、List
+## 一、CopyOnWriteArrayList
 
 ```java
 // 具体集合类型ArrayList：
@@ -1043,9 +1043,9 @@ public E get(int index) {
 List<String> list = new CopyOnWriteArrayList<>();
 ```
 
-### 1、写时复制技术
+### 写时复制技术
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204072009224.png" alt="image-20220407200925958" style="zoom:80%;" />
+<img src="img/202204072009224.png" alt="image-20220407200925958" style="zoom:80%;" />
 
 使用写时复制技术要向集合对象中写入数据时：
 
@@ -1083,7 +1083,7 @@ public boolean add(E e) {
 
 
 
-## 二、Set
+## 二、CopyOnWriteArraySet
 
 采用了写时复制技术的Set集合：java.util.concurrent.CopyOnWriteArraySet
 
@@ -1145,7 +1145,7 @@ private boolean addIfAbsent(E e, Object[] snapshot) {
 
 
 
-## 三、Map
+## 三、ConcurrentHashMap
 
 [底层](./collection/concurrent-hash-map-source-code.md)
 
@@ -1160,13 +1160,16 @@ Map<String, String> map = new ConcurrentHashMap<>();
 for (int i = 0; i < 5; i++) {
     new Thread(()->{
         for (int j = 0; j < 5; j++) {
-            String key = UUID.randomUUID().toString().replace("-","").substring(0, 5);
-            String value = UUID.randomUUID().toString().replace("-","").substring(0, 5);
+            String key = UUID.randomUUID()
+                .toString().replace("-","").substring(0, 5);
+            String value = UUID.randomUUID()
+                .toString().replace("-","").substring(0, 5);
             map.put(key, value);
             System.out.println("map = " + map);
         }
     }, "thread" + i).start();
 }
+
 ```
 
 ### 1、jdk1.7之前Segment
@@ -1185,7 +1188,7 @@ ConcurrentHashMap，它内部细分了若干个小的 HashMap，称之为`段(Se
 
 简单理解就是，ConcurrentHashMap 是一个 Segment 数组，Segment 通过继承ReentrantLock 来进行加锁，所以每次需要加锁的操作**锁住的是一个 segment**，这样只要保证每个 Segment 是线程安全的，也就实现了全局的线程安全。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061546572.png" alt="image-20220406154643937" style="zoom:50%;" />
+<img src="img/segment.png" alt="image-20220406154643937" style="zoom:50%;" />
 
 每个segment也具有红黑树结构
 

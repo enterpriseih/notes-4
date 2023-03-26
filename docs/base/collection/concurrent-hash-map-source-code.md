@@ -89,6 +89,7 @@ public ConcurrentHashMap(int initialCapacity,float loadFactor, int concurrencyLe
     UNSAFE.putOrderedObject(ss, SBASE, s0); // ordered write of segments[0]
     this.segments = ss;
 }
+
 ```
 
 总结一下在 Java 7 中 ConcurrnetHashMap 的初始化逻辑。
