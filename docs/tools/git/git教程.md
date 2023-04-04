@@ -117,7 +117,7 @@ git branch
 git branch -d daily/0.0.1
 ```
 
-如果分支已经完成使命则可以通过 `-d` 参数将分支删除，这里为了继续下一步操作，暂不执行删除操作
+如果分支已经完成使命则可以通过 `-d` 参数将分支删除
 
 ### git checkout
 
@@ -154,6 +154,14 @@ Changes not staged for commit:
     modified:   README.md
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
+
+### git diff
+
+```shell
+git diff 文件名
+```
+
+查看修改文件的修改内容，输入`q`按回车退出
 
 ### git add
 

@@ -84,7 +84,7 @@ package package_name
 
 package的代码结构示例如下：
 
-<img src="../Coding/GitHub/go-tutorial/workspace/lesson27/img/package_structure.jpg" alt="image-20211104181754164"  />
+<img src="./img/package_structure.jpg" alt="image-20211104181754164"  />
 
 package里的变量、函数、结构体、方法等如果要被本package外的程序引用，需要在命名的时候首字母大写。
 
@@ -252,9 +252,11 @@ Go 1.11开始，有了Go Modules，工程项目可以建在任何地方，代码
 
 3. 下载所需第三方Module，比如gin
 
-	```go
-	go get -u github.com/gin-gonic/gin
-	```
+  ```go
+  go get -u github.com/gin-gonic/gin
+  // 指定特定分支的版本
+  go get -u github.com/gin-gonic/gin@branchName
+  ```
 
 4. 代码里import对应的Module
 
@@ -364,6 +366,14 @@ init函数没有参数，没有返回值。
 * 同一个pacakge里的init函数调用顺序不确定
 * 不同package的init函数，根据package import的依赖关系来决定调用顺序，比如package A里import了package B，那package B的init()函数就会比package A的init函数先调用。
 * **无论package被import多少次，package里的init函数只会执行一次**
+
+## replace
+
+replace顾名思义，就是用新的package去替换另一个package，他们可以是不同的package，也可以是同一个package的不同版本。
+
+```shell
+go mod edit -replace=old[@v]=new[@v]
+```
 
 
 
@@ -2369,7 +2379,7 @@ func NewMetricManager(options ...Option) *MetricManager {
 	func (book Book) changeTitle2() {
 	    book.title = "new title2"
 	}
-	
+	5
 	func main() {
 	    book := Book{1, "expert", "go"}
 	    book.printBook()
@@ -2474,7 +2484,7 @@ func NewMetricManager(options ...Option) *MetricManager {
 
 ## 切片的使用
 
-切片访问：对切片的访问，类似数组一样，可以用下标索引或者range迭代的方式进行。可以参考[lesson10](./workspace/lesson10)和[lesson14](./workspace/lesson14)
+切片访问：对切片的访问，类似数组一样，可以用下标索引或者range迭代的方式进行。
 
 ```go
 package main
@@ -2655,234 +2665,6 @@ func main() {
 
 1. [Go Quiz: 从Go面试题看slice的底层原理和注意事项](https://github.com/jincheng9/go-tutorial/blob/main/workspace/senior/p8)
 2. [Go Quiz: 从Go面试题搞懂slice range遍历的坑](
-
-# range迭代
-
-range可以用于for循环，对字符串，数组array，切片slice，集合map或通道channel进行迭代
-
-## range对字符串string进行迭代
-
-* 有2种方法可以对string进行range遍历，一种是只拿到字符串的下标索引，一种是同时拿到下标索引和对应的值
-
-	```go
-	package main
-	
-	import "fmt"
-	
-	func main() {
-	    str := "abcdgfg"
-	    // 方法1：可以通过range拿到字符串的下标索引
-	    for index := range(str) {
-	        fmt.Printf("index:%d, value:%d\n", index, str[index])
-	    }
-	    fmt.Println()
-	    
-	    // 方法2：可以通过range拿到字符串的下标索引和对应的值
-	    for index, value := range(str) {
-	        fmt.Println("index=", index, ", value=", value)
-	    }
-	    fmt.Println()
-	    
-	    // 也可以直接通过len获取字符串长度进行遍历
-	    for index:=0; index<len(str); index++ {
-	        fmt.Printf("index:%d, value:%d\n", index, str[index])
-	    }
-	}
-	```
-
-## range对数组array进行迭代
-
-* 一维数组
-
-	```go
-	package main
-	
-	import "fmt"
-	
-	const SIZE = 4
-	
-	func main() {
-	    /*
-	    注意：数组的大小不能用变量，比如下面的SIZE必须是常量，如果是变量就会编译报错
-	    non-constant array bound size
-	    */
-	    array := [SIZE]int{1, 2, 3} 
-	    
-	    // 方法1：只拿到数组的下标索引
-	    for index := range array {
-	        fmt.Printf("index=%d value=%d ", index, array[index])
-	    }
-	    fmt.Println()
-	    
-	    // 方法2：同时拿到数组的下标索引和对应的值
-	    for index, value:= range array {
-	        fmt.Printf("index=%d value=%d ", index, value)
-	    }
-	    fmt.Println()
-	}
-	```
-
-	
-
-* 二维数组
-
-	```go
-	package main
-	
-	import "fmt"
-	import "reflect"
-	
-	func main() {
-	    array := [2][3]int{{1, 2, 3}, {4, 5, 6}}
-	    // 只拿到行的索引
-	    for index := range array {
-	        // array[index]类型是一维数组
-	        fmt.Println(reflect.TypeOf(array[index]))
-	        fmt.Printf("index=%d, value=%v\n", index, array[index])
-	    }
-	    
-	    // 拿到行索引和该行的数据
-	    for row_index, row_value := range array {
-	        fmt.Println(row_index, reflect.TypeOf(row_value), row_value)
-	    }
-	    
-	    // 双重遍历，拿到每个元素的值
-	    for row_index, row_value := range array {
-	        for col_index, col_value := range row_value {
-	            fmt.Printf("array[%d][%d]=%d ", row_index, col_index, col_value)
-	        }
-	        fmt.Println()
-	    }
-	}
-	```
-
-	
-
-## range对切片slice进行迭代
-
-* 一维切片：会根据切片的长度len()进行遍历
-
-	```go
-	package main
-	
-	import "fmt"
-	
-	func main() {
-	    slice := []int{1,2,3}
-	    // 方式1
-	    for index := range slice {
-	        fmt.Printf("index=%d, value=%d\n", index, slice[index])
-	    }
-	    // 方式2
-	    for index, value := range slice {
-	        fmt.Printf("index=%d, value=%d\n", index, value)
-	    }
-	}
-	```
-
-	
-
-* 二维切片：range遍历方式类似二维数组
-
-	```go
-	package main
-	
-	import "fmt"
-	import "reflect"
-	
-	func main() {
-	    slice := [][]int{{1,2}, {3, 4, 5}}
-	    fmt.Println(len(slice))
-	    // 方法1，拿到行索引
-	    for index := range slice{
-	        fmt.Printf("index=%d, type:%v, value=%v\n", index, reflect.TypeOf(slice[index]), slice[index])
-	    }
-	    
-	    // 方法2，拿到行索引和该行的值，每行都是一维切片
-	    for row_index, row_value := range slice{
-	        fmt.Printf("index=%d, type:%v, value=%v\n", row_index, reflect.TypeOf(row_value), row_value)
-	    }
-	    
-	    // 方法3，双重遍历，获取每个元素的值
-	    for row_index, row_value := range slice {
-	        for col_index, col_value := range row_value {
-	            fmt.Printf("slice[%d][%d]=%d ", row_index, col_index, col_value)
-	        }
-	        fmt.Println()
-	    }
-	}
-	```
-
-	
-
-## range对集合map进行迭代
-
-* 有如下2种方法可以遍历map，一种是拿到key，一种是拿到key,value
-
-	```go
-	package main
-	
-	import "fmt"
-	
-	func main() {
-	    hash := map[string]int{"a":1}
-	    // 方法1，拿到key，再根据key获取value
-	    for key := range hash{
-	        fmt.Printf("key=%s, value=%d\n", key, hash[key])
-	    }
-	    
-	    // 方法2，同时拿到key和value
-	    for key, value := range hash{
-	        fmt.Printf("key=%s, value=%d\n", key, value)
-	    }
-	    
-	    /* nil map不能存放key-value键值对，比如下面的方式会报错：panic: assignment to entry in nil map
-	    var hash2 map[string]int 
-	    hash2["a"] = 1
-	    */
-	}
-	```
-
-	
-
-## range对通道channel进行迭代
-
-对channel进行range迭代，会循环从channel里取数据
-
-```go
-package main
-
-import "fmt"
-import "time"
-
-
-func addData(ch chan int) {
-	/*
-	每3秒往通道ch里发送一次数据
-	*/
-	size := cap(ch)
-	for i:=0; i<size; i++ {
-		ch <- i
-		time.Sleep(3*time.Second)
-	}
-	// 数据发送完毕，关闭通道
-	close(ch)
-}
-
-
-func main() {
-	ch := make(chan int, 10)
-	// 开启一个goroutine，用于往通道ch里发送数据
-	go addData(ch)
-
-	/* range迭代从通道ch里获取数据
-	通道close后，range迭代取完通道里的值后，循环会自动结束
-	*/
-	for i := range ch {
-		fmt.Println(i)
-	}
-}
-```
 
 # map集合
 
@@ -4081,6 +3863,234 @@ func main() {
 
 
 
+# range迭代
+
+range可以用于for循环，对字符串，数组array，切片slice，集合map或通道channel进行迭代
+
+## range对字符串string进行迭代
+
+* 有2种方法可以对string进行range遍历，一种是只拿到字符串的下标索引，一种是同时拿到下标索引和对应的值
+
+	```go
+	package main
+	
+	import "fmt"
+	
+	func main() {
+	    str := "abcdgfg"
+	    // 方法1：可以通过range拿到字符串的下标索引
+	    for index := range(str) {
+	        fmt.Printf("index:%d, value:%d\n", index, str[index])
+	    }
+	    fmt.Println()
+	    
+	    // 方法2：可以通过range拿到字符串的下标索引和对应的值
+	    for index, value := range(str) {
+	        fmt.Println("index=", index, ", value=", value)
+	    }
+	    fmt.Println()
+	    
+	    // 也可以直接通过len获取字符串长度进行遍历
+	    for index:=0; index<len(str); index++ {
+	        fmt.Printf("index:%d, value:%d\n", index, str[index])
+	    }
+	}
+	```
+
+## range对数组array进行迭代
+
+* 一维数组
+
+	```go
+	package main
+	
+	import "fmt"
+	
+	const SIZE = 4
+	
+	func main() {
+	    /*
+	    注意：数组的大小不能用变量，比如下面的SIZE必须是常量，如果是变量就会编译报错
+	    non-constant array bound size
+	    */
+	    array := [SIZE]int{1, 2, 3} 
+	    
+	    // 方法1：只拿到数组的下标索引
+	    for index := range array {
+	        fmt.Printf("index=%d value=%d ", index, array[index])
+	    }
+	    fmt.Println()
+	    
+	    // 方法2：同时拿到数组的下标索引和对应的值
+	    for index, value:= range array {
+	        fmt.Printf("index=%d value=%d ", index, value)
+	    }
+	    fmt.Println()
+	}
+	```
+
+	
+
+* 二维数组
+
+	```go
+	package main
+	
+	import "fmt"
+	import "reflect"
+	
+	func main() {
+	    array := [2][3]int{{1, 2, 3}, {4, 5, 6}}
+	    // 只拿到行的索引
+	    for index := range array {
+	        // array[index]类型是一维数组
+	        fmt.Println(reflect.TypeOf(array[index]))
+	        fmt.Printf("index=%d, value=%v\n", index, array[index])
+	    }
+	    
+	    // 拿到行索引和该行的数据
+	    for row_index, row_value := range array {
+	        fmt.Println(row_index, reflect.TypeOf(row_value), row_value)
+	    }
+	    
+	    // 双重遍历，拿到每个元素的值
+	    for row_index, row_value := range array {
+	        for col_index, col_value := range row_value {
+	            fmt.Printf("array[%d][%d]=%d ", row_index, col_index, col_value)
+	        }
+	        fmt.Println()
+	    }
+	}
+	```
+
+	
+
+## range对切片slice进行迭代
+
+* 一维切片：会根据切片的长度len()进行遍历
+
+	```go
+	package main
+	
+	import "fmt"
+	
+	func main() {
+	    slice := []int{1,2,3}
+	    // 方式1
+	    for index := range slice {
+	        fmt.Printf("index=%d, value=%d\n", index, slice[index])
+	    }
+	    // 方式2
+	    for index, value := range slice {
+	        fmt.Printf("index=%d, value=%d\n", index, value)
+	    }
+	}
+	```
+
+	
+
+* 二维切片：range遍历方式类似二维数组
+
+	```go
+	package main
+	
+	import "fmt"
+	import "reflect"
+	
+	func main() {
+	    slice := [][]int{{1,2}, {3, 4, 5}}
+	    fmt.Println(len(slice))
+	    // 方法1，拿到行索引
+	    for index := range slice{
+	        fmt.Printf("index=%d, type:%v, value=%v\n", index, reflect.TypeOf(slice[index]), slice[index])
+	    }
+	    
+	    // 方法2，拿到行索引和该行的值，每行都是一维切片
+	    for row_index, row_value := range slice{
+	        fmt.Printf("index=%d, type:%v, value=%v\n", row_index, reflect.TypeOf(row_value), row_value)
+	    }
+	    
+	    // 方法3，双重遍历，获取每个元素的值
+	    for row_index, row_value := range slice {
+	        for col_index, col_value := range row_value {
+	            fmt.Printf("slice[%d][%d]=%d ", row_index, col_index, col_value)
+	        }
+	        fmt.Println()
+	    }
+	}
+	```
+
+	
+
+## range对集合map进行迭代
+
+* 有如下2种方法可以遍历map，一种是拿到key，一种是拿到key,value
+
+	```go
+	package main
+	
+	import "fmt"
+	
+	func main() {
+	    hash := map[string]int{"a":1}
+	    // 方法1，拿到key，再根据key获取value
+	    for key := range hash{
+	        fmt.Printf("key=%s, value=%d\n", key, hash[key])
+	    }
+	    
+	    // 方法2，同时拿到key和value
+	    for key, value := range hash{
+	        fmt.Printf("key=%s, value=%d\n", key, value)
+	    }
+	    
+	    /* nil map不能存放key-value键值对，比如下面的方式会报错：panic: assignment to entry in nil map
+	    var hash2 map[string]int 
+	    hash2["a"] = 1
+	    */
+	}
+	```
+
+	
+
+## range对通道channel进行迭代
+
+对channel进行range迭代，会循环从channel里取数据
+
+```go
+package main
+
+import "fmt"
+import "time"
+
+
+func addData(ch chan int) {
+	/*
+	每3秒往通道ch里发送一次数据
+	*/
+	size := cap(ch)
+	for i:=0; i<size; i++ {
+		ch <- i
+		time.Sleep(3*time.Second)
+	}
+	// 数据发送完毕，关闭通道
+	close(ch)
+}
+
+
+func main() {
+	ch := make(chan int, 10)
+	// 开启一个goroutine，用于往通道ch里发送数据
+	go addData(ch)
+
+	/* range迭代从通道ch里获取数据
+	通道close后，range迭代取完通道里的值后，循环会自动结束
+	*/
+	for i := range ch {
+		fmt.Println(i)
+	}
+}
+```
+
 
 
 # defer语义
@@ -4265,6 +4275,20 @@ Answer：defer常用于成对的操作，比如文件打开后要关闭、锁的
 [参考](https://coolshell.cn/articles/21146.html)
 
 ```go
+type Option interface {
+	apply(c *config)
+}
+
+type optionFunc func(c *config)
+
+func (fn optionFunc) apply(c *config) {
+	fn(c)
+}
+```
+
+
+
+```go
 type Server struct {
     Addr string
     Port int
@@ -4279,7 +4303,7 @@ type Config struct {
 }
 
 // 创建一个函数类型，名为Option，这个名字随意
-type Option func(*Server)
+type Option func(s *Server)
 
 func MaxConns(maxconns int) Option {
     return func(s *Server) {
