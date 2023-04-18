@@ -318,7 +318,7 @@ public enum ResponseDto {
 
 # 对象的实例化
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203311610240.png" alt="第10章_对象的实例化" style="zoom:50%;" />
+<img src="img/202203311610240.png" alt="第10章_对象的实例化" style="zoom:50%;" />
 
 # Java只支持值传递
 
@@ -602,9 +602,9 @@ System.out.println(s3 == s4);
 
 补充：
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203312241480.PNG" alt="IMG_1014" style="zoom:40%;" />
+<img src="img/202203312241480.png" alt="IMG_1014" style="zoom:40%;" />
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203312241221.PNG" alt="IMG_1013" style="zoom:40%;" />
+<img src="img/202203312241221.png" alt="IMG_1013" style="zoom:40%;" />
 
 
 
@@ -612,7 +612,7 @@ System.out.println(s3 == s4);
 
 # 集合框架
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061519804.png" alt="image-20220406151857332" style="zoom: 50%;" />
+<img src="img/202204061519804.png" alt="image-20220406151857332" style="zoom: 50%;" />
 
 threshold：扩容的阈值，=容量*加载因子，超过阈值就扩容
 
@@ -625,7 +625,7 @@ threshold：扩容的阈值，=容量*加载因子，超过阈值就扩容
 
 ## 一、Collection
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061509495.png" alt="image-20220406150940121" style="zoom:67%;" />
+<img src="img/202204061509495.png" alt="image-20220406150940121" style="zoom:67%;" />
 
 ### 1、Arrays.sort()
 
@@ -783,7 +783,7 @@ comparator是个比较器接口，实现该接口的类是个比较器，其中�
 
 ### Map
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061510286.png" alt="image-20220406151031801" style="zoom:67%;" />
+<img src="img/202204061510286.png" alt="image-20220406151031801" style="zoom:67%;" />
 
 ### HashMap 和 Hashtable 的区别
 

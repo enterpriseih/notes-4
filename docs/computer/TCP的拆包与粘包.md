@@ -8,7 +8,7 @@
 
 # 消息的变化
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202208081522264.png" alt="图片" style="zoom:67%;" />
+<img src="img/TCP消息的变化.png" alt="图片" style="zoom:67%;" />
 
 四层网络模型每层各司其职，消息在进入每一层时都会多加一个**报头**，每多一个报头可以理解为**数据报多戴一顶帽子**。这个报头上面记录着消息从哪来，到哪去，以及消息多长等信息。比如，**`mac头`记录的是硬件的唯一地址，`IP头`记录的是从哪来和到哪去，`tcp头`记录到是到达目的主机后具体去哪个进程（端口）**。
 
@@ -34,7 +34,7 @@
 
 - **MSS**：Maximum Segment Size，最大分段大小。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202208081533334.png" alt="图片" style="zoom:80%;" />
+<img src="img/MSS和MTU.png" alt="图片" style="zoom:80%;" />
 
 假设 MTU= 1500 byte，那么 **MSS = 1500- 20(IP Header) -20 (TCP Header) = 1460 byte**，如果应用层有 **2000 byte** 发送，那么需要两个切片才可以完成发送，第一个 TCP 切片 = 1460，第二个 TCP 切片 = 540。
 

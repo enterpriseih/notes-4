@@ -1,6 +1,6 @@
 # Java IO
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061117929.png" alt="image-20220406111706468" style="zoom:50%;" />
+<img src="img/202204061117929.png" alt="image-20220406111706468" style="zoom:50%;" />
 
 
 
@@ -12,7 +12,7 @@ NIO 主要有三大核心部分：Channel(通道)，Buffer(缓冲区)，Selector
 
 传统 IO 基于字节流和字符流进行操作，而 NIO 基于 Channel 和 Buffer进行操作，数据总是从通道读取到缓冲区中，或者从缓冲区写入到通道中。Selector用于监听多个通道的事件（比如：连接打开，数据到达）。因此，**单个线程可以监听多个数据通道**。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207191651377.png" alt="640 (4)" style="zoom:67%;" />
+<img src="img/202207191651377.png" alt="640 (4)" style="zoom:67%;" />
 
 > IO是面向流，NIO是面向缓冲区
 
@@ -52,7 +52,7 @@ Channel 和 IO 中的 Stream(流)是差不多一个等级的。只不过` Stream
 
 缓冲区，实际上是一个容器，是一个连续数组。Channel 提供从文件、网络读取数据的渠道，但是读取或写入的数据都必须经由 Buffer
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204061133636.png" alt="image-20220406113328926" style="zoom: 50%;" />
+<img src="img/202204061133636.png" alt="image-20220406113328926" style="zoom: 50%;" />
 
 从一个客户端向服务端发送数据，然后服务端接收数据的过程。客户端发送数据时，必须先将数据存入 Buffer 中，然后将 Buffer 中的内容写入通道。服务端这边接收数据必须通过 Channel 将数据读入到 Buffer 中，然后再从 Buffer 中取出数据来处理。 
 

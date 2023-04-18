@@ -135,11 +135,11 @@ public class LambdaTest1 {
 
 ### 内置四大核心函数式接口
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211555124.png" alt="image-20220421155539918" style="zoom:50%;" />
+<img src="img/202204211555124.png" alt="image-20220421155539918" style="zoom:50%;" />
 
 **其他接口**
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211556577.png" alt="image-20220421155621312" style="zoom:50%;" />
+<img src="img/202204211556577.png" alt="image-20220421155621312" style="zoom:50%;" />
 
 
 
@@ -435,7 +435,7 @@ Stream.generate(Math::random).limit(10).forEach(System.out::println);
 
 ### a>筛选与切片
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211652981.png" alt="image-20220421165243901" style="zoom:50%;" />
+<img src="img/202204211652981.png" alt="image-20220421165243901" style="zoom:50%;" />
 
 
 
@@ -470,7 +470,7 @@ public void test1(){
 
 ### b>映射
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211653683.png" alt="image-20220421165305630" style="zoom:50%;" />
+<img src="img/202204211653683.png" alt="image-20220421165305630" style="zoom:50%;" />
 
 
 
@@ -517,7 +517,7 @@ characterStream.forEach(System.out::println);
 
 ### c>排序
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211653060.png" alt="image-20220421165331941" style="zoom: 40%;" />
+<img src="img/202204211653060.png" alt="image-20220421165331941" style="zoom: 40%;" />
 
 
 
@@ -555,9 +555,9 @@ employees.stream().sorted( (e1,e2) -> {
 
 ### a>匹配与查找
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211727976.png" alt="image-20220421172745219" style="zoom:50%;" />
+<img src="img/202204211727976.png" alt="image-20220421172745219" style="zoom:50%;" />
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211728699.png" alt="image-20220421172816979" style="zoom:48%;" />
+<img src="img/202204211728699.png" alt="image-20220421172816979" style="zoom:48%;" />
 
 
 
@@ -593,7 +593,7 @@ System.out.println(employee1);
 
 ### b>归约
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211730298.png" alt="image-20220421173046047" style="zoom:50%;" />
+<img src="img/202204211730298.png" alt="image-20220421173046047" style="zoom:50%;" />
 
 备注：map 和 reduce 的连接通常称为 map-reduce 模式，因 Google 用它来进行网络搜索而出名。
 
@@ -619,7 +619,7 @@ System.out.println(sumMoney.get());
 
 ### c>收集
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211733569.png" alt="image-20220421173355505" style="zoom:50%;" />
+<img src="img/202204211733569.png" alt="image-20220421173355505" style="zoom:50%;" />
 
 Collector 接口中方法的实现决定了如何对流执行收集的操作(如收集到 List、Set、 Map)。
 
@@ -643,9 +643,9 @@ employeeSet.forEach(System.out::println);
 
 另外， Collectors 实用类提供了很多静态方法，可以方便地创建常见收集器实例， 具体方法与实例如下表:
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211736250.png" alt="image-20220421173454207" style="zoom:50%;" />
+<img src="img/202204211736250.png" alt="image-20220421173454207" style="zoom:50%;" />
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211736891.png" alt="image-20220421173508187" style="zoom:51%;" />
+<img src="img/202204211736891.png" alt="image-20220421173508187" style="zoom:51%;" />
 
 
 
@@ -657,7 +657,7 @@ Optional\<T> 类(java.util.Optional) 是一个容器类，它可以保存类型T
 
 > 这是一个可以为null的容器对象。如果值存在 则isPresent()方法会返回true，调用get()方法会返回该对象。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204211847835.png" alt="image-20220421184741327" style="zoom:50%;" />
+<img src="img/202204211847835.png" alt="image-20220421184741327" style="zoom:50%;" />
 
 ```java
 

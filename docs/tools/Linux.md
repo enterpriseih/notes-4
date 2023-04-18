@@ -102,11 +102,9 @@ Linux 支持很多文件类型，其中非常重要的文件类型有: **普通�
 
 ## Linux 基本命令
 
-下面只是给出了一些比较常用的命令。
+Linux 命令在线速查手册：https://www.w3xue.com/manual/linux/ 。
 
-推荐一个 Linux 命令快查网站，非常不错，大家如果遗忘某些命令或者对某些命令不理解都可以在这里得到解决。Linux 命令在线速查手册：https://www.w3xue.com/manual/linux/ 。
-
-另外，[shell.how](https://www.shell.how/) 这个网站可以用来解释常见命令的意思，对你学习 Linux 基本命令以及其他常用命令（如 Git、NPM）。
+> `命令 --help` 快速查看帮助文档
 
 ### 目录切换命令
 
@@ -268,17 +266,95 @@ Linux 系统是一个多用户多任务的分时操作系统，任何一个要�
 - `groupdel 用户组`:要删除一个已有的用户组
 - `groupmod 选项 用户组` : 修改用户组的属性
 
+### *系统信息命令
+
+- top：查看进程及资源占用情况
+
+`top [-] [d delay] [q] [c] [S] [s] [i] [n] [b]`
+
+> d : 改变显示的更新速度，或是在交谈式指令列( interactive command)按 s
+>
+> q : 没有任何延迟的显示速度，如果使用者是有 superuser 的权限，则 top 将会以最高的优先序执行
+>
+> c : 切换显示模式，共有两种模式，一是只显示执行档的名称，另一种是显示完整的路径与名称S : 累积模式，会将己完成或消失的子行程 ( dead child process ) 的 CPU time 累积起来
+>
+> s : 安全模式，将交谈式指令取消, 避免潜在的危机
+>
+> i : 不显示任何闲置 (idle) 或无用 (zombie) 的行程
+>
+> n : 更新的次数，完成后将会退出 top
+>
+> b : 批次档模式，搭配 "n" 参数一起使用，可以用来将 top 的结果输出到档案内
+
+- ps：查看进程信息
+
+> **`ps -ef`/`ps -aux`：** 这两个命令都是查看当前系统正在运行进程，两者的区别是展示格式不同。如果想要查看特定的进程可以使用这样的格式：**`ps -aux|grep redis`** （查看包括 redis 字符串的进程），也可使用 `pgrep redis -a`。
+>
+> 注意：如果直接用 ps（（Process Status））命令，会显示所有进程的状态，通常结合 grep 命令查看某进程的状态。
+
+- free：查看内存占用情况
+
+`free [-bkmotV][-s <间隔秒数>]`
+
+> -b 　以Byte为单位显示内存使用情况。
+>
+> -k 　以KB为单位显示内存使用情况。
+>
+> -m 　以MB为单位显示内存使用情况。
+>
+> -o 　不显示缓冲区调节列。
+>
+> -s<间隔秒数> 　持续观察内存使用状况。
+>
+> -t 　显示内存总和列。
+>
+> -V 　显示版本信息。
+
+- df：查看磁盘占用情况
+
+> `df [或者文件名]`：磁盘使用的文件系统信息
+
+- ifconfig：查看网络接口信息
+
+- netstat：查看网络状态信息
+
+
+
+- 
+
+> `lsof -i:8080`  =》查看8080端口的占用情况
+>
+> `curl localhost:8080` =》url请求localhost:8080
+>
+> `ps -ef|grep nginx` =》查看是否启动nginx
+
+### *文件查看命令
+
+- cat：查看文件内容
+
+`cat 文件名`
+
+- head：查看文件开头内容
+
+`head [-n lines | -c bytes] [file ...]`
+
+- tail：查看文件末尾内容
+
+
+
+- grep、sed、awk 三剑客：灵活查找和处理文件内容
+
+**`grep 要搜索的字符串 要搜索的文件 --color`：** 搜索命令，--color 代表高亮显示
+
+[sed](https://www.w3xue.com/manual/linux/linux-comm-sed.html)、[awk](https://www.w3xue.com/manual/linux/linux-comm-awk.html)
+
+
+
 ### 其他常用命令
 
 - **`pwd`：** 显示当前所在位置
 
 - `sudo + 其他命令`：以系统管理者的身份执行指令，也就是说，经由 sudo 所执行的指令就好像是 root 亲自执行。
-
-- **`grep 要搜索的字符串 要搜索的文件 --color`：** 搜索命令，--color 代表高亮显示
-
-- **`ps -ef`/`ps -aux`：** 这两个命令都是查看当前系统正在运行进程，两者的区别是展示格式不同。如果想要查看特定的进程可以使用这样的格式：**`ps -aux|grep redis`** （查看包括 redis 字符串的进程），也可使用 `pgrep redis -a`。
-
-  注意：如果直接用 ps（（Process Status））命令，会显示所有进程的状态，通常结合 grep 命令查看某进程的状态。
 
 - **`kill -9 进程的pid`：** 杀死进程（-9 表示强制终止。）
 

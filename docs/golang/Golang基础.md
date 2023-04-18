@@ -58,6 +58,24 @@
 	runtime.main_main·f: function main is undeclared in the main package
 	```
 
+## go.work
+
+因为vscode和go都是使用的workspace
+
+使用的就好了
+
+go work init ./
+
+go work use examples/echo
+
+examples/echo是包名
+
+
+
+git config --global url."https://git.wosai-inc.com"insteadOf "ssh://git.wosai-inc.com"
+
+git config --global url."ssh://git.wosai-inc.com"insteadOf "https://git.wosai-inc.com"
+
 ## 编译和运行
 
 Go是编译型语言
@@ -3410,7 +3428,7 @@ type Numeric interface {
 }
 ```
 
-这意味着一个接口不仅可以定义一组方法，还可以定义一组类型。使用 `Numeric` 接口作为类型约束，意味着值可以是整数或浮点数。
+**这意味着一个接口不仅可以定义一组方法**，**还可以定义一组类型**。使用 `Numeric` 接口作为类型约束，意味着值可以是整数或浮点数。
 
 ```go
 type Node[T Numeric] struct {
