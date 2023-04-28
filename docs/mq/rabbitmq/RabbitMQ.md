@@ -9,7 +9,7 @@ https://note.oddfar.com/pages/95ce73/#hello-world
 - AMQP全称：`Advanced Message Queuing Protocol` 高级消息队列协议。
 - AMQP定义：是具有现代特征的二进制协议。是一个提供统一消息服务的应用层标准高级消息队列协议，是**应用层协议的一个开放标准，为面向消息的中间件设计**。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121518726.jpg" alt="AMQP协议模型" style="zoom:67%;" />
+<img src="img/AMQP协议模型.png" alt="AMQP协议模型"  />
 
 
 
@@ -35,7 +35,7 @@ https://note.oddfar.com/pages/95ce73/#hello-world
 
 # RabbitMQ架构
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207181619273.png" alt="RabbitMQ-00000007" style="zoom:75%;" />
+<img src="img/RabbitMQ工作原理.png" alt="RabbitMQ-00000007"  />
 
 > ① 生产者将消息(msg)和路由键(routekey)发送指定的交换机(exchange)上
 >
@@ -79,7 +79,7 @@ RabbitMQ 使用信道的方式来传输数据。
 
 **发布订阅模式**：生产者和消息队列之间有一个交换机，生产者发送消息给交换机，交换机负责传递给对应的消息队列。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642577.png" alt="发布订阅模式"  />
+<img src="img/发布订阅模式.png" alt="发布订阅模式"  />
 
 以下都是发布订阅的模式的分类：
 
@@ -87,7 +87,7 @@ RabbitMQ 使用信道的方式来传输数据。
 
 **定向Direct**：也称路由模式，不同的消息根据路由键进行分配。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642954.png" alt="direct"/>
+<img src="img/定向模式.png" alt="direct"/>
 
 P：生产者，向Exchange发送消息，发送消息时，会指定一个routing key。
 
@@ -99,7 +99,7 @@ C2：消费者，其所在队列指定了需要routing key 为 info、error、wa
 
 **通配符/主题Topic**：路由键可以使用通配符进行绑定
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642805.png" alt="topic"/>
+<img src="img/topic模式.png" alt="topic"/>
 
 # 应答机制
 
@@ -111,7 +111,7 @@ C2：消费者，其所在队列指定了需要routing key 为 info、error、wa
 
 如果消费者由于某些原因失去连接(其通道已关闭，连接已关闭或 TCP 连接丢失)，导致消息未发送 ACK 确认，RabbitMQ 将了解到消息未完全处理，并将对其重新排队。如果此时其他消费者可以处理，它将很快将其重新分发给另一个消费者。这样，即使某个消费者偶尔死亡，也可以确保不会丢失任何消息。
 
-# [交换机](./rabbitmq/RabbitMQ-交换机.md)
+# [交换机](./RabbitMQ-交换机.md)
 
 Exchange属性：
 
@@ -127,7 +127,7 @@ Exchange属性：
 - 所有发送到Direct Exchange的消息被转发到Routing key中指定的Queue。
 - 一句话：直连的方式，生产者发送消息的Routing Key和Direct Exchange的Routing Key必须完全匹配，才会路由到绑定的Queue。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642954.png" alt="direct"/>
+<img src="img/DirectExchange.png" alt="direct"/>
 
 ## Topic Exchange
 
@@ -135,7 +135,7 @@ Exchange属性：
 - Exchange将Routing Key和某个Topic进行**模糊匹配**，此时队列需要绑定一个Topic。
 - 一句话：Topic Exchange和Queue绑定Routing Key可以使用通配符，生产者发送消息的Routing Key只要和Topic Exchange的Routing Key匹配就能路由到Topic Exchange绑定的队列。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642805.png" alt="topic"/>
+<img src="img/TopicExchange.png" alt="topic"/>
 
 比如要传送item的增删改查信息，创建四个队列复杂，使用通配符，item.*就可以传递
 
@@ -152,7 +152,7 @@ Exchange属性：
 - 发送到Exchange的消息都会被转发到与该Exchange绑定的所有Queue上。
 - Fanout Exchange转发消息是最快的。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121642577.png" alt="发布订阅模式"  />
+<img src="img/FanoutExchange.png" alt="发布订阅模式"  />
 
 ## Headers Exchange
 
@@ -168,7 +168,7 @@ Exchange属性：
 - x-match = all ：表示所有的键值对都匹配才能接受到消息；
 - x-match = any ：表示只要有键值对匹配就能接受到消息。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207121641034.png" alt="headers" />
+<img src="img/HeadersExchange.png" alt="headers" />
 
 # 如何保证消息发送？消息接收？
 
@@ -320,7 +320,7 @@ RabbitMQ 有三种模式：单机模式、普通集群模式、镜像集群模�
 
 缺点：1、集群内存在大量的数据传输；2、如果实例数据所在节点宕机，会导致丢失所有元数据。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202208191155314.jpg" alt="rabbitmq" style="zoom:80%;" />
+<img src="img/普通集群.png" alt="rabbitmq" style="zoom:80%;" />
 
 这种集群消费者消费数据要么就是随机连接一个机器拉取数据，要么固定来接queue所在实例获取数据，但是都不能做到高可用，前者数据获取会产生大量的网络开销，后者会产生单节点性能瓶颈。如果放 queue 的实例宕机了，会导致接下来其他实例就无法从那个实例拉取，如果你开启了消息持久化，让 RabbitMQ 落地存储消息的话，消息不一定会丢，但是必须要等这个实例恢复了，才可以继续从这个 queue实例拉取数据。
 
@@ -328,7 +328,7 @@ RabbitMQ 有三种模式：单机模式、普通集群模式、镜像集群模�
 
 镜像集群才是RabbitMQ所谓的高可用集群模式，镜像集群与普通集群的区别就在于镜像集群模式下，创建的queue，**不管是元数据还是queue的data都会存在于多个实例节点上**，**每个RabbitMQ节点上都会有一个完整的queue镜像**，每次把数据写到queue里的时候，都会自动同步消息到每个queue的节点上。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202208191200685.jpg" alt="rabbitmq2" style="zoom:80%;" />
+<img src="img/镜像集群.png" alt="rabbitmq2" style="zoom:80%;" />
 
 缺点：
 
