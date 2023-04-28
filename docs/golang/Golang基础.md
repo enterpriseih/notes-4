@@ -72,9 +72,7 @@ examples/echo是包名
 
 
 
-git config --global url."https://git.wosai-inc.com"insteadOf "ssh://git.wosai-inc.com"
-
-git config --global url."ssh://git.wosai-inc.com"insteadOf "https://git.wosai-inc.com"
+git config --global url."ssh://"insteadOf "https://"
 
 ## 编译和运行
 

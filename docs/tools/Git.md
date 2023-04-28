@@ -43,13 +43,25 @@ git 入门网站
 
 接下来，将通过对 我的博客 仓库进行实例操作，讲解如何使用 `Git` 拉取代码到提交代码的整个流程。
 
-### ssh
+### SSH
+
+先查看有没有，没有再执行
 
 ```
-ssh-keygen -t rsa -C yienx1205@gamil.com
+ssh-keygen -t rsa -C yienx1205@gmail.com
 ```
 
 针对该github账号形成密钥，进入 ~/.ssh 打开 id_rsa.pub 复制后添加至 github 
+
+而后生成token，在第一次push的时候使用token当作密码，成功后之后的每次都不用再输入token了
+
+注：如果输入错误，需要执行一下指令进行清除后才能和重新输入
+
+```shell
+git config --system --unset credential.helper
+```
+
+
 
 ### git clone
 

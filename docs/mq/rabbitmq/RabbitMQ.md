@@ -1,3 +1,5 @@
+https://note.oddfar.com/pages/95ce73/#hello-world
+
 # AMQP协议
 
 ## 简介

@@ -94,7 +94,7 @@ docker restart CONTAINER [CONTAINER...]
 docker ps
 
 # 进入容器
-docker exec –it 容器名(或id) /bin/bash
+docker exec -it 容器名(或id) /bin/bash
 # 使用exec之后用exit退出不会停止容器
 
 # 退出

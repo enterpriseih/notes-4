@@ -102,13 +102,13 @@
 
 ### :wrench: 工具
 
-- [git教程](./docs/tools/git/git教程.md)
+- [Git](./docs/tools/Git.md)
 - [正则表达式](./docs/tools/正则表达式.md)
 - [JUnit5](./docs/tools/JUnit5Test.md)
 - [Linux](./docs/tools/Linux.md)
-- [Shell](./docs/tools/shell.md)
+- [Shell](./docs/tools/Shell.md)
 - [Maven](./docs/maven/Maven.md)
-- [Docker](./docs/Docker.md)
+- [Docker](./docs/docker+k8s/Docker.md)
 
 ### 项目
 
