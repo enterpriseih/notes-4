@@ -14,7 +14,7 @@
   - [Topic 匹配案例](#topic-%E5%8C%B9%E9%85%8D%E6%A1%88%E4%BE%8B)
   - [Topic 实战](#topic-%E5%AE%9E%E6%88%98)
 
-在上一节中，我们创建了一个工作队列。我们假设的是工作队列背后，每个任务都恰好交付给一个消费者(工作进程)。在这一部分中，我们将做一些完全不同的事情-我们将消息传达给多个消费者。这种模式 称为 ”发布/订阅”。
+前面假设的是工作队列背后，每个任务都恰好交付给一个消费者(工作进程)。在这一部分中，将做一些完全不同的事情-将消息传达给多个消费者。这种模式 称为 ”发布/订阅”。
 
 
 
@@ -24,7 +24,7 @@ RabbitMQ 消息传递模型的核心思想是: **生产者生产的消息从不�
 
 相反，**生产者只能将消息发送到交换机(exchange)**，交换机工作的内容非常简单，一方面它接收来自生产者的消息，另一方面将它们推入队列。交换机必须确切知道如何处理收到的消息。是应该把这些消息放到特定队列还是说把他们到许多队列中还是说应该丢弃它们。这就的由交换机的类型来决定。
 
-![RabbitMQ-00000035](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000035.png)
+<img src="img/RabbitMQ-00000035.png" alt="RabbitMQ-00000035"  />
 
 **Exchanges 的类型：**
 
@@ -34,9 +34,11 @@ RabbitMQ 消息传递模型的核心思想是: **生产者生产的消息从不�
 
 ​	在前面部分我们对 exchange 一无所知，但仍然能够将消息发送到队列。之前能实现的 原因是因为我们使用的是默认交换，我们通过空字符串(“”)进行标识。
 
-![RabbitMQ-00000036](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000036.png)
+```java
+channel.basicPublish("", "hello", null, message.getBytes());
+```
 
-第一个参数是交换机的名称。空字符串表示默认或无名称交换机：消息能路由发送到队列中其实是由 routingKey(bindingkey)绑定 key 指定的，如果它存在的话
+第一个参数是交换机的名称。空字符串表示默认或无名称交换机：消息能路由发送到队列中其实是由 routingKey(bindingkey)绑定 key 指定的，如果它存在的话，`hello`的位置放的就是key了
 
 
 
@@ -52,67 +54,62 @@ RabbitMQ 消息传递模型的核心思想是: **生产者生产的消息从不�
 String queueName = channel.queueDeclare().getQueue();
 ```
 
-![RabbitMQ-00000037](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000037.png)
+<img src="img/RabbitMQ-00000037.png" alt="RabbitMQ-00000037"  />
 
 ## 绑定 bindings
 
-什么是 bingding 呢，binding 其实是 exchange 和 queue 之间的桥梁，它告诉我们 exchange 和那个队列进行了绑定关系。比如说下面这张图告诉我们的就是 X 与 Q1 和 Q2 进行了绑定
+binding 其实是 exchange 和 queue 之间的桥梁，它告诉我们 exchange 和那个队列进行了绑定关系。比如说下面这张图告诉我们的就是 X 与 Q1 和 Q2 进行了绑定
 
-![RabbitMQ-00000038](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000038.png)
+<img src="img/RabbitMQ-00000038.png" alt="RabbitMQ-00000038"  />
 
 
 
-![image-20210627203918539](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/image-20210627203918539.png)
+<img src="img/image-20210627203918539.png" alt="image-20210627203918539"  />
 
-## Fanout exchange
+## Fanout exchange 发布订阅
 
 ### Fanout 介绍
 
-Fanout 这种类型非常简单。正如从名称中猜到的那样，它是将接收到的所有消息广播到它知道的 所有队列中。系统中默认有些 exchange 类型
+Fanout **将接收到的所有消息广播到绑定的所有Queue中**，此时routingKey不起作用。系统中默认有些 exchange 类型。
 
-![RabbitMQ-00000039](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000039.png)
+<img src="img/RabbitMQ-00000039.png" alt="RabbitMQ-00000039"  />
 
 ### Fanout 实战 
 
 
 
-![RabbitMQ-00000040](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000040.png)
+<img src="img/RabbitMQ-00000040.png" alt="RabbitMQ-00000040"  />
 
 Logs 和临时队列的绑定关系如下图
 
-![RabbitMQ-00000041](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000041.png)
+<img src="img/RabbitMQ-00000041.png" alt="RabbitMQ-00000041"  />
 
 
 
-为了说明这种模式，我们将构建一个简单的日志系统。它将由两个程序组成:第一个程序将发出日志消 息，第二个程序是消费者。其中我们会启动两个消费者，其中一个消费者接收到消息后把日志存储在磁盘，
-
-
+为了说明这种模式，我们将构建一个简单的日志系统。启动两个消费者，一个打印在控制台，一个写入文件。
 
 ReceiveLogs01 将接收到的消息打印在控制台
 
 ```java
-package com.oddfar.five;
-
 import com.oddfar.utils.RabbitMqUtils;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DeliverCallback;
 
-/**
- * @author zhiyuan
- */
 public class ReceiveLogs01 {
     private static final String EXCHANGE_NAME = "logs";
 
     public static void main(String[] args) throws Exception {
 
         Channel channel = RabbitMqUtils.getChannel();
-        channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+        channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangType.FANOUT);
         /**
          * 生成一个临时的队列 队列的名称是随机的
          * 当消费者断开和该队列的连接时 队列自动删除
          */
         String queueName = channel.queueDeclare().getQueue();
-        //把该临时队列绑定我们的 exchange 其中 routingkey(也称之为 binding key)为空字符串
+        // 将该临时队列绑定我们的 exchange 
+        // 其中 routingkey(也称之为 binding key)为空字符串，
+        // 因为fanout下的exchange会广播给所有绑定的队列，所以key为空
         channel.queueBind(queueName, EXCHANGE_NAME, "");
         System.out.println("等待接收消息,把接收到的消息打印在屏幕........... ");
 
@@ -136,7 +133,7 @@ public class ReceiveLogs02 {
     public static void main(String[] args) throws Exception {
 
         Channel channel = RabbitMqUtils.getChannel();
-        channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+        channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangType.FANOUT);
         /**
          * 生成一个临时的队列 队列的名称是随机的
          * 当消费者断开和该队列的连接时 队列自动删除
@@ -173,11 +170,12 @@ public class EmitLog {
         Channel channel = RabbitMqUtils.getChannel();
 
         /**
-         * 声明一个 exchange
+         * 声明一个 exchange, 
+         * 大部分时候是消费者先上线，生产者多声明不会出问题的，幂等性
          * 1.exchange 的名称
          * 2.exchange 的类型
          */
-        channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+        channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangType.FANOUT);
         Scanner sc = new Scanner(System.in);
         System.out.println("请输入信息");
         while (sc.hasNext()) {
@@ -192,29 +190,29 @@ public class EmitLog {
 
 ## Direct exchange
 
-在上一节中，我们构建了一个简单的日志记录系统。我们能够向许多接收者广播日志消息。在本节我们将向其中添加一些特别的功能——让某个消费者订阅发布的部分消息。例如我们只把严重错误消息定向存储到日志文件(以节省磁盘空间)，同时仍然能够在控制台上打印所有日志消息。
+在本节将添加一些特别的功能——让某个消费者订阅发布的部分消息。例如我们只把严重错误消息定向存储到日志文件(以节省磁盘空间)，同时仍然能够在控制台上打印所有日志消息。
 
-我们再次来回顾一下什么是 bindings，绑定是交换机和队列之间的桥梁关系。也可以这么理解： **队列只对它绑定的交换机的消息感兴趣**。绑定用参数：routingKey 来表示也可称该参数为 binding key， 创建绑定我们用代码:channel.queueBind(queueName, EXCHANGE_NAME, "routingKey");
+**队列只对它绑定的交换机的消息感兴趣**。
+
+绑定用参数：routingKey 来表示也可称该参数为 binding key， 创建绑定我们用代码:`channel.queueBind(queueName, EXCHANGE_NAME, "routingKey");`
 
 绑定之后的意义由其交换类型决定。
 
 ### Direct 介绍
 
+上一节中的我们的日志系统将所有消息广播给所有消费者，对此我们想做一些改变，例如将日志消息写入磁盘的程序仅接收严重错误(errros)，而不存储警告(warning)或信息(info)日志消，避免浪费磁盘空间。
 
-
-上一节中的我们的日志系统将所有消息广播给所有消费者，对此我们想做一些改变，例如我们希 望将日志消息写入磁盘的程序仅接收严重错误(errros)，而不存储哪些警告(warning)或信息(info)日志 消息避免浪费磁盘空间。Fanout 这种交换类型并不能给我们带来很大的灵活性-它只能进行无意识的 广播，在这里我们将使用 direct 这种类型来进行替换，这种类型的工作方式是，消息只去到它绑定的 routingKey 队列中去。
-
-![RabbitMQ-00000042](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000042.png)
+<img src="img/RabbitMQ-00000042.png" alt="RabbitMQ-00000042"  />
 
 在上面这张图中，我们可以看到 X 绑定了两个队列，绑定类型是 direct。队列Q1 绑定键为 orange， 队列 Q2 绑定键有两个:一个绑定键为 black，另一个绑定键为 green.
 
-在这种绑定情况下，生产者发布消息到 exchange 上，绑定键为 orange 的消息会被发布到队列 Q1。绑定键为 blackgreen 和的消息会被发布到队列 Q2，其他消息类型的消息将被丢弃。
+在这种绑定情况下，生产者发布消息到 exchange 上，绑定键为 orange 的消息会被发布到队列 Q1。绑定键为 black 和 green 的消息会被发布到队列 Q2，其他消息类型的消息将被丢弃。
 
 ### 多重绑定 
 
 
 
-![RabbitMQ-00000043](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000043.png)
+<img src="img/RabbitMQ-00000043.png" alt="RabbitMQ-00000043"  />
 
 当然如果 exchange 的绑定类型是direct，**但是它绑定的多个队列的 key 如果都相同**，在这种情况下虽然绑定类型是 direct **但是它表现的就和 fanout 有点类似了**，就跟广播差不多，如上图所示。
 
@@ -222,11 +220,11 @@ public class EmitLog {
 
 关系：
 
-![RabbitMQ-00000044](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000044.png)
+<img src="img/RabbitMQ-00000044.png" alt="RabbitMQ-00000044"  />
 
 交换机：
 
-![RabbitMQ-00000045](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000045.png)
+<img src="img/RabbitMQ-00000045.png" alt="RabbitMQ-00000045"  />
 
 c2：绑定disk，routingKey为error
 
@@ -235,16 +233,12 @@ c1：绑定console，routingKey为info、warning
 1、
 
 ```java
-package com.oddfar.six;
-
-import com.oddfar.utils.RabbitMqUtils;
+import com.yienx.utils.RabbitMqUtils;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DeliverCallback;
 
-/**
- * @author zhiyuan
- */
+
 public class ReceiveLogsDirect01 {
     private static final String EXCHANGE_NAME = "direct_logs";
 
@@ -259,7 +253,7 @@ public class ReceiveLogsDirect01 {
         channel.queueBind(queueName, EXCHANGE_NAME, "error");
         System.out.println("等待接收消息...");
 
-        //发送回调
+        //回调
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), "UTF-8");
             message = "接收绑定键:" + delivery.getEnvelope().getRoutingKey() + ",消息:" + message;
@@ -290,7 +284,7 @@ public class ReceiveLogsDirect02 {
 
         System.out.println("等待接收消息...");
 
-        //发送回调
+        //回调
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), "UTF-8");
             message = "接收绑定键:" + delivery.getEnvelope().getRoutingKey() + ",消息:" + message;
@@ -332,17 +326,17 @@ public class EmitLogDirect {
 }
 ```
 
+
+
 ## Topics exchange
 
 ### Topic 的介绍
 
-在上一个小节中，我们改进了日志记录系统。我们没有使用只能进行随意广播的 fanout 交换机，而是使用了 direct 交换机，从而有能实现有选择性地接收日志。
+在上一个小节中，使用了 direct 交换机，从而有能实现有选择性地接收日志。
 
-尽管使用 direct 交换机改进了我们的系统，但是它仍然存在局限性——比方说我们想接收的日志类型有 info.base 和 info.advantage，某个队列只想 info.base 的消息，那这个时候direct 就办不到了。这个时候就只能使用 **topic** 类型
+仍然存在局限性——比方说想接收的日志类型有 info.base 和 info.advantage，某个队列只想 info.base 的消息，那这个时候direct 就办不到了。这个时候就只能使用 **topic** 类型
 
-::: tip Topic的要求
-
-:::
+> **Topic的要求**
 
 发送到类型是 topic 交换机的消息的 routing_key 不能随意写，必须满足一定的要求，它必须是**一个单词列表**，**以点号分隔开**。这些单词可以是任意单词
 
@@ -361,7 +355,7 @@ public class EmitLogDirect {
 
 下图绑定关系如下
 
-![RabbitMQ-00000046](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000046.png)
+<img src="img/TopicExchange.png"  />
 
 - Q1-->绑定的是
   - 中间带 orange 带 3 个单词的字符串 `(*.orange.*)`
@@ -375,7 +369,7 @@ public class EmitLogDirect {
 | 例子                     | 说明                                       |
 | ------------------------ | ------------------------------------------ |
 | quick.orange.rabbit      | 被队列 Q1Q2 接收到                         |
-| azy.orange.elephant      | 被队列 Q1Q2 接收到                         |
+| lazy.orange.elephant     | 被队列 Q1Q2 接收到                         |
 | quick.orange.fox         | 被队列 Q1 接收到                           |
 | lazy.brown.fox           | 被队列 Q2 接收到                           |
 | lazy.pink.rabbit         | 虽然满足两个绑定但只被队列 Q2 接收一次     |
@@ -390,14 +384,11 @@ public class EmitLogDirect {
 
 ### Topic 实战 
 
-![RabbitMQ-00000047](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000047.png)
+<img src="img/RabbitMQ-00000047.png" alt="RabbitMQ-00000047"  />
 
 代码如下：
 
 ```java
-package com.oddfar.seven;
-
-import com.oddfar.utils.RabbitMqUtils;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
@@ -407,7 +398,6 @@ import java.util.Map;
 /**
  * 发送端
  *
- * @author zhiyuan
  */
 public class EmitLogTopic {
     private static final String EXCHANGE_NAME = "topic_logs";

@@ -1,28 +1,11 @@
----
-title: RabbitMQ - 死信队列
-date: 2021-06-28 08:56:07
-permalink: /pages/1477b8/
----
-
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-- [死信的概念](#%E6%AD%BB%E4%BF%A1%E7%9A%84%E6%A6%82%E5%BF%B5)
-- [死信的来源](#%E6%AD%BB%E4%BF%A1%E7%9A%84%E6%9D%A5%E6%BA%90)
-- [死信实战](#%E6%AD%BB%E4%BF%A1%E5%AE%9E%E6%88%98)
-  - [死信之TTl](#%E6%AD%BB%E4%BF%A1%E4%B9%8Bttl)
-  - [死信之最大长度](#%E6%AD%BB%E4%BF%A1%E4%B9%8B%E6%9C%80%E5%A4%A7%E9%95%BF%E5%BA%A6)
-  - [死信之消息被拒](#%E6%AD%BB%E4%BF%A1%E4%B9%8B%E6%B6%88%E6%81%AF%E8%A2%AB%E6%8B%92)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ## 死信的概念
 
-先从概念解释上搞清楚这个定义，死信，顾名思义就是无法被消费的消息，字面意思可以这样理 解，一般来说，producer 将消息投递到 broker 或者直接到queue 里了，consumer 从 queue 取出消息 进行消费，但某些时候由于特定的原因**导致 queue 中的某些消息无法被消费**，这样的消息如果没有后续的处理，就变成了死信，有死信自然就有了死信队列。
+死信，就是无法被消费的消息。一般来说，producer 将消息投递到 broker 或者直接到queue 里了，consumer 从 queue 取出消息进行消费，但某些时候由于特定的原因**导致 queue 中的某些消息无法被消费**，这样的消息如果没有后续的处理，就变成了死信，有死信自然就有了死信队列。
 
-应用场景：为了保证订单业务的消息数据不丢失，需要使用到 RabbitMQ 的死信队列机制，当消息消费发生异常时，将消息投入死信队列中。还有比如说：用户在商城下单成功并点击去支付后在指定时间未支付时自动失效
+应用场景：
+
+- 为了保证订单业务的消息数据不丢失，需要使用到 RabbitMQ 的死信队列机制，当消息消费发生异常时，将消息投入死信队列中，再进行相对应的处理，防止消息丢失。
+- 用户在商城下单成功并点击去支付后在**指定时间未支付时自动失效**。
 
 
 
@@ -42,9 +25,9 @@ permalink: /pages/1477b8/
 
 ## 死信实战 
 
-![RabbitMQ-00000048](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000048.png)
+<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202305082034448.png" alt="RabbitMQ-00000048"  />
 
-### 死信之TTl
+### 死信之TTL
 
 消费者 C1 代码：
 
@@ -52,7 +35,6 @@ permalink: /pages/1477b8/
 /**
  * 死信队列 - 消费者01
  *
- * @author zhiyuan
  */
 public class Consumer01 {
 
@@ -109,7 +91,8 @@ public class Producer {
 
         channel.exchangeDeclare(NORMAL_EXCHANGE, BuiltinExchangeType.DIRECT);
         //设置消息的 TTL 时间 10s
-        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().expiration("10000").build();
+        AMQP.BasicProperties properties = 
+            new AMQP.BasicProperties().builder().expiration("10000").build();
         //该信息是用作演示队列个数限制
         for (int i = 1; i < 11; i++) {
             String message = "info" + i;
@@ -123,7 +106,7 @@ public class Producer {
 
 启动 C1 ，之后关闭消费者，模拟其接收不到消息。再启动 Producer
 
-![RabbitMQ-00000049](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000049.png)
+<img src="img/RabbitMQ-00000049.png" alt="RabbitMQ-00000049"  />
 
 消费者 C2 代码：
 
@@ -155,17 +138,36 @@ public class Consumer02 {
 }
 ```
 
-![RabbitMQ-00000050](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000050.png)
+<img src="img/RabbitMQ-00000050.png" alt="RabbitMQ-00000050"  />
 
 ### 死信之最大长度
 
-1、消息生产者代码去掉 TTL 属性
+1、消息生产者代码去掉 TTL 属性，`basicPublish` 的第三个参数改为 null
 
-![image-20210628101337825](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/image-20210628101337825.png)
+```java
+public class Producer {
+    //普通交换机的名称
+    public static final String NORMAL_EXCHANGE = "normal_exchange";
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        Channel channel = RabbitMQUtils.getChannel();
+
+        //死信消息 设置ttl时间 live to time 单位是ms
+        //AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().expiration("10000").build();
+        for (int i = 1; i <11 ; i++) {
+            String message = "info"+i;
+            channel.basicPublish(NORMAL_EXCHANGE,"zhangsan",null,message.getBytes());
+        }
+    }
+}
+
+```
+
+
 
 2、C1 消费者修改以下代码**(启动之后关闭该消费者 模拟其接收不到消息)**
 
-![RabbitMQ-00000051](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000051.png)
+<img src="img/RabbitMQ-00000051.png" alt="RabbitMQ-00000051"  />
 
 ```java
 //设置正常队列的长度限制，例如发10个，4个则为死信
@@ -176,7 +178,7 @@ params.put("x-max-length",6);
 
 3、C2 消费者代码不变(启动 C2 消费者) 
 
-![RabbitMQ-00000052](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000052.png)
+<img src="img/RabbitMQ-00000052.png" alt="RabbitMQ-00000052"  />
 
 ### 死信之消息被拒
 
@@ -239,15 +241,14 @@ public class Consumer01 {
         channel.basicConsume(normalQueue, false, deliverCallback, consumerTag -> {
         });
     }
-
 }
 ```
 
-![RabbitMQ-00000053](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000053.png)
+<img src="img/RabbitMQ-00000053.png" alt="RabbitMQ-00000053"  />
 
 3、C2 消费者代码不变
 
 启动消费者 1 然后再启动消费者 2 
 
-![RabbitMQ-00000054](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000054.png)
+<img src="img/RabbitMQ-00000054.png" alt="RabbitMQ-00000054"  />
 

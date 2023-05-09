@@ -1,8 +1,3 @@
----
-title: RabbitMQ - 发布确认
-date: 2021-06-27 18:01:21
-permalink: /pages/ef9b33/
----
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
@@ -17,7 +12,7 @@ permalink: /pages/ef9b33/
 
 ## 发布确认逻辑
 
-生产者将信道设置成 confirm 模式，一旦信道进入 confirm 模式，所有在该信道上面发布的消息都将会被指派一个唯一的 ID(从 1 开始)，一旦消息被投递到所有匹配的队列之后，broker 就会发送一个确认给生产者(包含消息的唯一 ID)，这就使得生产者知道消息已经正确到达目的队列了，如果消息和队列是可持久化的，那么确认消息会在将消息写入磁盘之后发出，broker 回传给生产者的确认消息中 delivery-tag 域包含了确认消息的序列号，此外 broker 也可以设置basic.ack 的 multiple 域，表示到这个序列号之前的所有消息都已经得到了处理。
+生产者将信道设置成 confirm 模式，一旦信道进入 confirm 模式，所有在该信道上面发布的消息都将会被指派一个唯一的 ID(从 1 开始)，一旦消息被投递到所有匹配的队列之后，broker 就会发送一个确认给生产者(包含消息的唯一 ID且在写入磁盘之后发出)，这就使得生产者知道消息已经正确到达目的队列了，如果消息和队列是可持久化的，那么**确认消息会在将消息写入磁盘之后发出**，broker 回传给生产者的确认消息中 delivery-tag 域包含了确认消息的序列号，此外 broker 也可以设置basic.ack 的 multiple 域，表示到这个序列号之前的所有消息都已经得到了处理。
 
 confirm 模式最大的好处在于他是异步的，一旦发布一条消息，生产者应用程序就可以在等信道返回确认的同时继续发送下一条消息，当消息最终得到确认之后，生产者应用便可以通过回调方法来处理该确认消息，如果RabbitMQ 因为自身内部错误导致消息丢失，就会发送一条 nack 消息， 生产者应用程序同样可以在回调方法中处理该 nack 消息。
 
@@ -113,17 +108,141 @@ public static void publishMessageBatch() throws Exception {
 
 异步确认虽然编程逻辑比上两个要复杂，但是性价比最高，无论是可靠性还是效率都没得说， 他是利用回调函数来达到消息可靠性传递的，这个中间件也是通过函数回调来保证是否投递成功， 下面就让我们来详细讲解异步确认是怎么实现的。
 
-![RabbitMQ-00000034](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000034.png)
+<img src="img/RabbitMQ-00000034.png" alt="RabbitMQ-00000034"  />
 
 
 
+ ```java
+ //异步发布确认
+ public static void publishMessageAsync() throws Exception{
+     Channel channel = RabbitMQUtils.getChannel();
+     //队列的声明
+     String queueName = UUID.randomUUID().toString();
+     channel.queueDeclare(queueName, false, true, false, null);
+ 
+     //开启发布确认
+     channel.confirmSelect();
+     //开始时间
+     long begin = System.currentTimeMillis();
+ 
+     //消息确认回调的函数
+     ConfirmCallback ackCallback = (deliveryTag,multiple) ->{
+         // TODO
+         System.out.println("确认的消息:"+deliveryTag);
+     };
+     /**
+      * 1.消息的标记
+      * 2.是否为批量确认
+      */
+     //消息确认失败回调函数
+     ConfirmCallback nackCallback= (deliveryTag,multiple) ->{
+         // TODO
+         System.out.println("未确认的消息:"+deliveryTag);
+     };
+ 
+     //准备消息的监听器 监听那些消息成功了，哪些消息失败了
+     /**
+      * 1.监听哪些消息成功了
+      * 2.监听哪些消息失败了
+      */
+     channel.addConfirmListener(ackCallback,nackCallback);//异步通知
+ 
+     //批量发送消息
+     for (int i = 0; i < MESSAGE_COUNT; i++) {
+         String message=i+"消息";
+         channel.basicPublish("",queueName,null,message.getBytes());
+     }
+ 
+     //结束时间
+     long end = System.currentTimeMillis();
+     System.out.println("发布"+MESSAGE_COUNT+"个异步发布确认消息，耗时:"+(end-begin)+"ms");
+ }
+ ```
 
 
 
-
-如何处理异步未确认消息?
+#### 如何处理异步未确认消息?
 
 最好的解决的解决方案就是把未确认的消息放到一个基于内存的能被发布线程访问的队列， 比如说用 ConcurrentLinkedQueue 这个队列在 confirm callbacks 与发布线程之间进行消息的传递。
+
+
+
+```java
+//异步发布确认
+public static void publishMessageAsync() throws Exception{
+
+    Channel channel = RabbitMQUtils.getChannel();
+    //队列的声明
+    String queueName = UUID.randomUUID().toString();
+    channel.queueDeclare(queueName, false, true, false, null);
+
+    //开启发布确认
+    channel.confirmSelect();
+
+    /**
+     * 线程安全有序的一个哈希表，适用于高并发的情况下
+     * 1.轻松的将序号与消息进行关联
+     * 2.轻松批量删除条目 只要给到序号
+     * 3.支持高并发(多线程)
+     * 4.支持有序批量操作
+     */
+    ConcurrentSkipListMap<Long,String> outstandingConfirms=
+        new ConcurrentSkipListMap<>();
+
+    //消息确认回调的函数
+    ConfirmCallback ackCallback = (deliveryTag,multiple) ->{
+        if(multiple) {
+            //2.删除掉已经确认的消息 剩下的就是未确认的消息
+            //headMap保留key小于tag的视图，只是映射，不是个新的map
+            ConcurrentNavigableMap<Long, String> confirmed =
+                outstandingConfirms.headMap(deliveryTag);
+            // 将outstandingConfirms中的这部分删除
+            confirmed.clear();
+        }else {
+            outstandingConfirms.remove(deliveryTag);
+        }
+        System.out.println("确认的消息:" + deliveryTag);
+    };
+    /**
+     * 1.消息的标记
+     * 2.是否为批量确认
+     */
+    //消息确认失败回调函数
+    ConfirmCallback nackCallback= (deliveryTag,multiple) ->{
+        //3.打印一下未确认的消息都有哪些
+        String message = outstandingConfirms.remove(deliveryTag);
+        System.out.println("未确认的消息是:"+message+":::未确认的消息tag:"+deliveryTag);
+    };
+
+    //准备消息的监听器 监听那些消息成功了，哪些消息失败了
+    /**
+         * 1.监听哪些消息成功了
+         * 2.监听哪些消息失败了
+         */
+    channel.addConfirmListener(ackCallback,nackCallback);//异步通知
+
+    //开始时间
+    long begin = System.currentTimeMillis();
+
+    //批量发送消息
+    for (int i = 0; i < MESSAGE_COUNT; i++) {
+        String message=i+"消息";
+        channel.basicPublish("",queueName,null,message.getBytes());
+        //1.此处记录下所有要发送的消息 消息的总和
+        outstandingConfirms.put(channel.getNextPublishSeqNo(),message);
+    }
+
+    //结束时间
+    long end = System.currentTimeMillis();
+    System.out.println("发布"+MESSAGE_COUNT+"个异步发布确认消息，耗时:"+(end-begin)+"ms");
+}
+```
+
+
+
+
+
+
 
 **以上 3 种发布确认速度对比 :**
 

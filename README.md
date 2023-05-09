@@ -69,7 +69,7 @@
 - [MyBatis笔记](./docs/framework/mybatis/MyBatis笔记.md)
 - [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)
 - [SpringBoot笔记](./docs/framework/spring/springboot/SpringBoot笔记.md)
-- [SpringBoot常用注解](./docs/framework/spring/springboot/spring-common-annotations.md)
+- [SpringBoot常用注解](./docs/framework/spring/spring-common-annotations.md)
 - [SpringCloud笔记](./docs/framework/spring/springcloud/SpringCloud.md)
 - [SpringSecurity](./docs/framework/spring/springsecurity/SpringSecurity.md)
 
