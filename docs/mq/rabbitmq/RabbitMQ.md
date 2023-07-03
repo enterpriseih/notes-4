@@ -1,4 +1,10 @@
-https://note.oddfar.com/pages/95ce73/#hello-world
+- [简单案例](./01-RabbitMQ简单案例.md)
+- [确认发布](./02-RabbitMQ确认发布.md)
+- [交换机](./03-RabbitMQ交换机.md)
+- [死信队列](./04-RabbitMQ死信队列.md)
+- [延迟队列+SpringBoot](./05-RabbitMQ延迟队列+springboot.md)
+- [发布确认高级](./06-RabbitMQ发布确认高级.md)
+- [幂等性、优先、惰性](./07-RabbitMQ幂等性、优先级、惰性.md)
 
 # AMQP协议
 

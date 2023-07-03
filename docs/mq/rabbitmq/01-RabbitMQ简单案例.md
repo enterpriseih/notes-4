@@ -104,10 +104,7 @@ public class Producer {
 获取“生产者”发出的消息
 
 ```java
-package com.oddfar.one;
-
 import com.rabbitmq.client.*;
-
 
 public class Consumer {
     private final static String QUEUE_NAME = "hello";

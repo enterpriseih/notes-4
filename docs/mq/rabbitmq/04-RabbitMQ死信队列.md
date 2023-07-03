@@ -1,6 +1,6 @@
 ## 死信的概念
 
-死信，就是无法被消费的消息。一般来说，producer 将消息投递到 broker 或者直接到queue 里了，consumer 从 queue 取出消息进行消费，但某些时候由于特定的原因**导致 queue 中的某些消息无法被消费**，这样的消息如果没有后续的处理，就变成了死信，有死信自然就有了死信队列。
+死信，就是无法被消费的消息。一般来说，producer 将消息投递到 broker 或者直接到queue 里了，consumer 从 queue 取出消息进行消费，但某些时候由于特定的原因**导致 queue 中的某些消息无法被消费**，这样的消息如果没有后续的处理，就变成了死信，有死信自然就有了**死信队列** (DLX, Dead Letter Exchange)。
 
 应用场景：
 
@@ -62,9 +62,12 @@ public class Consumer01 {
         params.put("x-dead-letter-exchange", DEAD_EXCHANGE);
         //正常队列设置死信 routing-key 参数 key 是固定值
         params.put("x-dead-letter-routing-key", "lisi");
+        // 这里也可以设置过期时间，在生产方发送的时候指定可以更加灵活
+        params.put("x-message-ttl", 10000);
 
         //正常队列
         String normalQueue = "normal-queue";
+        // params是正常队列绑定的死信交换机及对应队列的的信息
         channel.queueDeclare(normalQueue, false, false, false, params);
         channel.queueBind(normalQueue, NORMAL_EXCHANGE, "zhangsan");
 
@@ -73,8 +76,7 @@ public class Consumer01 {
             String message = new String(delivery.getBody(), "UTF-8");
             System.out.println("Consumer01 接收到消息" + message);
         };
-        channel.basicConsume(normalQueue, true, deliverCallback, consumerTag -> {
-        });
+        channel.basicConsume(normalQueue, true, deliverCallback, consumerTag -> {});
     }
 
 }
@@ -88,9 +90,9 @@ public class Producer {
 
     public static void main(String[] argv) throws Exception {
         Channel channel = RabbitMqUtils.getChannel();
-
+		
         channel.exchangeDeclare(NORMAL_EXCHANGE, BuiltinExchangeType.DIRECT);
-        //设置消息的 TTL 时间 10s
+        //设置消息的 TTL 时间 10s, time to live
         AMQP.BasicProperties properties = 
             new AMQP.BasicProperties().builder().expiration("10000").build();
         //该信息是用作演示队列个数限制
@@ -119,7 +121,9 @@ public class Consumer02 {
 
     public static void main(String[] args) throws Exception {
         Channel channel = RabbitMqUtils.getChannel();
-
+		/**
+		 * 可以不用重新声明了，前面声明过就可以了
+		 */
         //声明交换机
         channel.exchangeDeclare(DEAD_EXCHANGE, BuiltinExchangeType.DIRECT);
         //声明队列
@@ -132,8 +136,7 @@ public class Consumer02 {
             String message = new String(delivery.getBody(), "UTF-8");
             System.out.println("Consumer02 接收到消息" + message);
         };
-        channel.basicConsume(deadQueue, true, deliverCallback, consumerTag -> {
-        });
+        channel.basicConsume(deadQueue, true, deliverCallback, consumerTag -> {});
     }
 }
 ```
@@ -170,7 +173,7 @@ public class Producer {
 <img src="img/RabbitMQ-00000051.png" alt="RabbitMQ-00000051"  />
 
 ```java
-//设置正常队列的长度限制，例如发10个，4个则为死信
+//设置正常队列的长度限制，例如发10个，4个则为死信，因为最大长度为6
 params.put("x-max-length",6);
 ```
 

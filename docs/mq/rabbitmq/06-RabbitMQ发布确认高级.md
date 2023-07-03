@@ -1,33 +1,16 @@
----
-title: RabbitMQ - 发布确认高级
-date: 2021-06-29 13:06:08
-permalink: /pages/c94906/
----
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-- [发布确认 springboot 版本](#%E5%8F%91%E5%B8%83%E7%A1%AE%E8%AE%A4-springboot-%E7%89%88%E6%9C%AC)
-- [回退消息](#%E5%9B%9E%E9%80%80%E6%B6%88%E6%81%AF)
-- [备份交换机](#%E5%A4%87%E4%BB%BD%E4%BA%A4%E6%8D%A2%E6%9C%BA)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-
-
-在生产环境中由于一些不明原因，导致 RabbitMQ  重启，在 RabbitMQ 重启期间生产者消息投递失败， 导致消息丢失，需要手动处理和恢复。于是，我们开始思考，如何才能进行 RabbitMQ 的消息可靠投递呢？ 
+在生产环境中由于一些不明原因，导致 RabbitMQ 重启，在 RabbitMQ 重启期间生产者消息投递失败，导致消息丢失，需要手动处理和恢复。于是，我们开始思考，如何才能进行 RabbitMQ 的消息可靠投递呢？ 
 
 ## 发布确认 springboot 版本
 
 确认机制方案：
 
-![RabbitMQ-00000068](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000068.png)
+<img src="img/发布确认机制方案.png" alt="RabbitMQ-00000068"  />
 
 代码架构图：
 
 
 
-![RabbitMQ-00000069](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000069.png)
+<img src="img/RabbitMQ-00000069.png" alt="RabbitMQ-00000069"  />
 
 在配置文件当中需要添加
 
@@ -41,9 +24,7 @@ spring.rabbitmq.publisher-confirm-type=correlated
 
 - `SIMPLE` 值经测试有两种效果，其一效果和 CORRELATED 值一样会触发回调方法，其二在发布消息成功后使用 rabbitTemplate 调用 waitForConfirms 或 waitForConfirmsOrDie 方法等待 broker 节点返回发送结果，根据返回结果来判定下一步的逻辑，要注意的点是 waitForConfirmsOrDie 方法如果返回 false 则会关闭 channel，则接下来无法发送消息到 broker;
 
-::: tip 代码
-
-:::
+> 代码
 
 **1、添加配置类：**
 
@@ -100,7 +81,7 @@ public class MyCallBack implements RabbitTemplate.ConfirmCallback {
 }
 ```
 
-**3、消息生产者** 
+**3、消息生产者**  
 
 ```java
 @RestController
@@ -164,11 +145,11 @@ public class ConfirmConsumer {
 
 结果分析：
 
-![image-20210629135636990](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/image-20210629135636990.png)
+<img src="img/image-20210629135636990.png" alt="image-20210629135636990"  />
 
 可以看到，发送了两条消息，第一条消息的 RoutingKey 为 "key1"，第二条消息的 RoutingKey 为 "key2"，两条消息都成功被交换机接收，也收到了交换机的确认回调，但消费者只收到了一条消息，因为第二条消息的 RoutingKey 与队列的 BindingKey 不一致，也没有其它队列能接收这个消息，所有第二条消息被直接丢弃了。
 
-丢弃的消息交换机是不知道的，需要解决告诉生产者消息传送失败
+丢弃的消息交换机是不知道的，**需要解决告诉生产者消息传送失败**
 
 ## 回退消息
 
@@ -178,7 +159,7 @@ Mandatory 参数
 rabbitTemplate.setReturnsCallback(myCallBack);
 ```
 
-在仅开启了生产者确认机制的情况下，交换机接收到消息后，会直接给消息生产者发送确认消息，如果发现该消息不可路由，那么消息会被直接丢弃，此时生产者是不知道消息被丢弃这个事件的。
+> 在仅开启了生产者确认机制的情况下，交换机接收到消息后，会直接给消息生产者发送确认消息，如果发现该消息不可路由，那么消息会被直接丢弃，此时生产者是不知道消息被丢弃这个事件的。
 
 那么如何让无法被路由的消息帮我想办法处理一下？最起码通知我一声，我好自己处理啊。通过设置 mandatory 参数可以在当消息传递过程中不可达目的地时将消息返回给生产者。
 
@@ -263,7 +244,7 @@ public void init() {
 
 结果分析：
 
-![image-20210629143756078](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/image-20210629143756078.png)
+<img src="img/image-20210629143756078.png" alt="image-20210629143756078"  />
 
 
 
@@ -273,13 +254,13 @@ public void init() {
 
 有了 mandatory 参数和回退消息，我们获得了对无法投递消息的感知能力，在生产者的消息无法被投递时发现并处理。但有时候，我们并不知道该如何处理这些无法路由的消息，最多打个日志，然后触发报警，再来手动处理。而通过日志来处理这些无法路由的消息是很不优雅的做法，特别是当生产者所在的服务有多台机器的时候，手动复制日志会更加麻烦而且容易出错。而且设置 mandatory 参数会增加生产者的复杂性，需要添加处理这些被退回的消息的逻辑。如果既不想丢失消息，又不想增加生产者的复杂性，该怎么做呢？
 
-前面在设置死信队列的文章中，我们提到，可以为队列设置死信交换机来存储那些处理失败的消息，可是这些不可路由消息根本没有机会进入到队列，因此无法使用死信队列来保存消息。 在 RabbitMQ 中，有一种备份交换机的机制存在，可以很好的应对这个问题。
+> 前面在设置死信队列的文章中，我们提到，可以为队列设置死信交换机来存储那些处理失败的消息，可是这些不可路由消息根本没有机会进入到队列，因此无法使用死信队列来保存消息。 在 RabbitMQ 中，有一种备份交换机的机制存在，可以很好的应对这个问题。
 
 什么是备份交换机呢？备份交换机可以理解为 RabbitMQ 中交换机的“备胎”，当我们为某一个交换机声明一个对应的备份交换机时，就是为它创建一个备胎，当交换机接收到一条不可路由消息时，将会把这条消息转发到备份交换机中，由备份交换机来进行转发和处理，通常备份交换机的类型为 Fanout ，这样就能把所有消息都投递到与其绑定的队列中，然后我们在备份交换机下绑定一个队列，这样所有那些原交换机无法被路由的消息，就会都进 入这个队列了。当然，我们还可以建立一个报警队列，用独立的消费者来进行监测和报警。
 
 - 代码架构图 
 
-![RabbitMQ-00000072](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000072.png)
+<img src="img/RabbitMQ-00000072.png" alt="RabbitMQ-00000072"  />
 
 1、修改配置类
 
@@ -380,15 +361,15 @@ public class WarningConsumer {
 
 之前已写过 `confirm.exchange` 交换机，由于更改配置，需要删掉，不然会报错
 
-![RabbitMQ-00000073](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/RabbitMQ-00000073.png)
+<img src="img/RabbitMQ-00000073.png" alt="RabbitMQ-00000073"  />
 
 
 
 - 访问： <http://localhost:8080/confirm/sendMessage/%E4%BD%A0%E5%A5%BD>
 
-![image-20210629152752935](https://cdn.jsdelivr.net/gh/oddfar/static/img/RabbitMQ/image-20210629152752935.png)
+<img src="img/image-20210629152752935.png" alt="image-20210629152752935"  />
 
-mandatory 参数与备份交换机可以一起使用的时候，如果两者同时开启，消息究竟何去何从？谁优先级高，经过上面结果显示答案是**备份交换机优先级高**。
+mandatory 参数与备份交换机可以一起使用的时候，如果两者同时开启，**备份交换机优先级高**。
 
 
 

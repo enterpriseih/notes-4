@@ -102,6 +102,16 @@ git init -b main .
 
 或创建的时候指定
 
+
+
+显示配置信息
+
+```
+git config --global --list
+```
+
+
+
 ### git branch
 
 > 创建、重命名、查看、删除项目分支，通过 `Git` 做项目开发时，一般都是在开发分支中进行，开发完成后合并分支到主干。
@@ -139,6 +149,11 @@ git branch -d daily/0.0.1
 ```
 git checkout daily/0.0.1
 
+```
+
+> 创建并切换分支
+> 
+```
 # 在checkout命令指定 -b选项执行，可以创建分支并进行切换。
 git checkout -b <branch>
 ```
@@ -267,6 +282,16 @@ Date:   Wed Jan 11 09:31:33 2017 +0800
 ```
 
 提交记录可能会非常多，按 `J` 键往下翻，按 `K` 键往上翻，按 `Q` 键退出查看
+
+### git reset
+
+```
+git reset --hard [版本号, 即git log中commit后的部分]
+```
+
+
+
+
 
 ### git tag
 

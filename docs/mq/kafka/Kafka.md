@@ -1,20 +1,24 @@
+# 概念
+
+分布式、基于发布订阅模式、消息队列
+
 # Kafka消费模式
 
 ### 点对点
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231109893.png" alt="一对一消费模式" style="zoom:75%;" />
+<img src="img/点对点.png" alt="一对一消费模式"  />
 
 消息生产者发布消息到Queue队列中，通知消费者从队列中拉取消息进行消费。**消息被消费之后则删除**，Queue支持多个消费者，但对于一条消息而言，只有一个消费者可以消费，即一条消息只能被一个消费者消费。
 
 ### 发布/订阅
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231109265.png" alt="一对多消费" style="zoom:75%;" />
+<img src="img/发布订阅.png" alt="一对多消费"  />
 
 利用Topic存储消息，消息生产者将消息发布到Topic中，同时有多个消费者订阅此topic，消费者可以从中消费消息，注意发布到Topic中的消息会被多个消费者消费，**消费者消费数据之后，数据不会被清除**，Kafka会默认保留一段时间，然后再删除。
 
 # 基础架构
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231723315.png" alt="image-20220723172346266" style="zoom:50%;" />
+<img src="img/基础架构.png" alt="image-20220723172346266"  />
 
 - **Consumer Group**：消费者组，消费者组则是一组中存在多个消费者，消费者消费Broker中当前Topic的不同分区中的消息，消费者组之间互不影响，所有的消费者都属于某个消费者组，即消费者组是**逻辑上的一个订阅者**。**某一个分区中的消息只能被一个消费者组中的一个消费者所消费**
 - **Broker**：经纪人，一台Kafka服务器就是一个Broker，一个集群由多个Broker组成，一个Broker可以容纳多个Topic。
@@ -45,7 +49,17 @@ Zookeeper存储：运行的broker、leader、ISR（后续详情）
 
 # 生产者-发送流程
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207241723861.png" alt="image-20220724172301478" style="zoom:50%;" />
+在消息发送的过程中，涉及到了两个线程——**main** 线程和 **Sender** 线程。
+
+在 main 线程中创建了一个双端队列 **RecordAccumulator**。main 线程将消息发送给  RecordAccumulator， Sender 线程不断从 RecordAccumulator 中拉取消息发送到 Kafka Broker。
+
+<img src="img/生产者发布流程.png" alt="image-20220724172301478"  />
+
+Serializer：在代码中需要指定kv的序列化
+
+- 异步发送
+- 异步发送带回调
+- 同步发送
 
 # 生产者-分区策略
 
@@ -64,7 +78,7 @@ Zookeeper存储：运行的broker、leader、ISR（后续详情）
 
 topic的每个partition收到producer发送的数据后，都需要向producer发送ack，如果producer收到ack就会进行下一轮的发送，**否则重新发送数据**。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231505094.png" alt="消息发送示意图" style="zoom:75%;" />
+<img src="img/生产者ISR.png" alt="消息发送示意图"  />
 
 
 
@@ -108,12 +122,12 @@ Kafka为用户提供了三种可靠性级别，用户根据可靠性和延迟的
 - `1`：producer等待broker的ack，partition的leader落盘成功后返回ack，**如果在follower同步成功之前leader故障，那么将丢失数据。**
 	- ack后生产者不会再发，因为它认为已经发过了
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231515736.png" alt="img" style="zoom:75%;" />
+<img src="img/生产者ACK01.png" alt="img" style="zoom:75%;" />
 
 - `-1(all`：producer等待broker的ack，partition的leader和ISR的follower全部落盘成功才返回ack，但是**如果在follower同步完成后，broker发送ack之前，如果leader发生故障，会造成数据重复。**
 	- 生产者没有收到ack，会继续重发，导致数据重复
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231515832.png" alt="img" style="zoom:75%;" />
+<img src="img/生产者ACK02.png" alt="img" style="zoom:75%;" />
 
 # 生产者-数据去重
 
@@ -151,13 +165,13 @@ Kafka为用户提供了三种可靠性级别，用户根据可靠性和延迟的
 
 > 幂等性只能保证的是在**单分区单会话**内不重复。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231631507.png" alt="image-20220723163133703" style="zoom:50%;" />
+<img src="img/幂等性.png" alt="image-20220723163133703" style="zoom: 67%;" />
 
 ## 事务
 
 > 开启事务，必须开启幂等性。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231635374.png" alt="image-20220723163544418" style="zoom:50%;" />
+<img src="img/事务.png" alt="image-20220723163544418"  />
 
 
 
@@ -186,11 +200,11 @@ Kafka为用户提供了三种可靠性级别，用户根据可靠性和延迟的
 >
 > 根据Sequence Number来判断，只要发现不是单调递增的数据，就暂停落盘，之前的可以落盘。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231649708.png" alt="image-20220723164939787" style="zoom:50%;" />
+<img src="img/数据乱序.png" alt="image-20220723164939787"  />
 
 
 
-### 
+
 
 # Broker-文件存储与清理
 
@@ -204,7 +218,7 @@ Topic是逻辑上的改变，Partition是物理上的概念，每个Partition对
 
 主要通过相应的log和index等文件保存具体的消息文件。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231456601.png" alt="iShot_2022-07-23_14.51.02" style="zoom:50%;" />
+<img src="img/文件存储01.png" alt="iShot_2022-07-23_14.51.02" style="zoom:50%;" />
 
 生产者不断的向log文件追加消息文件，为了防止log文件过大导致定位效率低下，Kafka的log文件以1G为一个分界点，**当.log文件大小超过1G的时候，此时会创建一个新的.log文件**，同时为了快速定位大文件中消息位置，Kafka采取了**分片**和**索引**的机制来加速定位。
 
@@ -242,7 +256,7 @@ Topic是逻辑上的改变，Partition是物理上的概念，每个Partition对
 
 - compact日志压缩：对于相同key的不同value值，只保留最后一个版本
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207232207746.png" alt="image-20220723220716680" style="zoom:50%;" />
+<img src="img/文件存储02.png" alt="image-20220723220716680" style="zoom:50%;" />
 
 > compact策略只适合特殊场景，比如消息的key是用户ID，value是用户的资料，通过这种压缩策略，整个消息集里就保存了所有用户最新的资料。
 
@@ -250,7 +264,7 @@ Topic是逻辑上的改变，Partition是物理上的概念，每个Partition对
 
 # Broker-ZK
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231722919.png" alt="image-20220723172224560" style="zoom:50%;" />
+<img src="img/Broker-ZK.png" alt="image-20220723172224560" style="zoom:50%;" />
 
 在zookeeper的服务端存储的Kafka相关信息: 
 
@@ -270,7 +284,7 @@ Topic是逻辑上的改变，Partition是物理上的概念，每个Partition对
 
 # Broker-工作流程
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231728982.png" alt="image-20220723172814768" style="zoom:50%;" />
+<img src="img/Broker工作流程.png" alt="image-20220723172814768" style="zoom:50%;" />
 
 > AR：分区中所有副本统称；启动的时候会有个节点顺序
 >
@@ -310,7 +324,7 @@ Topic是逻辑上的改变，Partition是物理上的概念，每个Partition对
 
 ## 数据一致性问题
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207231517320.png" alt="img" style="zoom:75%;" />
+<img src="img/数据一致性.png" alt="img" style="zoom:75%;" />
 
 - **LEO(Log End Offset)**：每个副本最后的一个offset
 - **HW(High Watermark)**：**ISR队列中最小**的LEO。
@@ -341,7 +355,7 @@ Topic是逻辑上的改变，Partition是物理上的概念，每个Partition对
 
 **PageCache页缓存**：Kafka重度依赖底层操作系统提供的PageCache功能。当上层有写操作时，操作系统只是将数据写入 PageCache。当读操作发生时，先从PageCache中查找，如果找不到，再去磁盘中读取。实际上PageCache是把尽可能多的空闲内存都当作了磁盘缓存来使用。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207232216743.png" alt="image-20220723221626036" style="zoom:50%;" />
+<img src="img/高效读取数据.png" alt="image-20220723221626036" style="zoom:50%;" />
 
 
 
@@ -363,7 +377,7 @@ Broker主动给消费者推送消息。
 
 ## 总体工作流程
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207232230504.png" alt="image-20220723223004825" style="zoom:50%;" />
+<img src="img/消费者工作流程.png" alt="image-20220723223004825" style="zoom:50%;" />
 
 ## 消费者组原理
 
@@ -372,13 +386,13 @@ Consumer Group(CG)：消费者组，由多个consumer组成。形成一个消费
 - **消费者组内每个消费者负责消费不同分区的数据**，一个分区的数据只能由消费者组中的一个消费者消费。
 - **消费者组之间互不影响**。所有的消费者都属于某个消费者组，即消费者组是逻辑上的一个订阅者。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207232254396.png" alt="image-20220723225400882" style="zoom:50%;" />
+<img src="img/消费者组原理.png" alt="image-20220723225400882" style="zoom:50%;" />
 
 # 消费者-分区的分配与再平衡
 
 分区分配策略：Range、RoundRobin、Sticky、CooperativeSticky
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207241726579.png" alt="image-20220724172641695" style="zoom:50%;" />
+<img src="img/消费者-分区的分配与再平衡.png" alt="image-20220724172641695" style="zoom:50%;" />
 
 由哪个consumer来消费哪个partition的数据。
 
@@ -386,7 +400,7 @@ Consumer Group(CG)：消费者组，由多个consumer组成。形成一个消费
 
 ## 一、Range
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207241735909.png" alt="image-20220724173537768" style="zoom:50%;" />
+<img src="img/Range.png" alt="image-20220724173537768" style="zoom:50%;" />
 
 Range针对的是每个topic。
 
@@ -400,7 +414,7 @@ Range针对的是每个topic。
 
 ## 二、RoundRobin
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207241747463.png" alt="image-20220724174745117" style="zoom:50%;" />
+<img src="img/RoundRobin.png" alt="image-20220724174745117" style="zoom:50%;" />
 
 RoundRobin 针对集群中所有Topic而言。
 
@@ -430,7 +444,7 @@ __consumer_offsets 主题里面采用 key 和 value 的方式存储数据。**ke
 
 ## 自动提交offset
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207241812346.png" alt="image-20220724181218486" style="zoom:50%;" />
+<img src="img/自动提交offset.png" alt="image-20220724181218486" style="zoom:50%;" />
 
 自动提交offset的相关参数：
 
@@ -440,7 +454,7 @@ __consumer_offsets 主题里面采用 key 和 value 的方式存储数据。**ke
 
 ## 手动提交offset
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207241814054.png" alt="image-20220724181441277" style="zoom:50%;" />
+<img src="img/手动提交offset.png" alt="image-20220724181441277" style="zoom:50%;" />
 
 手动提交offset的方法有两种：分别是**commitSync**(同步提交)和**commitAsync**(异步提交)。
 
@@ -475,7 +489,7 @@ auto.offset.reset = earliest | latest | none 默认是 latest。
 - 重复消费：已经消费了数据，但是 offset 没提交。自动提交引起的。 
 - 漏消费：先提交 offset 后消费，有可能会造成数据的漏消费。手动提交引起的。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207241843495.png" alt="image-20220724184344430" style="zoom:50%;" />
+<img src="img/漏消费和重复消费.png" alt="image-20220724184344430" style="zoom:50%;" />
 
 如何解决：消费者事务
 
@@ -489,7 +503,7 @@ auto.offset.reset = earliest | latest | none 默认是 latest。
 
 # 消费者-数据积压之消费者提高吞吐量
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207241848242.png" alt="image-20220724184833581" style="zoom:50%;" />
+<img src="img/消费者-数据积压之消费者提高吞吐量.png" alt="image-20220724184833581" style="zoom:50%;" />
 
 1. Kafka消费能力不足
 
