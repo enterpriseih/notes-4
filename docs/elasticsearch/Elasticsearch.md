@@ -1,179 +1,12 @@
 # 1.elasticsearch概述
 
-Elasticsearch 是一个**分布式、高扩展、高实时**的搜索与[数据分析](https://baike.baidu.com/item/数据分析/6577123)引擎。它能很方便的使大量数据具有搜索、分析和探索的能力。它提供**可扩展**的搜索，具有**接近实时**的搜索。ES本身扩展性很好，可以扩展到上百台服务器。ES也使用Java开发并使用Lucene作为核心来实现所有索引和搜索的功能，但是它的目的是通过简单的RESTful API来隐藏Lucene的复杂性，从而让全文检索变得简单。
-
-据国际权威的数据库产品评测机构DB Engines的统计，在2016年1月，ElasticSearch已经超过Solr等，成为排名第一的搜索引擎类应用！
-
- 
-
-**谁在使用ES：**
-
-- 维基百科，类似百度百科，全文检索，高亮，搜索推荐。
-- Stack Overflow，国外程序异常论坛。
-- GitHub。
-- 电商网站，检索商品。
-- 国内：站内搜索（电商，招聘，门户），IT系统搜索，数据分析。
-
-# 2.elasticsearch环境
-
-## 2.1.安装elasticsearch
-
-> Linux普通安装
-
-**下载地址：https://www.elastic.co/cn/downloads/elasticsearch**
-
-```shell
-# jdk1.8最低要求！elasticsearch支持客户端，界面工具！
-# Java开发，elasticsearch的版本和我们之后对应的Java的核心包！版本对应！JDK环境正常
-
-# 1、下载elasticsearch-7.8.0-linux-x86_64.tar.gz，然后解压到指定文件，就可以使用了！
-
-# 2、熟悉elasticsearch目录
-- bin                   # 启动文件    
-- config                # 配置文件
-    log4j2              # 日志配置文件
-    jvm.options         # JVM相关配置 如过内存小 修改一下JVM的配置
-    elasticsearch.yml   # ElasticSearch配置文件  默认9200端口
-- lib                   # 相关jar
-- modules               # 功能模块
-- plugins               # 插件
-- logs                  # 日志
-
-# 3、启动elasticsearch之前的准备工作
-# 由于elasticsearch-7.X不能以Root启动elasticsearch，所以需要创建用户
-adduser Tangs # 添加用户
-passwd Tangs # 设置密码
-
-chown -R Tangs /opt/elasticsearch/elasticsearch-7.8.0/  # Root个用户权限！
-
-# 4、以新的用户到bin目录启动elasticsearch脚本
-[Tangs@Ringo bin]$ ./elasticsearch
-
-# 5、测试连接
-[root@Ringo elasticsearch-7.8.0]# curl localhost:9200
-{
-  "name" : "Ringo",
-  "cluster_name" : "elasticsearch",
-  "cluster_uuid" : "IS5Y80WYRJOj4AHmIQ32Fw",
-  "version" : {
-    "number" : "7.8.0",
-    "build_flavor" : "default",
-    "build_type" : "tar",
-    "build_hash" : "757314695644ea9a1dc2fecd26d1a43856725e65",
-    "build_date" : "2020-06-14T19:35:50.234439Z",
-    "build_snapshot" : false,
-    "lucene_version" : "8.5.1",
-    "minimum_wire_compatibility_version" : "6.8.0",
-    "minimum_index_compatibility_version" : "6.0.0-beta1"
-  },
-  "tagline" : "You Know, for Search"
-}
-```
-
-> Docker安装
-
-```shell
-# 1、需要将elasticsearch的config文件夹拷贝到挂载目录下
-
-# 2、修改elasticsearch.yml 文件
-network.host: 0.0.0.0
-http.port: 9200
-
-# 3、启动并运行
-docker run -e "ES_JAVA_OPTS=-Xms256m -Xmx256m" \
---name elasticsearch -p 9200:9200 -p 9300:9300 \
--e "discovery.type=single-node" \
--v /root/elasticsearch/config:/usr/share/elasticsearch/config \
--d elasticsearch:7.8.0
-
-# 4、测试连接
-[root@Ringo config]# curl localhost:9200
-{
-  "name" : "78f3957f5cb9",
-  "cluster_name" : "elasticsearch",
-  "cluster_uuid" : "-IsEt9kXQxKemftK6b8RaA",
-  "version" : {
-    "number" : "7.8.0",
-    "build_flavor" : "default",
-    "build_type" : "docker",
-    "build_hash" : "757314695644ea9a1dc2fecd26d1a43856725e65",
-    "build_date" : "2020-06-14T19:35:50.234439Z",
-    "build_snapshot" : false,
-    "lucene_version" : "8.5.1",
-    "minimum_wire_compatibility_version" : "6.8.0",
-    "minimum_index_compatibility_version" : "6.0.0-beta1"
-  },
-  "tagline" : "You Know, for Search"
-}
-```
+Elasticsearch 是一个**分布式、高扩展、高实时**的搜索与数据分析引擎。它能很方便的使大量数据具有搜索、分析和探索的能力。它提供**可扩展**的搜索，具有**接近实时**的搜索。
 
 
 
-## 2.2.安装elasticsearch-head
+# 2.ES环境
 
-**下载地址：https://github.com/mobz/elasticsearch-head**
-
-```shell
-# 1、安装node.js
-
-# 2、安装grunt
-npm install -g grunt-cli
-
-# 查看grunt是否安装成功
-grunt -version
-
-# 3、克隆elasticsearch-head项目
-
-# 4、到elasticsearch-head目录下安装依赖
-npm install
-
-# 5、运行elasticsearch-head
-npm run start
-
-# 6、开启elasticsearch服务端的跨域支持，进入elasticsearch.yml
-# 在文件末尾添加如下配置
-http.cors.enabled: true
-http.cors.allow-origin: "*"
-node.master: true
-node.data: true
-
-# 取消以下两行的注释
-cluster.name: my-application
-node.name: node-1
-
-# 7、测试连接
-http://localhost:9100/
-```
-
-## 2.3.安装kibana
-
-**下载地址：https://www.elastic.co/cn/downloads/kibana**
-
-**Kibana的版本要和elasticsearch版本对应！**
-
-> Docker安装
-
-```shell
-# 1、拉取kibana镜像
-docker pull kibana:7.8.0
-
-# 2、修改kibana.yml
-server.port: 5601
-server.name: "kibana"
-server.host: "0.0.0.0"
-elasticsearch.hosts: ["http://172.18.0.5:9200"]
-
-# 3、运行kibana
-docker run --name kibana --privileged=true -p 5601:5601 \
--v /root/kibana/config:/usr/share/kibana/config \
--d kibana:7.8.0
-
-# 4、测试连接
-http://39.97.3.60:5601
-
-# 5、kibana汉化 打开kibana.yml
-i18n.locale: "zh-CN"   # 重启docker容器这样就可以将kibana汉化了！ 
-```
+略
 
 # 3.ES核心概念
 
@@ -234,7 +67,7 @@ user
 
 一个集群至少有一个节点，而一个节点就是一个`elasticsearch`进程，节点可以有多个索引，如果创建索引，那么索引将会有5个分片(`primary shard`，又称主分片)构成，每一个主分片会有一个副本（`replica shard`，又称复制分片）。
 
-![分片](https://img-blog.csdnimg.cn/20200808165624176.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JyaW5nb18=,size_16,color_FFFFFF,t_70)
+<img src="img/集群结构.png" alt="分片"  />
 
 上图是一个有3个节点的集群，可以直接看到主分片[P]和对应的复制分片[R]都不会在同一个节点内，这样有利于某个节点挂掉了，数据也不会丢失。实际上，一个分片是一个`Lucene`索引，一个包含__倒排索引__的文件目录，倒排索引的结构使得`elasticsearch`在不扫描全部文档的情况下，就能告诉你哪些文档包含特定的关键字。不过，倒排索引是什么？
 
@@ -274,23 +107,24 @@ To forever,study every day, good good up # 文档2包含的内容
 
 两个文档都匹配，但是第一个文档比第二个匹配程度更高。如果没有别的条件，现在，这两个包含关键字的都将返回。
 
-
+- 正排索引：文档 -> 词条1、词条2、...
+- 倒排索引：词条1 -> 文档1、文档2、...
 
 > 创建倒排索引步骤
 
 1、创建文档列表：`Lucene`首先对原始文档数据进行编号，形成列表，就是一个文档列表。
 
-![文档列表](https://img-blog.csdnimg.cn/20200808170226686.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JyaW5nb18=,size_16,color_FFFFFF,t_70)
+<img src="img/倒排索引1.png" alt="文档列表" style="zoom:67%;" />
 
 
 
-2、创建倒排索引列表：対原始文档中的数据进行分词，得到词条。対词条进行编号，以词条创建索引。然后记录下包含该词条的所有文档编号及其他信息。
+2、创建倒排索引列表：対原始文档中的数据进行**分词**，得到词条。対词条进行编号，以词条创建索引。然后记录下包含该词条的所有文档编号及其他信息。
 
-<img src="https://img-blog.csdnimg.cn/20200808170240614.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JyaW5nb18=,size_16,color_FFFFFF,t_70" alt="创建倒排索引"  />
+<img src="img/倒排索引2.png" alt="创建倒排索引" style="zoom:80%;" />
 
 
 
-**搜索的过程：**
+- **搜索的过程：**
 
 当用户输入任意的词条时，首先对用户输入的数据进行分词，得到用户要搜索的所有词条，然后拿着这些词条去倒排索引列表中进行匹配。找到这些词条就能找到包含这些词条的所有文档的编号。
 
@@ -298,125 +132,18 @@ To forever,study every day, good good up # 文档2包含的内容
 
 
 
-# 4.IK分词器插件
+## 3.6 段
 
-## 4.1.什么是IK分词器？
+<img src="img/段.png" alt="image-20230704150649534" style="zoom:50%;" />
 
-**分词**：即把一段中文或者别的划分为一个个的关键字，我们在搜索时候会把自己的信息进行分词，会把数据库中或者索引库中的数据进行分词，然后进行一个匹配操作，默认的中文分词是将每个字看成一个词，比如"我喜欢你"会被分为"我"，"喜"，"欢"，"你"，这显然是不符合要求的，所以我们需要安装中文分词器ik来解决这个问题。
-
-如果要使用中文，建议使用ik分词器。
-
-IK提供了两个分词算法：`ik_smart`和`ik_max_word`，其中`ik_smart`为最少切分，`ik_max_word`为最细粒度划分！
-
-## 4.2.安装IK分词器插件
-
-> Docker安装
-
-**压缩文件下载地址：https://github.com/medcl/elasticsearch-analysis-ik/releases**
-
-```shell
-# 注意IK要和ES版本一直
-
-# 1、进入Docker容器执行
-./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.8.0/elasticsearch-analysis-ik-7.8.0.zip
-
-# 2、查看IK是否安装成功
-[root@a2fa79fcb8ef bin]# ./elasticsearch-plugin list
-analysis-ik
-```
-
-## 4.3.查看不同的分词器
-
-> ik_smart最少切分
-
-![ik_smart](https://img-blog.csdnimg.cn/2020080817382810.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JyaW5nb18=,size_16,color_FFFFFF,t_70)
+- 一个集群包含1个或多个节点；
+- 一个节点包含1个或多个索引；
+- 一个索引：类似 Mysql 中的数据库；
+- 每个索引又由一个或多个分片组成；
+- 每个分片都是一个 Lucene 索引实例，您可以将其视作一个独立的搜索引擎，它能够对 Elasticsearch 集群中的数据子集进行索引并处理相关查询；
+- 每个分片包含多个segment (段)，每一个segment都是一个倒排索引。
 
 
-
-> ik_max_word为最细粒度划分！穷尽所有可能！
-
-![ik_max_word](https://img-blog.csdnimg.cn/20200808174011818.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JyaW5nb18=,size_16,color_FFFFFF,t_70)
-
-
-
-## 4.3.自定义字典
-
-> 给IK增加字典
-
-```xml 
-<!--第一步：在IKAnalyzer.cfg.xml同级目录下新建一个自己的字典ringo.dic并写入内容-->
-棠时
-
-<!--找到IKAnalyzer.cfg.xml可以增加自己的字典-->
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
-        <comment>IK Analyzer 扩展配置</comment>
-        <!--用户可以在这里配置自己的扩展字典 -->
-        <entry key="ext_dict">ringo.dic</entry>
-         <!--用户可以在这里配置自己的扩展停止词字典-->
-        <entry key="ext_stopwords"></entry>
-        <!--用户可以在这里配置远程扩展字典 -->
-        <!-- <entry key="remote_ext_dict">words_location</entry> -->
-        <!--用户可以在这里配置远程扩展停止词字典-->
-        <!-- <entry key="remote_ext_stopwords">words_location</entry> -->
-</properties>
-
-<!--第三步：重启elasticsearch-->
-```
-
-> 测试
-
-```json
-# 1、没有增加自己定义的字典之前
-# 测试样例
-GET _analyze
-{
-  "analyzer": "ik_smart",
-  "text": "棠时"
-}
-
-# 结果
-{
-  "tokens" : [
-    {
-      "token" : "棠",
-      "start_offset" : 0,
-      "end_offset" : 1,
-      "type" : "CN_CHAR",
-      "position" : 0
-    },
-    {
-      "token" : "时",
-      "start_offset" : 1,
-      "end_offset" : 2,
-      "type" : "CN_CHAR",
-      "position" : 1
-    }
-  ]
-}
-
-# 2、增加自己自定义的词典并重启elasticsearch之后
-# 测试样例
-GET _analyze
-{
-  "analyzer": "ik_smart",
-  "text": "棠时"
-}
-
-# 结果
-{
-  "tokens" : [
-    {
-      "token" : "棠时",
-      "start_offset" : 0,
-      "end_offset" : 2,
-      "type" : "CN_WORD",
-      "position" : 0
-    }
-  ]
-}
-```
 
 # 5.关于索引的基本操作
 
@@ -431,9 +158,9 @@ GET _analyze
 |  GET   |     localhost:9200/索引名称/类型名称/文档id     |  通过文档id查询文档  |
 |  POST  |    localhost:9200/索引名称/类型名称/_search     |     查询所有数据     |
 
-## 5.2.添加索引
+> types类型名称在7.x后彻底去除，默认使用_doc，一个index中只包含一个类型
 
-当然不是只有`kibana`可以测试，使用其他软件如`Postman`或者T`alend APT Tester`都可以。
+## 5.2.添加索引
 
 ```shell
 # 使用Postman测试 
@@ -842,6 +569,8 @@ GET /testdb/_search
 }
 ```
 
+
+
 # 7.SpringBoot整合ES
 
 **官方文档地址：https://www.elastic.co/guide/en/elasticsearch/client/index.html**
@@ -962,7 +691,7 @@ public class ElasticSearchConf {
 
 > ES自动配置
 
-![自动配置](https://img-blog.csdnimg.cn/2020080911062628.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JyaW5nb18=,size_16,color_FFFFFF,t_70)
+![自动配置](img/springboot的es配置.png)
 
 
 
@@ -992,8 +721,6 @@ class RestClientConfigurations {
 ## 7.2.关于索引的API操作
 
 ```java
-package com.ymy.elasticsearch;
-
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -1075,8 +802,6 @@ public class TestESIdxAPI {
 ## 7.3.关于文档的API操作
 
 ```java
-package com.ymy.elasticsearch;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymy.elasticsearch.entity.User;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -1295,3 +1020,4 @@ public class TestESDocAPI2 {
     }
 }
 ```
+

@@ -115,7 +115,8 @@ git config --global --list
 ### git branch
 
 > 创建、重命名、查看、删除项目分支，通过 `Git` 做项目开发时，一般都是在开发分支中进行，开发完成后合并分支到主干。
->
+
+> 创建分支
 
 ```
 git branch daily/0.0.0
@@ -123,23 +124,46 @@ git branch daily/0.0.0
 
 创建一个名为 `daily/0.0.0` 的日常开发分支，分支名只要不包括特殊字符即可。
 
+> 重命名分支
+
 ```
 git branch -m daily/0.0.0 daily/0.0.1
 ```
 
-如果觉得之前的分支名不合适，可以为新建的分支重命名，重命名分支名为 `daily/0.0.1`
+重命名分支名为 `daily/0.0.1`
+
+如果是远程分支，得先重命名本地对应分支，然后删除远程分支，再推送
+
+> 查看当前项目分支列表
 
 ```
+# 本地
 git branch
+# 远程和本地
+git branch -a
 ```
 
-通过不带参数的branch命令可以查看当前项目分支列表
+> 删除本地分支
 
 ```
 git branch -d daily/0.0.1
 ```
 
 如果分支已经完成使命则可以通过 `-d` 参数将分支删除
+
+> 将分支dev推到远程
+
+```
+git push origin dev:dev
+```
+
+> 删除远程分支
+
+```
+git push origin --delete dev
+```
+
+
 
 ### git checkout
 
@@ -148,7 +172,6 @@ git branch -d daily/0.0.1
 
 ```
 git checkout daily/0.0.1
-
 ```
 
 > 创建并切换分支

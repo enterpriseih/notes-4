@@ -629,12 +629,14 @@ Collector 接口中方法的实现决定了如何对流执行收集的操作(如
 // 练习1：查找工资大于6000的员工，结果返回为一个List或Set
 
 List<Employee> employees = EmployeeData.getEmployees();
-List<Employee> employeeList = employees.stream().filter(e -> e.getSalary() > 6000).collect(Collectors.toList());
+List<Employee> employeeList = employees.stream()
+    .filter(e -> e.getSalary() > 6000).collect(Collectors.toList());
 // List自身的forEach
 employeeList.forEach(System.out::println);
 
 
-Set<Employee> employeeSet = employees.stream().filter(e -> e.getSalary() > 6000).collect(Collectors.toSet());
+Set<Employee> employeeSet = employees.stream()
+    .filter(e -> e.getSalary() > 6000).collect(Collectors.toSet());
 employeeSet.forEach(System.out::println);
 
 ```
