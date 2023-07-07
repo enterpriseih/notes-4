@@ -108,6 +108,8 @@ git init -b main .
 
 ```
 git config --global --list
+or
+cat ~/.gitconfig
 ```
 
 
