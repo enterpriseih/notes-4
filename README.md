@@ -1,6 +1,6 @@
 # notes by YiENx
 
-好好学习，天天向上！！！
+### [JDNotes](./docs/JD/JDNotes目录)
 
 ### :coffee: Java基础
 
@@ -51,20 +51,24 @@
 ### :globe_with_meridians:计算机基础
 
 - [计算机网络](./docs/computer/计算机网络.md)
+- [TCP的拆包与粘包](./docs/computer/TCP的拆包与粘包.md)
 - [攻击技术](./docs/computer/攻击技术.md)
 - [Web](./docs/computer/Web.md)
 - [IO模型](./docs/computer/IO模型.md)
 
-### 分布式
+### 分布式与微服务
 
 - [分布式与微服务](./docs/distributed/分布式与微服务.md)
 - [接口的幂等性](./docs/distributed/接口的幂等性.md)
 - [Zookeeper](./docs/distributed/zookeeper/Zookeeper.md)
+- [Netty](./docs/netty/Netty)
+- [NettyRpc](./docs/netty/NettyRpc)
 
 ### 框架
 
 - [Spring](./docs/framework/spring/Spring.md)
 - [动态代理](./docs/framework/spring/动态代理.md)
+- [拦截器Intercepter](./docs/framework/spring/拦截器Intercepter.md)
 - [SpringMVC笔记](./docs/framework/spring/springmvc/SpringMVC笔记.md)
 - [MyBatis笔记](./docs/framework/mybatis/MyBatis笔记.md)
 - [MyBatis-plus笔记](./docs/framework/mybatis/MyBatis-plus笔记.md)
@@ -72,6 +76,7 @@
 - [**SpringBoot常用注解**](./docs/framework/spring/spring-common-annotations.md)
 - [SpringCloud笔记](./docs/framework/spring/springcloud/SpringCloud.md)
 - [SpringSecurity](./docs/framework/spring/springsecurity/SpringSecurity.md)
+- [日志](./docs/framework/日志)
 
 ### :pencil2: 数据结构与算法
 
