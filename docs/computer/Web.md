@@ -156,7 +156,7 @@ function setCookie(name, value) {
 
 问题：同一个web容器中可能有多个web程序，不同的web程序中可能会用到同个第三方类库的不同版本。
 
-<img src="img/打破双亲委派.png" alt="img" style="zoom:80%;" />
+<img src="assets/打破双亲委派.png" alt="img" style="zoom:80%;" />
 
 >  如上图，上面的橙色部分还是和原来一样，采用双亲委派机制，而黄色部分是tomcat第一部分自定义的类加载器，这部分主要加载tomcat包中的类，这一部分依然采用的是双亲委派机制，而绿色部分是tomcat第二部分自定义类加载器，正是这一部分，打破了类的双亲委派机制。
 
@@ -363,7 +363,7 @@ session.getAttribute("user");
 
 session复制
 
-<img src="img/session复制.png" style="zoom: 67%;" />
+<img src="assets/session复制.png" style="zoom: 67%;" />
 
 ### 2、cookie+redis实现***
 
@@ -377,7 +377,7 @@ session复制
 
 ### 3、token实现***
 
-<img src="img/token.png" alt="图片" style="zoom:67%;" />
+<img src="assets/token.png" alt="图片" style="zoom:67%;" />
 
 1. 用户向服务器发送用户名、密码以及验证码用于登陆系统。
 

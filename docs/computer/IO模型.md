@@ -5,7 +5,7 @@
 - read：把数据从磁盘读取到内核缓冲区，再拷贝到用户缓冲区
 - write：先把数据写入到 socket缓冲区，最后写入网卡设备
 
-<img src="img/传统IO流.png" alt="img" style="zoom:80%;" />
+<img src="assets/传统IO流.png" alt="img" style="zoom:80%;" />
 
 1. 用户空间的应用程序通过read()函数，向操作系统发起IO调用，上下文从用户态到切换到内核态，然后再通过 DMA 控制器将数据从磁盘文件中读取到内核缓冲区
 2. 接着CPU将内核空间缓冲区的数据拷贝到用户空间的数据缓冲区，然后read系统调用返回，而系统调用的返回又会导致上下文从内核态切换到用户态
@@ -18,19 +18,25 @@
 
 # 用户态和内核态
 
-通过**系统调用**将Linux整个体系分为内核态和用户态(或者说内核空间和用户空间)。
+>   用户态和内核态是操作系统的两种运行级别。
 
-内核态从本质上说就是我们所说的内核，它是一种**特殊的软件程序**。控制计算机的硬件资源，例如协调CPU资源，分配内存资源，并且提供稳定的环境供应用程序运行。
+## 概念
 
-**用户态就是提供应用程序运行的空间**，为了使应用程序访问到内核管理的资源例如CPU，内存，I/O。
+**内核态**(Kernel Mode)：运行操作系统程序，操作硬件
 
-内核必须提供一组通用的访问接口，这些接口就叫**系统调用**。
+-   处于内核态执行时，则能访问所有的内存空间和对象，且所占有的处理器是不允许被抢占的。
 
-**从用户态到内核态切换可以通过三种方式**:
+**用户态**(User Mode)：运行用户程序
 
-1. 系统调用：其实系统调用本身就是中断，但是软件中断，跟硬中断不同。
-2. 异常：如果当前进程运行在用户态，如果这个时候发生了异常事件，就会触发切换。例如：缺页异常。
-3. 外设中断：当外设完成用户的请求时，会向CPU发送中断信号。
+-   处于用户态执行时，进程所能访问的内存空间和对象受到限制，其所处于占有的处理器是可被抢占的
+
+## 切换
+
+用户态—>内核态：唯一途径是通过中断、异常、陷入机制(访管指令)
+
+内核态—>用户态：设置程序状态字 (Program Status Word, PSW)
+
+
 
 # 零拷贝
 
@@ -53,6 +59,7 @@
 ```c
 #include <sys/mman.h>
 void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
+    
 ```
 
 - addr：指定映射的虚拟内存地址
@@ -66,7 +73,7 @@ void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset
 
 **内存映射mmap**：核心就是操作系统**把内核缓冲区与应用程序共享**，将一段用户空间内存映射到内核空间，当映射成功后，用户对这段内存区域的修改可以直接反映到内核空间；同样地，内核空间对这段区域的修改也直接反映用户空间。正因为有这样的映射关系, 就不需要在用户态与内核态之间拷贝数据。
 
-<img src="img/mmap+write.png" alt="img" style="zoom:80%;" />
+<img src="assets/mmap+write.png" alt="img" style="zoom:80%;" />
 
 1. 用户应用程序通过 mmap() 向操作系统发起 IO调用，上下文从用户态切换到内核态；然后通过 DMA 将数据从磁盘中复制到内核空间缓冲区
 2. mmap 系统调用返回，上下文从内核态切换回用户态（这里不需要将数据从内核空间复制到用户空间，因为用户空间和内核空间共享了这个缓冲区）
@@ -89,7 +96,7 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 
 只要我们的代码执行 read 或者 write 这样的系统调用，一定会发生 2 次上下文切换：首先从用户态切换到内核态，当内核执行完任务后，再切换回用户态交由进程代码执行。因此，如果想减少上下文切换次数，就一定要减少系统调用的次数，解决方案就是**把 read、write 两次系统调用合并成一次**，在内核中完成磁盘与网卡的数据交换。在 Linux 2.1 版本内核开始引入的 sendfile 就是通过这种方式来实现零拷贝的：
 
-<img src="img/sendfile.png" alt="img" style="zoom:80%;" />
+<img src="assets/sendfile.png" alt="img" style="zoom:80%;" />
 
 1. 用户应用程序发出 sendfile 系统调用，上下文从用户态切换到内核态；然后通过 DMA 控制器将数据从磁盘中复制到内核缓冲区中
 2. 然后CPU将数据从内核空间缓冲区复制到 socket 缓冲区
@@ -102,7 +109,7 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 
 Linux 2.4 版本之后，对 sendfile 做了升级优化，引入了 SG-DMA技术，其实就是对DMA拷贝加入了 scatter/gather 操作，它可以直接从内核空间缓冲区中将数据读取到网卡，无需将内核空间缓冲区的数据再复制一份到 socket 缓冲区，从而省去了一次 CPU拷贝。
 
-<img src="img/DMA+sendfile.png" alt="img" style="zoom:80%;" />
+<img src="assets/DMA+sendfile.png" alt="img" style="zoom:80%;" />
 
 1. 用户应用程序发出 sendfile 系统调用，上下文从用户态切换到内核态；然后通过 DMA 控制器将数据从磁盘中复制到内核缓冲区中
 2. 接下来不需要CPU将数据复制到 socket 缓冲区，而是将相应的文件描述符信息复制到 socket 缓冲区，该描述符包含了两种的信息：①内核缓冲区的内存地址、②内核缓冲区的偏移量
@@ -220,7 +227,7 @@ https://blog.csdn.net/qq_44377709/article/details/123724519
 - 内核缓冲区中有完整的数据后，内核会将内核缓冲区中的数据复制到用户缓冲区
 - 直到用户缓冲区中有数据，用户进程才能解除阻塞状态继续执行
 
-<img src="img/BIO同步阻塞.png" alt="640" style="zoom:67%;" />
+<img src="assets/BIO同步阻塞.png" alt="640" style="zoom:67%;" />
 
 ## 二、NIO同步非阻塞
 
@@ -231,7 +238,7 @@ https://blog.csdn.net/qq_44377709/article/details/123724519
 - 当内核缓冲区**数据准备好了之后**，用户**进程阻塞**，内核开始将内核缓冲区数据复制到用户缓冲区
 - 复制完成后，用户进程解除阻塞，读取数据继续执行
 
-<img src="img/NIO非同步阻塞.png" alt="640 (1)" style="zoom:67%;" />
+<img src="assets/NIO非同步阻塞.png" alt="640 (1)" style="zoom:67%;" />
 
 所以事实上，在非阻塞 IO 模型中，**用户线程**需要**不断地询问内核数据是否就绪**，也就说非阻塞 IO 不会交出 CPU，而会一直占用 CPU。
 
@@ -251,7 +258,7 @@ IO多路复用模型是**建立在内核提供的多路分离函数select基础�
 
 **非阻塞IO中是通过用户线程去不断询问，而多路复用IO是单独的内核线程去轮询。**
 
-<img src="img/IO多路复用.png" alt="640 (2)" style="zoom:67%;" />
+<img src="assets/IO多路复用.png" alt="640 (2)" style="zoom:67%;" />
 
 实现方式有select、poll、epoll
 
@@ -271,7 +278,7 @@ asynchronous
 
 IO 操作的两个阶段都不会阻塞用户线程，这两个阶段都是由内核自动完成，然后发送一个信号告知用户线程操作已完成。
 
-<img src="img/异步.png" alt="640 (3)" style="zoom:67%;" />
+<img src="assets/异步.png" alt="640 (3)" style="zoom:67%;" />
 
 > **用户线程中不需要再次调用 IO 函数进行具体的读写**。这点是和信号驱动模型有所不同的。
 >
@@ -391,7 +398,7 @@ epoll 的描述符事件有两种触发模式：LT（level trigger）和 ET（ed
 
 	epoll通过内核和用户空间共享一块内存来实现的。mmap
 
-<img src="img/select-poll-epoll对比.png" alt="image-20210322173910834" style="zoom:80%;" />
+<img src="assets/select-poll-epoll对比.png" alt="image-20210322173910834" style="zoom:80%;" />
 
 ### 应用场景
 

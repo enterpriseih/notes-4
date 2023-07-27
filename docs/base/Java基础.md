@@ -1280,6 +1280,28 @@ synchronized则是JVM直接支持的，JVM能够在运行时作出相应的优�
 - K V (key value) 分别代表java键值中的Key Value
 - E (element) 代表Element
 
+### 使用
+
+>   定义泛型方法时，必须在返回值前边加一个\<T\>，来声明这是一个泛型方法，持有一个泛型T，然后才可以用泛型T作为方法的返回值。
+
+范型方法
+
+```java
+public <T> T getObject(T t) {}
+```
+
+
+
+范型类
+
+```java
+public class Test<T> {}
+```
+
+
+
+
+
 ## 二、范型擦除
 
 ### 概念

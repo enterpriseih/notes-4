@@ -1,6 +1,6 @@
-# notes by YiENx
+# YiENx's NOTES
 
-### [JDNotes](./docs/JD/JDNotes目录)
+### :speak_no_evil: [JDNotes](./docs/JD/JDNotes目录)
 
 ### :coffee: Java基础
 
@@ -23,7 +23,6 @@
 ### J.U.C
 
 - [多线程并发](./docs/thread/多线程并发.md)
-- [进程间通信方式](./docs/thread/进程间通信方式.md)
 - [Java内存模型(JMM)](./docs/thread/Java内存模型.md)
 - [多线程中的锁](./docs/thread/多线程中的锁.md)
 - [ThreadLocal](./docs/thread/ThreadLocal本地线程变量.md)
@@ -51,6 +50,7 @@
 ### :globe_with_meridians:计算机基础
 
 - [计算机网络](./docs/computer/计算机网络.md)
+- [操作系统-进程](./docs/computer/进程.md)
 - [TCP的拆包与粘包](./docs/computer/TCP的拆包与粘包.md)
 - [攻击技术](./docs/computer/攻击技术.md)
 - [Web](./docs/computer/Web.md)

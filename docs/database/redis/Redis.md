@@ -16,6 +16,8 @@ MongoDB：document 数据库
 
 
 
+# 使用
+
 查看默认安装目录: /usr/local/bin
 
 redis-benchmark:性能测试工具，可以在自己本子运行，看看自己本子性能如何 
@@ -30,7 +32,7 @@ redis-server:Redis 服务器启动命令
 
 redis-cli:客户端，操作入口
 
-```
+```shell
 复制解压文件里的redis.conf到其他目录
 修改复制的文件中的后台启动设置 daemonize no 改成 yes
 后台启动启动
@@ -105,7 +107,7 @@ https://mp.weixin.qq.com/s/FZu3acwK6zrCBZQ_3HoUgw
 
 Redis 客户端与 Redis 服务器之间使用 TCP 协议进行连接，一个客户端可以通过一个 socket 连接发起多个请求命令。每个请求命令发出后 client 通常会阻塞并等待 redis 服务器处理，redis 处理完请求命令后会将结果通过响应报文返回给 client，因此当执行多条命令的时候都需要等待上一条命令执行完毕才能执行。
 
-![在这里插入图片描述](img/pipline.png)
+<img src="img/pipline.png" alt="在这里插入图片描述" />
 
 ```shell
 > get keya
@@ -304,6 +306,8 @@ ttl key
 ```
 
 ### 数据结构
+
+>   补充：*redis* 里存的都是二进制数据，其实就是*字节数组*（byte[]），这些字节数据是没有数据类型的，只有把它们按照合理的格式解码后，可以变成一个字符串。但可以理解为存入时是个字符串，redis 底层将其转换成 byte[]。所以 redis 可以存储二进制数据。
 
 Redis是key-value数据库，key的类型只能是String，但是value的数据类型就比较丰富了，主要包括五种：
 
