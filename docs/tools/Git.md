@@ -76,39 +76,47 @@ git clone https://github.com/gafish/gafish.github.com.git
 
 ### git config
 
-> 配置开发者用户名和邮箱
->
-
-```
-git config user.name gafish
-git config user.email gafish@qqqq.com
-```
+配置开发者用户名和邮箱
 
 每次代码提交的时候都会生成一条提交记录，其中会包含当前配置的用户名和邮箱。
 
-```
-git config --global init.defaultBranch <defaultBranch>
-#例
-git config --global init.defaultBranch main
+```shell
+# 全局配置
+git config --global user.name "name"
+git config --global user.email "email"
+
+# 局部项目配置，在项目根目录下进行单独配置，会优先使用局部配置
+git config user.name "name"
+git config user.email "email"
+git config --list
 ```
 
 修改默认创建的分支名
 
-```
-git init -b <branch-name> .
+```shell
+# 全局配置
+git config --global init.defaultBranch <defaultBranch>
 #例
-git init -b main .
+git config --global init.defaultBranch master
 ```
 
 或创建的时候指定
+
+```shell
+git init -b <branch-name> .
+#例
+git init -b master .
+```
+
+
 
 
 
 显示配置信息
 
-```
+```shell
 git config --global --list
-or
+# or
 cat ~/.gitconfig
 ```
 
@@ -277,11 +285,7 @@ To https://github.com/gafish/gafish.github.com.git
 git pull origin daily/0.0.1
 ```
 
-如果其它项目成员对项目做了改动并推送到服务器，我们需要将最新的改动更新到本地，这里我们来模拟一下这种情况。
 
-进入Github网站的项目首页，再进入 `daily/0.0.1` 分支，在线对 `README.md` 文件做一些修改并保存，然后在命令中执行以上命令，它将把刚才在线修改的部分拉取到本地，用编辑器打开 `README.md` ，你会发现文件已经跟线上的内容同步了。
-
-*如果线上代码做了变动，而你本地的代码也有变动，拉取的代码就有可能会跟你本地的改动冲突，一般情况下 `Git` 会自动处理这种冲突合并，但如果改动的是同一行，那就需要手动来合并代码，编辑文件，保存最新的改动，再通过 `git add .`和 `git commit -m 'xxx'` 来提交合并。*
 
 ### git log
 

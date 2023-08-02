@@ -42,7 +42,7 @@ Zookeeper = 文件系统 + 通知机制
 
 ### 3、角色
 
-![zk集群角色](images/zk集群.jpg)
+<img src="images/zk集群.jpg" alt="zk集群角色" />
 
 > ZooKeeper 集群中的所有机器通过一个 **Leader 选举过程** 来选定一台称为 “**Leader**” 的机器。集群由一个Leader和多个Follower、Observer组成。
 

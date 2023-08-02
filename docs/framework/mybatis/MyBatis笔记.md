@@ -313,7 +313,67 @@ properties、settings、typeAliases、typeHandlers、objectFactory、objectWrapp
 </configuration>
 ```
 - <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122328209.png" style="zoom:90%;" />
-# 四、默认的类型别名
+# 四、类型
+
+## 1、jdbcType与javaType的对应关系
+
+```sql
+ 1 JDBC Type           Java Type  
+ 2 CHAR                String  
+ 3 VARCHAR             String  
+ 4 LONGVARCHAR         String  
+ 5 NUMERIC             java.math.BigDecimal  
+ 6 DECIMAL             java.math.BigDecimal  
+ 7 BIT                 boolean  
+ 8 BOOLEAN             boolean  
+ 9 TINYINT             byte  
+10 SMALLINT            short  
+11 INTEGER             int  
+12 BIGINT              long  
+13 REAL                float  
+14 FLOAT               double  
+15 DOUBLE              double  
+16 BINARY              byte[]  
+17 VARBINARY           byte[]  
+18 LONGVARBINARY       byte[]  
+19 DATE                java.sql.Date  
+20 TIME                java.sql.Time  
+21 TIMESTAMP           java.sql.Timestamp  
+22 CLOB                Clob  
+23 BLOB                Blob  
+24 ARRAY               Array  
+25 DISTINCT            mapping of underlying type  
+26 STRUCT              Struct  
+27 REF                 Ref  
+28 DATALINK            java.net.URL[color=red][/color]  
+```
+
+在Mybatis明文建议在映射字段数据时建议将JdbcType属性加上，这样相对来说是比较安全的。
+
+```sql
+<insert id="saveRole">
+    insert into role values (
+        #{roleId},
+        #{name},
+        #{remarks},
+        #{orderNo},
+        #{createBy,jdbcType=VARCHAR},
+        #{createDept,jdbcType=VARCHAR},
+        #{createTime,jdbcType=DATE},
+        #{updateBy,jdbcType=VARCHAR},
+        #{updateTime,jdbcType=DATE}
+    )
+</insert>
+```
+
+通常会使用一个默认设置，虽然默认配置一般情况下不会出错，但是遇到个别情况还是会有问题的。Mybatis经常出现的：无效的列类型: 1111 错误，就是因为没有设置JdbcType造成的。
+
+
+
+
+
+## 2、类型别名
+
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122329506.png" style="zoom:67%;" />
 <img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204122329387.png" style="zoom:67%;" />
 

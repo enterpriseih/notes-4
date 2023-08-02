@@ -1,6 +1,6 @@
 # Vue的目录结构
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202204282214173.png" alt="image-20220428221413687" style="zoom: 50%;" />
+<img src="./assets/202204282214173.png" alt="image-20220428221413687" style="zoom: 50%;" />
 
 ```
 src
@@ -40,6 +40,36 @@ src
     </script>
 </body>
 ```
+
+
+
+# 启动vue项目
+
+1、安装 node.js 环境，会自带 npm
+
+```shell 
+node -v # 检查环境
+```
+
+配置 npm 路径
+
+```shell
+npm -g bin # 查看npm全局包可执行文件路径
+```
+
+在zshrc配置文件中配置
+
+
+
+2、搭建 vue 开发环境，安装 vue 的命令行工具 (`vue-cli`)
+
+```shell
+npm install --global vue-cli
+```
+
+
+
+
 
 
 

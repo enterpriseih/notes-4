@@ -30,7 +30,7 @@ DCL：Data Control Language数据控制语言
 
 [执行过程](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247485097&idx=1&sn=84c89da477b1338bdf3e9fcd65514ac1&chksm=cea24962f9d5c074d8d3ff1ab04ee8f0d6486e3d015cfd783503685986485c11738ccb542ba7&token=79317275&lang=zh_CN%23rd)
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202209200856149.png" alt="MySQL逻辑架构示意图" style="zoom: 25%;" />
+<img src="./assets/202209200856149.png" alt="MySQL逻辑架构示意图" style="zoom: 25%;" />
 
 SQL 执行过程分为两类
 
@@ -308,7 +308,7 @@ MVCC (Multiversion Concurrency Control) 是通过**数据行的多个版本管�
 - `trx_id`：每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的**事务id**赋值给 **trx_id** 隐藏列。
 - `roll_pointer`：每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到 **undo log** 中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207080948469.png" alt="iShot_2022-07-08_09.48.09" style="zoom:50%;" />
+<img src="./assets/202207080948469.png" alt="iShot_2022-07-08_09.48.09" style="zoom:50%;" />
 
 **MVCC 只在 READ COMMITTED 和 REPEATABLE READ 两个隔离级别下⼯作。**其他两个隔离级别和MVCC不兼容, 因为 READ UNCOMMITTED 总是读取最新的数据⾏, ⽽不是符合当前事务版本的数据⾏。⽽ SERIALIZABLE 则会对所有读取的⾏都加锁。 
 
@@ -376,7 +376,7 @@ ReadView的存在本身就保证了**事务不可以读取到未提交的事务�
 
 ## 幻读出现的特例
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202209221448635.png" alt="图片" style="zoom:67%;" />
+<img src="./assets/202209221448635.png" alt="图片" style="zoom:67%;" />
 
 在可重复读隔离级别下，事务 A 第一次执行普通的 select 语句时生成了一个 ReadView，之后事务 B 向表中新插入了一条 id = 5 的记录并提交。接着，事务 A 对 id = 5 这条记录进行了**更新操作**，在这个时刻，这条新记录的 trx_id 隐藏列的值就变成了事务 A 的事务 id，之后事务 A  再使用普通 select 语句去查询这条记录时就可以看到这条记录了，于是就发生了幻读。
 
@@ -621,7 +621,7 @@ insert into t values(null, 1, 1); (自增id,唯一键c,普通字段d)
 
 #### 核心思想
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205062237939.png" alt="image-20220506223726597" style="zoom:50%;" />
+<img src="./assets/202205062237939.png" alt="image-20220506223726597" style="zoom:50%;" />
 
 一共64位，**long 型**
 
@@ -635,7 +635,7 @@ insert into t values(null, 1, 1); (自增id,唯一键c,普通字段d)
 
 ### 2、UUID - 36位
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205062238676.png" alt="image-20220506223832810" style="zoom:50%;" />
+<img src="./assets/202205062238676.png" alt="image-20220506223832810" style="zoom:50%;" />
 
 UUID = 时间+UUID版本(16字节)- 时钟序列(4字节) - MAC地址(12字节)
 
@@ -707,13 +707,13 @@ UUID = 时间+UUID版本(16字节)- 时钟序列(4字节) - MAC地址(12字节)
 
 记录的格式
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203271340960.png" width=300px />
+<img src="./assets/202203271340960.png" width=300px />
 
 
 
 每页的格式
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203271340027.png" alt="image-20220327134057424" width=400px />
+<img src="./assets/202203271340027.png" alt="image-20220327134057424" width=400px />
 
 
 
@@ -723,7 +723,7 @@ UUID = 时间+UUID版本(16字节)- 时钟序列(4字节) - MAC地址(12字节)
 
 橙色：key
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203271345391.png" alt="image-20220327131631604" />
+<img src="./assets/202203271345391.png" alt="image-20220327131631604" />
 
 <br>
 
@@ -753,7 +753,7 @@ UUID = 时间+UUID版本(16字节)- 时钟序列(4字节) - MAC地址(12字节)
 
 以c2为索引，即以c2列的大小作为排序规则：
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203271358007.png" alt="image-20220327135830613" style="zoom:67%;" />
+<img src="./assets/202203271358007.png" alt="image-20220327135830613" style="zoom:67%;" />
 
 > 真实中二级索引的目录项中也会保存主键值，避免目录项值相同的情况
 
@@ -810,7 +810,7 @@ c2和c3联合组成索引，也是非聚簇索引
 
 可以理解为MyISAM中都是非聚簇索引，没有聚簇索引，需要回表
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203271420200.png" alt="image-20220327141929946" />
+<img src="./assets/202203271420200.png" alt="image-20220327141929946" />
 
 <br>
 
@@ -830,7 +830,7 @@ Memory支持（默认），InnoDB和MyISAM不支持
 
 但是InnoDB支持**自适应的哈希索引**：一个数据多次被访问时，会将地址存放到Hash表中
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203271434665.png" alt="image-20220327143408742" style="zoom:33%;" />
+<img src="./assets/202203271434665.png" alt="image-20220327143408742" style="zoom:33%;" />
 
 <br>
 
@@ -844,7 +844,7 @@ B-Tree（B：Balance，多路平衡查找树）
 
 B+Tree
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203271345391.png" alt="image-20220327131631604" />
+<img src="./assets/202203271345391-20230728211305040.png" alt="image-20220327131631604" />
 
 
 
@@ -852,7 +852,7 @@ B+Tree
 
 - 所有节点都存放数据
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202203271448896.png" alt="image-20220327144822430"  />
+<img src="./assets/202203271448896.png" alt="image-20220327144822430"  />
 
 <br>
 
@@ -880,7 +880,7 @@ https://blog.csdn.net/qq_48219653/article/details/121946067
 
 用c1,c2,c3创建索引，数据结构如下
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202210171759148.jpeg" alt="36030b5f72eb4303ad0d2cb590125576" style="zoom:67%;" />
+<img src="./assets/202210171759148.jpeg" alt="36030b5f72eb4303ad0d2cb590125576" style="zoom:67%;" />
 
 ## 思考题
 
@@ -1076,7 +1076,7 @@ https://blog.csdn.net/qq_48219653/article/details/121946067
 
 # 锁
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205112056261.png" alt="image-20220511205635387" style="zoom: 50%;" />
+<img src="./assets/202205112056261.png" alt="image-20220511205635387" style="zoom: 50%;" />
 
 ## 从类型划分：读锁S、写锁X
 
@@ -1204,7 +1204,7 @@ InnoDB与MyISAM的最大不同有两点：一是支持事务；二是采用了�
 
 但是在使用加锁方案解决时有个大问题，就是事务在第一次执行读取操作时，那些幻影记录尚不存在，我们无法给这些`幻影记录`加上`记录锁`。InnoDB提出了一种称之为`Gap Locks`的锁，官方的类型名称为：`LOCK_GAP`，我们可以简称为`gap锁`。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205112105930.png" alt="image-20220511210540436" style="zoom:50%;" />
+<img src="./assets/202205112105930.png" alt="image-20220511210540436" style="zoom:50%;" />
 
 图中id值为8的记录加了gap锁，意味着 不允许别的事务在id值为8的记录前边的间隙插入新记录 ，其实就是 id列的值(3, 8)这个区间的新记录是不允许立即插入的。
 
@@ -1277,7 +1277,7 @@ https://blog.csdn.net/qq_24691007/article/details/122932768
 
 ## 锁结构
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202205112125785.png" alt="image-20220405151409557" style="zoom:80%;" />
+<img src="./assets/202205112125785.png" alt="image-20220405151409557" style="zoom:80%;" />
 
 
 
@@ -1410,9 +1410,11 @@ hash算法的优缺点和范围路由的优缺点正好相反。
 >
 > Note：redo log 是引擎层面的，只有 Innodb 才有，用于崩溃恢复
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207091059187.png" alt="image-20220709105755994" style="zoom:50%;" />
+<img src="./assets/202207091059187.png" alt="image-20220709105755994" style="zoom:50%;" />
 
 **二进制日志转储线程** (Binlog dump thread)是一个主库线程。当从库线程连接的时候， 主库可以将二进制日志发送给从库，当主库读取事件(Event)的时候，会在 Binlog 上**加锁**，读取完成之后，再将锁释放掉。
+
+>   MySQL Dump协议是一种方便用户备份和恢复数据的协议。它允许开发人员通过命令行将数据库的内容导出到文本文件中，并且可以将导出的文件回送到数据库中以进行恢复。
 
 **从库 I/O 线程**会连接到主库，向主库发送请求更新Binlog。这时从库的I/O线程就可以读取到主库的二进制日志转储线程发送的 Binlog 更新部分，并且拷贝到本地的**中继日志** (Relay log)。
 
@@ -1420,8 +1422,8 @@ hash算法的优缺点和范围路由的优缺点正好相反。
 
 ### 1、步骤
 
-- Master 将写操作记录到 binlog
-- Slave 将 Master 的 binary log events 拷贝到 relay log
+- Master 将写操作记录到 binlog。
+- Slave 将 Master 的 binary log events 拷贝到中继日志(relay log)。
 - Slave 重做 relay log 中的 events，将改变应用到自己的数据库中。 
 
 > MySQL复制是异步的且串行化的，而且重启后从**接入点**开始复制。
@@ -1442,7 +1444,7 @@ mysql默认是异步的复制方式，主库把日志发给从库后不关心从
 
 等待的从库数有参数可以调节。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207091605956.png" alt="iShot_2022-07-09_16.04.06" style="zoom:70%;" />
+<img src="./assets/202207091605956.png" alt="iShot_2022-07-09_16.04.06" style="zoom:70%;" />
 
 ### 3、组复制
 
@@ -1450,7 +1452,7 @@ mysql默认是异步的复制方式，主库把日志发给从库后不关心从
 
 将多个节点共同组成一个**复制组**，在**执行读写(RW)事务**的时候，需要通过一致性协议层 (Consensus 层)的同意，也就是读写事务想要进行提交，必须要经过**组里“大多数人”(对应 Node 节点)的同意**，大多数指的是同意的节点数量需要**大于 (N/2+1)**，这样才可以进行提交，而不是原发起方一个说了算。而针对**只读(RO)事务**则不需要经过组内同意，直接 COMMIT 即可。
 
-<img src="https://cdn.jsdelivr.net/gh/YiENx1205/cloudimgs/notes/202207091623978.png" alt="iShot_2022-07-09_16.22.53" style="zoom:50%;" />
+<img src="./assets/202207091623978.png" alt="iShot_2022-07-09_16.22.53" style="zoom:50%;" />
 
 
 
