@@ -19,17 +19,23 @@
 
 <jmq:producer id="producer" retryTimes="2" transport="jmq.transport"/>
 
+<bean id="jmq2SpringProducerExample" class="com.jd.jmq.client.examples.jmq2.producer.Jmq2SpringProducerExample">
+    <property name="topic" value="${jmq.topic}"/>
+    <property name="producer" ref="producer"/>
+</bean>
+
 <!-- 同一消费者可以同时绑定多个 JmqListener，
 以实现不同的 topic 使用不同的 messageListener -->
 <!--    配置Consumer，
 messageListener bean需要实现com.jd.jmq.client.consumer.MessageListener接口，
 在onMessage方法中接收消息。-->
-<jmq:consumer id="consumer" transport="jmq.transport" autoStart="true">
-    <!-- mq1 -->
-    <jmq:listener topic="topic1" listener="topic1Listener"/>
-    <!-- mq2 -->
-    <jmq:listener topic="topic2" listener="topic2Listener"/>
+<jmq:consumer id="consumer" transport="jmq.transport">
+    <jmq:listener topic="${jmq.topic}" listener="messageListener"/>
 </jmq:consumer>
+<bean id="messageListener" 
+      class="com.jd.jmq.client.examples.jmq2.consumer.Jmq2SpringConsumerExample" 
+      init-method="init"/>
+
 
 ```
 

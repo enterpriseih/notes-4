@@ -17,6 +17,20 @@ JD的配置中心
 </dependency>
 ```
 
+在properties中配置laf的url等内容
+
+```properties
+laf.config.manager.application=regular-purchase
+laf.config.manager.parameters[0].name=autoListener
+laf.config.manager.parameters[0].value=true
+laf.config.manager.resources[0].name=regular_config
+laf.config.manager.resources[0].uri
+=ucc://regular-purchase:c483843d6e5b42e79704ebce598ace5f@ducc.jd.local/v1/namespace/regular_purchase/config/regular_config/profiles/production
+
+```
+
+
+
 创建配置类实例，以 jdbc 为例
 
 ```java

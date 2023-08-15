@@ -1352,6 +1352,20 @@ public class NumberHandler {
 
 
 
+因为范型擦除的原因，可以实现下面的效果
+
+```java
+List<Integer> list = new ArrayList<>();
+list.add(99);
+list.getClass().getMethod("add", Object.class).invoke(list, "reflect");
+System.out.println(list);
+// [99, reflect]
+```
+
+
+
+
+
 ### 弊端
 
 1、**泛型不支持基本数据类型**，只支持引用类型，因为泛型最终会被擦除成Object，其不能存储基本数据类型。

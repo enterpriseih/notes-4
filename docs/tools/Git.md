@@ -74,6 +74,24 @@ git clone https://github.com/gafish/gafish.github.com.git
 
 代码下载完成后在当前文件夹中会有一个 `gafish.github.com` 的目录，通过 `cd gafish.github.com` 命令进入目录。
 
+「github设置ssh key后push还要输入用户名和密码解决方案」
+
+因为用的是`https`而不是`ssh`，更新`origin`为`ssh`格式
+`HTTPS`的格式为：`https://github.com/用户名/仓库名.git`
+`SSH`的格式为：`git@github.com:用户名/仓库名.git`
+
+```
+git remote remove origin
+git remote add origin git@github.com:用户名/仓库名.git
+12
+```
+
+再`push`的时候实际上是采用的`SSH`方式推送的代码。（打开`config`文件可以看到`[remote "origin"]`的`url`为`ssh`格式）。
+
+---
+
+
+
 ### git config
 
 配置开发者用户名和邮箱
@@ -146,8 +164,10 @@ git branch -m daily/0.0.0 daily/0.0.1
 
 > 查看当前项目分支列表
 
-```
+```shell
 # 本地
+git branch
+# 远程
 git branch
 # 远程和本地
 git branch -a
@@ -161,16 +181,10 @@ git branch -d daily/0.0.1
 
 如果分支已经完成使命则可以通过 `-d` 参数将分支删除
 
-> 将分支dev推到远程
-
-```
-git push origin dev:dev
-```
-
 > 删除远程分支
 
-```
-git push origin --delete dev
+```shell
+git push origin -d remote_branch_name
 ```
 
 
@@ -569,13 +583,25 @@ git branch -a
 git branch -r
 ```
 
-查看远程版本库上的分支列表，加上 `-d` 参数可以删除远程版本库上的分支
+查看远程版本库上的分支列表
+
+```shell
+git push origin -d remote_branch_name
+```
+
+删除远程分支
 
 ```
-git branch -D
+git branch -D local_branch_name
 ```
 
-分支未提交到本地版本库前强制删除分支
+分支未提交到本地版本库前强制删除分支，忽略未add等
+
+```shell
+git branch -d local_branch_name
+```
+
+本地分支删除，会提示未add的错误
 
 ```
 git branch -vv

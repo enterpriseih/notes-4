@@ -1068,7 +1068,7 @@ https://blog.csdn.net/qq_48219653/article/details/121946067
 
 8. is null可以使用索引，is not null无法使用索引
 
-9. 范围条件右边的列索引失效
+9. `范围条件右边的列索引失效`：mysql会一直向右匹配直到遇到范围查询（>、<、between、like）就停止匹配，比如 a=1 and b=2 and c>3 and d=4 ，如果建立了（a,b,c,d)顺序的索引，d是用不到索引的。
 
 10. 数据库和表的字符集统一使用utf8mb4
 
